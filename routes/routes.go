@@ -19,6 +19,7 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/category", a.InsertCategory)
 
 	router.Post("/v1/order", a.CreateOrder)
-	router.Patch("/v1/order/:id", a.PaidOrderByID)
+	router.Patch("/v1/order/pay/:id", a.PaidOrderByID)
+	router.Patch("/v1/order/cancelPay/:id", a.CancelPayOrderByID)
 	router.Use(b.VerifyToken)
 }
