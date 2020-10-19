@@ -21,5 +21,9 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/order", a.CreateOrder)
 	router.Patch("/v1/order/pay/:id", a.PaidOrderByID)
 	router.Patch("/v1/order/cancelPay/:id", a.CancelPayOrderByID)
+	router.Patch("/v1/order/:id/rate/:rate", a.RateOrder)
+
+	router.Post("/v1/favorite", a.CreateFavorite)
+	router.Get("/v1/favorite/:id", a.GetFavoriteByUser)
 	router.Use(b.VerifyToken)
 }

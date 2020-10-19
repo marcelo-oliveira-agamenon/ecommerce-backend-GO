@@ -52,10 +52,8 @@ func PaidOrderByID(w *fiber.Ctx)  {
 
 //CancelPayOrderByID its in the name fucker
 func CancelPayOrderByID(w *fiber.Ctx)  {
-	id := w.Params("id")
-	
 	var order e.Order
-	order.ID = id
+	order.ID = w.Params("id")
 	result := db.DBConn.Model(&order).Update("paid", false)
 	if result.Error != nil {
 		w.Status(500).JSON("Server error")
@@ -66,4 +64,19 @@ func CancelPayOrderByID(w *fiber.Ctx)  {
 		"order": order,
 		"message": "Order payment cancelled",
 	})
+}
+
+//RateOrder put rate service
+func RateOrder(w *fiber.Ctx)  {
+	var order e.Order
+	order.ID = w.Params("id")
+	order.Rate, _ = strconv.Atoi(w.Params("rate"))
+
+	result := db.DBConn.Model(&order).Update("rate", order.Rate)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	w.Status(200).JSON("Order rated")
 }
