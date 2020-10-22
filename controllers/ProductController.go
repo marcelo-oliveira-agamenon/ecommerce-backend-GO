@@ -49,10 +49,55 @@ func InsertProduct(w *fiber.Ctx) {
 	w.Status(201).JSON(aux)
 }
 
-//GetAllProducts to database
+//GetAllProducts from database
 func GetAllProducts(w *fiber.Ctx) {
 	var products []u.Product
 	result := db.DBConn.Find(&products)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	w.Status(200).JSON(products)
+}
+
+//GetAllProductsByCategory from database
+func GetAllProductsByCategory(w *fiber.Ctx)  {
+	categoryID := w.Params("id")
+
+	var products []u.Product
+	result := db.DBConn.Where("categoryid", categoryID).Find(&products)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	w.Status(200).JSON(products)
+}
+
+//GetProductPromotion from database
+func GetProductPromotion(w *fiber.Ctx)  {
+	var products []u.Product
+	result := db.DBConn.Where("has_promotion", true).Find(&products)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	w.Status(200).JSON(products)
+}
+
+//GetRecentProducts from database
+func GetRecentProducts(w *fiber.Ctx)  {
+	
+}
+
+//GetProductByName from database
+func GetProductByName(w *fiber.Ctx)  {
+	strv := w.Params("string")
+
+	var products []u.Product
+	result := db.DBConn.Where("name like ?", "%" + strv + "%").Find(&products)
 	if result.Error != nil {
 		w.Status(500).JSON("Server error")
 		return

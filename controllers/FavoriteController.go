@@ -42,3 +42,17 @@ func GetFavoriteByUser(w * fiber.Ctx)  {
 
 	w.Status(200).JSON(fav)
 }
+
+//RemoveFromFavorite params id favorite
+func RemoveFromFavorite(w *fiber.Ctx)  {
+	id := w.Params("id")
+
+	var fav u.Favorites
+	result := db.DBConn.Where("id", id).Delete(&fav)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	w.Status(200).JSON("Sucess removing from favorite")
+}
