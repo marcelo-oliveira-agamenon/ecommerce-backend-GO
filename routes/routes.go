@@ -12,6 +12,7 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/login", a.Login)
 	router.Post("/v1/signUp", a.SignUpUser)
 	
+	router.Use(b.VerifyToken)
 	router.Get("/v1/product", a.GetAllProducts)
 	router.Post("/v1/product", a.InsertProduct)
 	router.Get("/v1/product/category/:id", a.GetAllProductsByCategory)
@@ -30,5 +31,4 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/favorite", a.CreateFavorite)
 	router.Get("/v1/favorite/:id", a.GetFavoriteByUser)
 	router.Delete("/v1/favorite/:id", a.RemoveFromFavorite)
-	router.Use(b.VerifyToken)
 }

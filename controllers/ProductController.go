@@ -89,7 +89,15 @@ func GetProductPromotion(w *fiber.Ctx)  {
 
 //GetRecentProducts from database
 func GetRecentProducts(w *fiber.Ctx)  {
-	
+	var products []u.Product
+
+	result := db.DBConn.Order("created_at desc").Find(&products)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	w.Status(200).JSON(products)
 }
 
 //GetProductByName from database
