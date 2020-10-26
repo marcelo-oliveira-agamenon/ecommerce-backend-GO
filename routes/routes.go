@@ -11,6 +11,7 @@ import (
 func Routes(router *fiber.App) {
 	router.Post("/v1/login", a.Login)
 	router.Post("/v1/signUp", a.SignUpUser)
+	router.Patch("/v1/resetPassword", a.ResetPassword)
 	
 	router.Use(b.VerifyToken)
 	router.Get("/v1/product", a.GetAllProducts)
@@ -23,10 +24,11 @@ func Routes(router *fiber.App) {
 	router.Get("/v1/category", a.SelectCategoryAll)
 	router.Post("/v1/category", a.InsertCategory)
 
+	router.Get("/v1/order/user/:id", a.GetByUser)
 	router.Post("/v1/order", a.CreateOrder)
-	router.Patch("/v1/order/pay/:id", a.PaidOrderByID)
-	router.Patch("/v1/order/cancelPay/:id", a.CancelPayOrderByID)
+	router.Patch("/v1/order/payment/:id/:bool", a.PaymentChangeOrderByID)
 	router.Patch("/v1/order/:id/rate/:rate", a.RateOrder)
+	router.Patch("/v1/order/:id/status/:status", a.ChangeStatusOrder)
 
 	router.Post("/v1/favorite", a.CreateFavorite)
 	router.Get("/v1/favorite/:id", a.GetFavoriteByUser)

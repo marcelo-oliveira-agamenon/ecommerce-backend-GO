@@ -77,7 +77,7 @@ func SignUpUser(w *fiber.Ctx)  {
 
 	result := db.DBConn.Create(&aux)
 	if result.Error != nil {
-		w.Status(403).JSON("Error creating user")
+		w.Status(500).JSON("Error creating user")
 		return
 	}
 
@@ -88,14 +88,14 @@ func SignUpUser(w *fiber.Ctx)  {
 func Login(w *fiber.Ctx) {
 	login := new(login)
 	if err := w.BodyParser(login); err != nil {
-		w.Status(403).JSON("Missing fields")
+		w.Status(500).JSON("Missing fields")
 		return
 	}
 
 	var user u.User
 	db.DBConn.Where("email = ?", login.Email).Find(&user)
 	if user.Phone == 0 {
-		w.Status(403).JSON("No user with this email")
+		w.Status(500).JSON("No user with this email")
 		return
 	}
 
@@ -103,7 +103,7 @@ func Login(w *fiber.Ctx) {
 	bodyPass := []byte(login.Password)
 	errorHash := bcrypt.CompareHashAndPassword(hashPass, bodyPass)
 	if errorHash != nil {
-		w.Status(403).JSON("Wrong password")
+		w.Status(500).JSON("Wrong password")
 		return
 	}
 
@@ -126,4 +126,29 @@ func Login(w *fiber.Ctx) {
 		"user": user,
 		"token": token,
 	})
+}
+
+//ResetPassword change password
+func ResetPassword(w *fiber.Ctx)  {
+	email := w.FormValue("email")
+	password := w.FormValue("password")
+	repeatPassword := w.FormValue("reset")
+	if password != repeatPassword {
+		w.Status(500).JSON("Passwords don't match")
+		return
+	}
+
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		w.Status(500).JSON("bcrypt error")
+		return
+	}
+
+	result := db.DBConn.Model(&u.User{}).Where("email = ?", email).Update("password", hashPassword)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	w.Status(200).JSON("Password changed")
 }

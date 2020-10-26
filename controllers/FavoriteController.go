@@ -11,7 +11,7 @@ import (
 //CreateFavorite product for a user
 func CreateFavorite(w *fiber.Ctx)  {
 	if w.FormValue("userid") == "" || w.FormValue("productid") == "" {
-		w.Status(403).JSON("Missing fields")
+		w.Status(500).JSON("Missing fields")
 		return
 	}
 

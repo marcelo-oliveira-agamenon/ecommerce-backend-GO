@@ -12,6 +12,8 @@ type Order struct {
 	ID				string
 	UserID			uuid.UUID
 	ProductID			string
+	TotalValue			float64
+	Status			string
 	Qtd				int
 	Paid				bool
 	Rate				int

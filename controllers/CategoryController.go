@@ -20,7 +20,7 @@ func SelectCategoryAll(w *fiber.Ctx)  {
 //InsertCategory into database
 func InsertCategory(w *fiber.Ctx)  {
 	if w.FormValue("name") == "" {
-		w.Status(404).JSON("Missing field name")
+		w.Status(500).JSON("Missing field name")
 		return
 	}
 
