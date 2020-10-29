@@ -15,7 +15,7 @@ type User struct {
 	Email			string			
 	Address		string
 	Avatar		string			
-	Phone			int				`gorm:"type:numeric"`
+	Phone			string
 	Password		string			
 	FacebookID		string			
 	Birthday		string			

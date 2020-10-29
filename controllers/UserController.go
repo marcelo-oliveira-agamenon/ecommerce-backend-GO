@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -37,11 +36,7 @@ func SignUpUser(w *fiber.Ctx)  {
 	aux.Name = w.FormValue("name")
 	aux.Password = w.FormValue("password")
 	aux.Email = w.FormValue("email")
-	aux.Phone, err = strconv.Atoi(w.FormValue("phone"))
-	if err != nil {
-		w.Status(500).JSON("Error in parse form")
-		return
-	}
+	aux.Phone = w.FormValue("phone")
 	aux.Address = w.FormValue("address")
 	aux.FacebookID = w.FormValue("facebookID")
 	aux.Birthday = w.FormValue("birthday")
@@ -94,7 +89,7 @@ func Login(w *fiber.Ctx) {
 
 	var user u.User
 	db.DBConn.Where("email = ?", login.Email).Find(&user)
-	if user.Phone == 0 {
+	if user.Phone == "" {
 		w.Status(500).JSON("No user with this email")
 		return
 	}
