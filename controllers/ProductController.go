@@ -61,6 +61,20 @@ func GetAllProducts(w *fiber.Ctx) {
 	w.Status(200).JSON(products)
 }
 
+//GetProductByID from database
+func GetProductByID(w *fiber.Ctx) {
+	productID := w.Params("id")
+
+	var product u.Product
+	result := db.DBConn.Where("id", productID).Find(&product)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	w.Status(200).JSON(product)
+}
+
 //GetAllProductsByCategory from database
 func GetAllProductsByCategory(w *fiber.Ctx)  {
 	categoryID := w.Params("id")

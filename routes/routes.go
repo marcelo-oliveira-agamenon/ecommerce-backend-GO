@@ -16,6 +16,7 @@ func Routes(router *fiber.App) {
 	router.Use(b.VerifyToken)
 	router.Get("/v1/product", a.GetAllProducts)
 	router.Post("/v1/product", a.InsertProduct)
+	router.Get("/v1/product/:id", a.GetProductByID)
 	router.Get("/v1/product/category/:id", a.GetAllProductsByCategory)
 	router.Get("/v1/product/promotion", a.GetProductPromotion)
 	router.Get("/v1/product/recent", a.GetRecentProducts)
