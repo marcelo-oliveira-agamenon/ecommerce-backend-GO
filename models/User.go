@@ -7,6 +7,9 @@ import (
 	"gorm.io/gorm"
 )
 
+//JSONB type postgres
+type JSONB map[string]interface{}
+
 //User model struct
 type User struct {
 	gorm.Model
@@ -14,7 +17,7 @@ type User struct {
 	Name			string
 	Email			string			
 	Address		string
-	Avatar		string			
+	Avatar		JSONB				`gorm:"type:jsonb"`			
 	Phone			string
 	Password		string			
 	FacebookID		string			

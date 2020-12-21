@@ -4,14 +4,16 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
 //Order struct model
 type Order struct {
+	gorm.Model
 	ID				string
 	UserID			uuid.UUID
-	ProductID			string
+	ProductID			pq.StringArray `gorm:"type:varchar(64)[]"`
 	TotalValue			float64
 	Status			string
 	Qtd				int

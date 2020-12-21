@@ -15,10 +15,10 @@ type Product struct {
 	Categoryid			string
 	CategoryID			Category				`gorm:"foreignKey:Categoryid;references:ID"`
 	Value				float64
-	Photos			pq.StringArray			`gorm:"type:text[]"`
+	Photos			pq.StringArray			`gorm:"type:_jsonb"`
 	StockQtd			int
 	Description			string
-	Typeunit			string
+	TypeUnit			string
 	TecnicalDetails		string
 	HasPromotion		bool
 	Discount			float64

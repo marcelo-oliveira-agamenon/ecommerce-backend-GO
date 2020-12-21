@@ -34,7 +34,7 @@ func CreateOrder(w * fiber.Ctx)  {
 	}
 	order.ID = ksuid.New().String()
 	order.UserID = uuid.FromStringOrNil(w.FormValue("userID"))
-	order.ProductID = w.FormValue("productID")
+	//order.ProductID = w.FormValue("productID")
 	order.Qtd, _ = strconv.Atoi(w.FormValue("qtd"))
 	order.Paid = false
 	order.TotalValue, _ = strconv.ParseFloat(w.FormValue("totalValue"), 64)

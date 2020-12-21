@@ -60,14 +60,14 @@ func SignUpUser(w *fiber.Ctx)  {
 	if avatarFile != nil {
 		file, err := avatarFile.Open()
 		avatarResponse := q.SendImageToAWS(file, avatarFile.Filename, avatarFile.Size, "user")
-		if avatarResponse == "Error upload image to AWS" || err != nil {
-			w.Status(500).JSON(avatarResponse)
+		if avatarResponse ==  nil || err != nil {
+			w.Status(500).JSON("Error upload image")
 			return
 		}
 		defer file.Close()
 		aux.Avatar = avatarResponse
 	} else {
-		aux.Avatar = ""
+		aux.Avatar = u.JSONB{}
 	}
 
 	result := db.DBConn.Create(&aux)

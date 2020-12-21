@@ -29,5 +29,9 @@ func CreateConnection()  {
 	}
 	DBConn = db
 
-	db.AutoMigrate(&u.User{}, &u.Product{}, &u.Category{}, &u.Favorites{}, &u.Order{})
+	db.AutoMigrate(&u.Order{})
+	db.AutoMigrate(&u.User{})
+	db.AutoMigrate(&u.Product{})
+	db.AutoMigrate(&u.Category{})
+	db.AutoMigrate(&u.Favorites{})
 }

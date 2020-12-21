@@ -142,10 +142,10 @@ golang.org/x/text/width
 # golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
-# gorm.io/driver/postgres v1.0.2
+# gorm.io/driver/postgres v1.0.5
 ## explicit
 gorm.io/driver/postgres
-# gorm.io/gorm v1.20.2
+# gorm.io/gorm v1.20.5
 ## explicit
 gorm.io/gorm
 gorm.io/gorm/callbacks

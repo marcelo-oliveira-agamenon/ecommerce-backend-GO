@@ -19,7 +19,7 @@ func InsertProduct(w *fiber.Ctx) {
 	aux.Value, _ = strconv.ParseFloat(w.FormValue("value"), 64)
 	aux.StockQtd, _ = strconv.Atoi(w.FormValue("stockqtd"))
 	aux.Description = w.FormValue("description")
-	aux.Typeunit = w.FormValue("type")
+	aux.TypeUnit = w.FormValue("type")
 	aux.TecnicalDetails = w.FormValue("tecnicalDetails")
 	aux.HasPromotion, _ = strconv.ParseBool(w.FormValue("hasPromotion"))
 	aux.Discount, _ = strconv.ParseFloat(w.FormValue("discount"), 64)
@@ -30,8 +30,8 @@ func InsertProduct(w *fiber.Ctx) {
 	if photos != nil {
 		file, err := photos.Open()
 		photosResponse := q.SendImageToAWS(file, photos.Filename, photos.Size, "product")
-		if photosResponse == "Error upload image to AWS" || err != nil {
-			w.Status(500).JSON(photosResponse)
+		if photosResponse == nil || err != nil {
+			w.Status(500).JSON("Error upload image to AWS")
 			return
 		}
 		defer file.Close()
