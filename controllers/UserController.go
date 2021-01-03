@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -65,9 +66,15 @@ func SignUpUser(w *fiber.Ctx)  {
 			return
 		}
 		defer file.Close()
-		aux.Avatar = avatarResponse
+
+		bytes, err := json.Marshal(avatarResponse)
+		if err != nil {
+			w.Status(500).JSON("Serialize json photos error")
+		}
+
+		aux.Avatar = []string{string(bytes)}
 	} else {
-		aux.Avatar = u.JSONB{}
+		aux.Avatar = []string{}
 	}
 
 	result := db.DBConn.Create(&aux)
@@ -75,6 +82,8 @@ func SignUpUser(w *fiber.Ctx)  {
 		w.Status(500).JSON("Error creating user")
 		return
 	}
+
+	q.SendEmailUtility(aux.Email, "teste")
 
 	w.Status(201).JSON("User created")
 }
@@ -88,7 +97,12 @@ func Login(w *fiber.Ctx) {
 	}
 
 	var user u.User
-	db.DBConn.Where("email = ?", login.Email).Find(&user)
+	result := db.DBConn.Where("email = ?", login.Email).Find(&user)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
 	if user.Phone == "" {
 		w.Status(500).JSON("No user with this email")
 		return

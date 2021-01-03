@@ -2,18 +2,25 @@ package utility
 
 import (
 	"fmt"
-	"net/smtp"
+
+	"gopkg.in/gomail.v2"
 )
 
 //SendEmailUtility function
-func SendEmailUtility(toUser string) string {
-	from := "marblack16@gmail.com"
-	
-	err := smtp.SendMail("smtp.gmail.com:587" ,smtp.PlainAuth("", from, "minhasenha1", "smtp.gmail.com"), from, []string{toUser}, []byte("dasdasd"))
-	if err != nil {
-		fmt.Print(err)
-		return "erro"
-	}
+func SendEmailUtility(toUser string, body string) bool {
+	fromUser := GetDotEnv("EMAIL_PRO")
+	userPassword := GetDotEnv("EMAIL_PRO_PASSWORD")
 
-	return "sucesso"
+	mail := gomail.NewMessage()
+	mail.SetHeader("From", fromUser)
+	mail.SetHeader("To", toUser)
+	mail.SetBody("text/html", body)
+
+	send := gomail.NewDialer("smtp.gmail.com", 587, fromUser, userPassword)
+	if err := send.DialAndSend(mail); err != nil {
+		fmt.Print(err)
+		return false
+	  }
+
+	return true
 }

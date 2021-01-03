@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/ecommerce/db"
@@ -35,7 +36,13 @@ func InsertProduct(w *fiber.Ctx) {
 			return
 		}
 		defer file.Close()
-		aux.Photos = []string{photosResponse}
+
+		bytes, err := json.Marshal(photosResponse)
+		if err != nil {
+			w.Status(500).JSON("Serialize json photos error")
+		}
+
+		aux.Photos = []string{string(bytes)}
 	} else {
 		aux.Photos = []string{}
 	}
