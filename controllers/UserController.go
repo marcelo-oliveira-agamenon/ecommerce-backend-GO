@@ -2,6 +2,8 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -83,7 +85,12 @@ func SignUpUser(w *fiber.Ctx)  {
 		return
 	}
 
-	q.SendEmailUtility(aux.Email, "teste")
+	fileEmail, err := ioutil.ReadFile("template/welcome.html")
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	q.SendEmailUtility(aux.Email, string(fileEmail), "Welcome to Cash And Grab")
 
 	w.Status(201).JSON("User created")
 }
