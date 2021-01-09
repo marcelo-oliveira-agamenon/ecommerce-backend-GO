@@ -7,9 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-//JSONB type postgres
-type JSONB map[string]interface{}
-
 //User model struct
 type User struct {
 	gorm.Model
@@ -17,7 +14,8 @@ type User struct {
 	Name			string
 	Email			string			
 	Address		string
-	Avatar		JSONB				`gorm:"type:jsonb"`			
+	ImageKey		string
+	ImageURL		string			
 	Phone			string
 	Password		string			
 	FacebookID		string			
@@ -27,5 +25,5 @@ type User struct {
 	UpdatedAt		time.Time
 	DeletedAt		gorm.DeletedAt
 	Favorite		[]Favorites			`gorm:"foreignKey:UserID"`
-	Order			[]Order			`gorm:"foreignKey:UserID"`
+	Order			[]Order			`gorm:"foreignKey:Userid"`
 }

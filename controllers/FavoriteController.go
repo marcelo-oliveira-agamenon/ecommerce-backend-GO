@@ -22,7 +22,7 @@ func CreateFavorite(w *fiber.Ctx)  {
 
 	result := db.DBConn.Create(&fav)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error creating favorites")
 		return
 	}
 
@@ -36,7 +36,7 @@ func GetFavoriteByUser(w * fiber.Ctx)  {
 	var fav []u.Favorites
 	result := db.DBConn.Where("user_id", id).Find(&fav)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error set favorite")
 		return
 	}
 
@@ -50,7 +50,7 @@ func RemoveFromFavorite(w *fiber.Ctx)  {
 	var fav u.Favorites
 	result := db.DBConn.Where("id", id).Delete(&fav)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error removing favorite")
 		return
 	}
 

@@ -14,7 +14,6 @@ type Product struct {
 	Categoryid			string
 	CategoryID			Category				`gorm:"foreignKey:Categoryid;references:ID"`
 	Value				float64
-	Photos			JSONB					`gorm:"type:jsonb"`
 	StockQtd			int
 	Description			string
 	TypeUnit			string
@@ -27,5 +26,5 @@ type Product struct {
 	UpdatedAt			time.Time
 	DeletedAt			gorm.DeletedAt
 	Favorites			[]Favorites				`gorm:"foreignKey:ProductID"`
-	Order				[]Order				`gorm:"foreignKey:ProductID"`
+	ProductImage		[]ProductImage			`gorm:"foreignKey:Productid"`
 }

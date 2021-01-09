@@ -27,8 +27,8 @@ func InsertCategory(w *fiber.Ctx)  {
 
 	image, _ := w.FormFile("image")
 	file, err := image.Open()
-	imageResponse, key := q.SendImageToAWS(file, image.Filename, image.Size, "category")
-	if imageResponse ==  nil || err != nil {
+	key, url := q.SendImageToAWS(file, image.Filename, image.Size, "category")
+	if key == "" || err != nil {
 		w.Status(500).JSON("Error upload image")
 		return
 	}
@@ -36,7 +36,8 @@ func InsertCategory(w *fiber.Ctx)  {
 
 	var category e.Category
 	category.Name = w.FormValue("name")
-	category.Image = imageResponse
+	category.ImageKey = key
+	category.ImageURL = url
 	
 	result := db.DBConn.Create(&category)
 	if result.Error != nil {

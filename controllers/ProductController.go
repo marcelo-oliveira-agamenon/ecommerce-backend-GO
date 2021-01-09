@@ -26,27 +26,33 @@ func InsertProduct(w *fiber.Ctx) {
 	aux.HasShipping, _ = strconv.ParseBool(w.FormValue("hasShipping"))
 	aux.ShippingPrice, _ = strconv.ParseFloat(w.FormValue("shippingPrice"), 64)
 
-	var keyAux string
+	var prImage  u.ProductImage
 	photos, _ := w.FormFile("photos")
 	if photos != nil {
 		file, err := photos.Open()
-		photosResponse, key := q.SendImageToAWS(file, photos.Filename, photos.Size, "product")
-		if photosResponse == nil || err != nil {
+		key, url := q.SendImageToAWS(file, photos.Filename, photos.Size, "product")
+		if key == "" || err != nil {
 			w.Status(500).JSON("Error upload image to AWS")
 			return
 		}
 		defer file.Close()
 
-		aux.Photos = photosResponse
-		keyAux = key
-	} else {
-		aux.Photos = u.JSONB{}
+		prImage.ImageKey = key
+		prImage.ImageURL = url
 	}
 
 	result := db.DBConn.Create(&aux)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
-		q.DeleteImageInAWS(keyAux)
+		w.Status(500).JSON("Error creating product")
+		q.DeleteImageInAWS(prImage.ImageKey)
+		return
+	}
+
+	prImage.ID = ksuid.New().String()
+	prImage.Productid = aux.ID
+	resultImage := db.DBConn.Create(&prImage)
+	if resultImage.Error != nil {
+		w.Status(500).JSON("Error creating product image")
 		return
 	}
 
@@ -56,9 +62,9 @@ func InsertProduct(w *fiber.Ctx) {
 //GetAllProducts from database
 func GetAllProducts(w *fiber.Ctx) {
 	var products []u.Product
-	result := db.DBConn.Find(&products)
+	result := db.DBConn.Preload("ProductImage").Find(&products)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing products")
 		return
 	}
 
@@ -70,9 +76,9 @@ func GetProductByID(w *fiber.Ctx) {
 	productID := w.Params("id")
 
 	var product u.Product
-	result := db.DBConn.Where("id", productID).Find(&product)
+	result := db.DBConn.Preload("ProductImage").Where("id", productID).Find(&product)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing product")
 		return
 	}
 
@@ -84,9 +90,9 @@ func GetAllProductsByCategory(w *fiber.Ctx)  {
 	categoryID := w.Params("id")
 
 	var products []u.Product
-	result := db.DBConn.Where("categoryid", categoryID).Find(&products)
+	result := db.DBConn.Preload("ProductImage").Where("categoryid", categoryID).Find(&products)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing products")
 		return
 	}
 
@@ -96,9 +102,9 @@ func GetAllProductsByCategory(w *fiber.Ctx)  {
 //GetProductPromotion from database
 func GetProductPromotion(w *fiber.Ctx)  {
 	var products []u.Product
-	result := db.DBConn.Where("has_promotion", true).Find(&products)
+	result := db.DBConn.Preload("ProductImage").Where("has_promotion", true).Find(&products)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing products")
 		return
 	}
 
@@ -109,9 +115,9 @@ func GetProductPromotion(w *fiber.Ctx)  {
 func GetRecentProducts(w *fiber.Ctx)  {
 	var products []u.Product
 
-	result := db.DBConn.Order("created_at desc").Find(&products)
+	result := db.DBConn.Preload("ProductImage").Order("created_at desc").Find(&products)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing products")
 		return
 	}
 
@@ -123,9 +129,9 @@ func GetProductByName(w *fiber.Ctx)  {
 	strv := w.Params("string")
 
 	var products []u.Product
-	result := db.DBConn.Where("name like ?", "%" + strv + "%").Find(&products)
+	result := db.DBConn.Preload("ProductImage").Where("name like ?", "%" + strv + "%").Find(&products)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing products")
 		return
 	}
 

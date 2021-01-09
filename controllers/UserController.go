@@ -57,27 +57,27 @@ func SignUpUser(w *fiber.Ctx)  {
 	}
 	aux.Password = string(hashPassword)
 
-	var keyAux string
 	avatarFile, _ := w.FormFile("avatar")
 	if avatarFile != nil {
 		file, err := avatarFile.Open()
-		avatarResponse, key := q.SendImageToAWS(file, avatarFile.Filename, avatarFile.Size, "user")
-		if avatarResponse ==  nil || err != nil {
+		key, url := q.SendImageToAWS(file, avatarFile.Filename, avatarFile.Size, "user")
+		if key ==  "" || err != nil {
 			w.Status(500).JSON("Error upload image")
 			return
 		}
 		defer file.Close()
 
-		aux.Avatar = avatarResponse
-		keyAux = key
+		aux.ImageKey = key
+		aux.ImageURL = url
 	} else {
-		aux.Avatar = u.JSONB{}
+		aux.ImageKey = ""
+		aux.ImageURL = ""
 	}
 
 	result := db.DBConn.Create(&aux)
 	if result.Error != nil {
 		w.Status(500).JSON("Error creating user")
-		q.DeleteImageInAWS(keyAux)
+		q.DeleteImageInAWS(aux.ImageKey)
 		return
 	}
 
@@ -158,7 +158,7 @@ func ResetPassword(w *fiber.Ctx)  {
 
 	result := db.DBConn.Model(&u.User{}).Where("email = ?", email).Update("password", hashPassword)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error reseting password")
 		return
 	}
 
@@ -172,7 +172,7 @@ func SendEmailToResetPassword(w *fiber.Ctx)  {
 	var user u.User
 	result := db.DBConn.Where("email = ?", email).Find(&user)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing user")
 		return
 	}
 

@@ -11,7 +11,8 @@ type Category struct {
 	gorm.Model
 	ID				int
 	Name				string
-	Image				JSONB				`gorm:"type:jsonb"`
+	ImageKey			string
+	ImageURL			string
 	CreatedAt			time.Time
 	UpdatedAt			time.Time
 	DeletedAt			gorm.DeletedAt

@@ -18,7 +18,7 @@ func GetByUser(w *fiber.Ctx)  {
 	var orders []e.Order
 	result := db.DBConn.Where("user_id", userid).Find(&orders)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing orders")
 		return
 	}
 
@@ -34,7 +34,7 @@ func CreateOrder(w * fiber.Ctx)  {
 	}
 
 	order.ID = ksuid.New().String()
-	order.UserID = uuid.FromStringOrNil(w.FormValue("userID"))
+	order.Userid = uuid.FromStringOrNil(w.FormValue("userID"))
 	aux := strings.Split(w.FormValue("productID"), ",")
 	order.ProductID = aux
 	order.Qtd, _ = strconv.Atoi(w.FormValue("qtd"))
@@ -44,7 +44,7 @@ func CreateOrder(w * fiber.Ctx)  {
 
 	result := db.DBConn.Create(&order)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error creating order")
 		return
 	}
 
@@ -60,7 +60,7 @@ func PaymentChangeOrderByID(w *fiber.Ctx)  {
 	order.ID = id
 	result := db.DBConn.Model(&order).Update("paid", status)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error change status")
 		return
 	}
 
@@ -75,7 +75,7 @@ func RateOrder(w *fiber.Ctx)  {
 
 	result := db.DBConn.Model(&order).Update("rate", order.Rate)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error set rate")
 		return
 	}
 
@@ -95,7 +95,7 @@ func ChangeStatusOrder(w *fiber.Ctx)  {
 	order.ID = id
 	result := db.DBConn.Model(&order).Update("status", status)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error set status")
 		return
 	}
 

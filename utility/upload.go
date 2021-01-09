@@ -13,12 +13,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	u "github.com/ecommerce/models"
 	"labix.org/v2/mgo/bson"
 )
 
 //SendImageToAWS function
-func SendImageToAWS(file multipart.File, fileHeader string, fileSize int64, typeModel string) (u.JSONB, string) {
+func SendImageToAWS(file multipart.File, fileHeader string, fileSize int64, typeModel string) (string, string) {
 	secretKey := os.Getenv("AWS_SECRET_KEY")
 	secretID := os.Getenv("AWS_SECRET_ID")
 	region := os.Getenv("AWS_REGION")
@@ -45,12 +44,12 @@ func SendImageToAWS(file multipart.File, fileHeader string, fileSize int64, type
 		StorageClass: aws.String("INTELLIGENT_TIERING"),
 	})
 	if err != nil {
-		return nil, ""
+		return "", ""
 	}
 
 	imageURL := "https://" + bucket + "." + "s3" + ".amazonaws.com/" + fileName
 
-	return u.JSONB{"key": fileName, "url": imageURL}, fileName
+	return fileName, imageURL
 }
 
 //DeleteImageInAWS function
