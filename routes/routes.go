@@ -12,6 +12,7 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/login", a.Login)
 	router.Post("/v1/signUp", a.SignUpUser)
 	router.Patch("/v1/resetPassword", a.ResetPassword)
+	router.Post("/v1/resetPasswordLink/:email", a.SendEmailToResetPassword)
 	
 	router.Use(b.VerifyToken)
 	router.Get("/v1/product", a.GetAllProducts)

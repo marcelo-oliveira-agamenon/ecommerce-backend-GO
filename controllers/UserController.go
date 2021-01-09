@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -87,7 +86,7 @@ func SignUpUser(w *fiber.Ctx)  {
 
 	fileEmail, err := ioutil.ReadFile("template/welcome.html")
 	if err != nil {
-		fmt.Print(err)
+		w.Status(201).JSON("User created, but failed sending email")
 	}
 
 	q.SendEmailUtility(aux.Email, string(fileEmail), "Welcome to Cash And Grab")
@@ -110,7 +109,7 @@ func Login(w *fiber.Ctx) {
 		return
 	}
 
-	if user.Phone == "" {
+	if user.Email == "" {
 		w.Status(500).JSON("No user with this email")
 		return
 	}
@@ -167,4 +166,30 @@ func ResetPassword(w *fiber.Ctx)  {
 	}
 
 	w.Status(200).JSON("Password changed")
+}
+
+//SendEmailToResetPassword send link to email to reset password
+func SendEmailToResetPassword(w *fiber.Ctx)  {
+	email := w.Params("email")
+
+	var user u.User
+	result := db.DBConn.Where("email = ?", email).Find(&user)
+	if result.Error != nil {
+		w.Status(500).JSON("Server error")
+		return
+	}
+
+	if user.Name == "" {
+		w.Status(500).JSON("No user with this email")
+		return
+	}
+
+	fileEmail, err := ioutil.ReadFile("template/resetPassword.html")
+	if err != nil {
+		w.Status(500).JSON("Server error")
+	}
+
+	q.SendEmailUtility(user.Email, string(fileEmail), "Reset Password")
+
+	w.Status(200).JSON("Email sended")
 }
