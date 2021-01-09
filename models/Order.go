@@ -13,7 +13,7 @@ type Order struct {
 	gorm.Model
 	ID				string
 	UserID			uuid.UUID
-	ProductID			pq.StringArray `gorm:"type:varchar(64)[]"`
+	ProductID			pq.StringArray		 `gorm:"type:varchar(64)[]"`
 	TotalValue			float64
 	Status			string
 	Qtd				int

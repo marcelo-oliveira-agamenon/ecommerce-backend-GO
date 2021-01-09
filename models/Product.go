@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +14,7 @@ type Product struct {
 	Categoryid			string
 	CategoryID			Category				`gorm:"foreignKey:Categoryid;references:ID"`
 	Value				float64
-	Photos			pq.StringArray			`gorm:"type:_jsonb"`
+	Photos			JSONB					`gorm:"type:jsonb"`
 	StockQtd			int
 	Description			string
 	TypeUnit			string

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"time"
 
@@ -58,29 +57,27 @@ func SignUpUser(w *fiber.Ctx)  {
 	}
 	aux.Password = string(hashPassword)
 
+	var keyAux string
 	avatarFile, _ := w.FormFile("avatar")
 	if avatarFile != nil {
 		file, err := avatarFile.Open()
-		avatarResponse := q.SendImageToAWS(file, avatarFile.Filename, avatarFile.Size, "user")
+		avatarResponse, key := q.SendImageToAWS(file, avatarFile.Filename, avatarFile.Size, "user")
 		if avatarResponse ==  nil || err != nil {
 			w.Status(500).JSON("Error upload image")
 			return
 		}
 		defer file.Close()
 
-		bytes, err := json.Marshal(avatarResponse)
-		if err != nil {
-			w.Status(500).JSON("Serialize json photos error")
-		}
-
-		aux.Avatar = []string{string(bytes)}
+		aux.Avatar = avatarResponse
+		keyAux = key
 	} else {
-		aux.Avatar = []string{}
+		aux.Avatar = u.JSONB{}
 	}
 
 	result := db.DBConn.Create(&aux)
 	if result.Error != nil {
 		w.Status(500).JSON("Error creating user")
+		q.DeleteImageInAWS(keyAux)
 		return
 	}
 

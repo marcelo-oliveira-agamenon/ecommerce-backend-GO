@@ -30,8 +30,8 @@ func CreateConnection()  {
 	DBConn = db
 
 	db.AutoMigrate(&u.Order{})
-	db.AutoMigrate(&u.User{})
 	db.AutoMigrate(&u.Product{})
+	db.AutoMigrate(&u.User{})
 	db.AutoMigrate(&u.Category{})
 	db.AutoMigrate(&u.Favorites{})
 }

@@ -32,9 +32,11 @@ func CreateOrder(w * fiber.Ctx)  {
 		w.Status(500).JSON("Missing fields")
 		return
 	}
+
 	order.ID = ksuid.New().String()
 	order.UserID = uuid.FromStringOrNil(w.FormValue("userID"))
-	//order.ProductID = w.FormValue("productID")
+	aux := strings.Split(w.FormValue("productID"), ",")
+	order.ProductID = aux
 	order.Qtd, _ = strconv.Atoi(w.FormValue("qtd"))
 	order.Paid = false
 	order.TotalValue, _ = strconv.ParseFloat(w.FormValue("totalValue"), 64)

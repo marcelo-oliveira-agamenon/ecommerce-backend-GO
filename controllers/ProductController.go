@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"strconv"
 
 	"github.com/ecommerce/db"
@@ -27,29 +26,27 @@ func InsertProduct(w *fiber.Ctx) {
 	aux.HasShipping, _ = strconv.ParseBool(w.FormValue("hasShipping"))
 	aux.ShippingPrice, _ = strconv.ParseFloat(w.FormValue("shippingPrice"), 64)
 
+	var keyAux string
 	photos, _ := w.FormFile("photos")
 	if photos != nil {
 		file, err := photos.Open()
-		photosResponse := q.SendImageToAWS(file, photos.Filename, photos.Size, "product")
+		photosResponse, key := q.SendImageToAWS(file, photos.Filename, photos.Size, "product")
 		if photosResponse == nil || err != nil {
 			w.Status(500).JSON("Error upload image to AWS")
 			return
 		}
 		defer file.Close()
 
-		bytes, err := json.Marshal(photosResponse)
-		if err != nil {
-			w.Status(500).JSON("Serialize json photos error")
-		}
-
-		aux.Photos = []string{string(bytes)}
+		aux.Photos = photosResponse
+		keyAux = key
 	} else {
-		aux.Photos = []string{}
+		aux.Photos = u.JSONB{}
 	}
 
 	result := db.DBConn.Create(&aux)
 	if result.Error != nil {
 		w.Status(500).JSON("Server error")
+		q.DeleteImageInAWS(keyAux)
 		return
 	}
 

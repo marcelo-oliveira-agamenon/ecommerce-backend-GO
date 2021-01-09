@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +17,7 @@ type User struct {
 	Name			string
 	Email			string			
 	Address		string
-	Avatar		pq.StringArray		`gorm:"type:text[]"`			
+	Avatar		JSONB				`gorm:"type:jsonb"`			
 	Phone			string
 	Password		string			
 	FacebookID		string			

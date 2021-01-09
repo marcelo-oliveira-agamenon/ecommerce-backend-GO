@@ -18,7 +18,7 @@ import (
 )
 
 //SendImageToAWS function
-func SendImageToAWS(file multipart.File, fileHeader string, fileSize int64, typeModel string) (u.JSONB) {
+func SendImageToAWS(file multipart.File, fileHeader string, fileSize int64, typeModel string) (u.JSONB, string) {
 	secretKey := os.Getenv("AWS_SECRET_KEY")
 	secretID := os.Getenv("AWS_SECRET_ID")
 	region := os.Getenv("AWS_REGION")
@@ -45,12 +45,12 @@ func SendImageToAWS(file multipart.File, fileHeader string, fileSize int64, type
 		StorageClass: aws.String("INTELLIGENT_TIERING"),
 	})
 	if err != nil {
-		return nil
+		return nil, ""
 	}
 
 	imageURL := "https://" + bucket + "." + "s3" + ".amazonaws.com/" + fileName
 
-	return u.JSONB{"key": fileName, "url": imageURL}
+	return u.JSONB{"key": fileName, "url": imageURL}, fileName
 }
 
 //DeleteImageInAWS function
