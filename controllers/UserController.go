@@ -102,7 +102,7 @@ func Login(w *fiber.Ctx) {
 	var user u.User
 	result := db.DBConn.Where("email = ?", login.Email).Find(&user)
 	if result.Error != nil {
-		w.Status(500).JSON("Server error")
+		w.Status(500).JSON("Error listing user")
 		return
 	}
 

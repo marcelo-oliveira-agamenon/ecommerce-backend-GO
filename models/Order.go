@@ -12,7 +12,7 @@ import (
 type Order struct {
 	gorm.Model
 	ID				string
-	Userid			uuid.UUID
+	Userid			uuid.UUID			`gorm:"column:user_id"`
 	UserID			User				`gorm:"foreignKey:Userid;references:ID"`
 	ProductID			pq.StringArray		`gorm:"type:varchar(64)[]"`
 	TotalValue			float64
