@@ -24,6 +24,15 @@ type claims struct {
 	jwt.StandardClaims
 }
 
+// swagger:operation POST /signUp user response
+// Adiciona novo usuário
+// ---
+// responses:
+//     '201':
+//         description: User created
+//     '500':
+//         description: Error
+
 //SignUpUser create user in db
 func SignUpUser(w *fiber.Ctx)  {
 	id, err := uuid.NewV4()
@@ -90,6 +99,15 @@ func SignUpUser(w *fiber.Ctx)  {
 
 	w.Status(201).JSON("User created")
 }
+
+// swagger:operation POST /login user response
+// Login na aplicação
+// ---
+// responses:
+//     '200':
+//         description: Login
+//     '500':
+//         description: Error
 
 //Login user in application
 func Login(w *fiber.Ctx) {

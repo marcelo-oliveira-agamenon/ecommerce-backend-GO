@@ -8,6 +8,8 @@ import (
 	u "github.com/ecommerce/utility"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
+
+	_ "github.com/pdrum/swagger-automation/docs"
 )
 
 func main()  {

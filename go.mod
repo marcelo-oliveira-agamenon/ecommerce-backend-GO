@@ -10,6 +10,7 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.3.0
+	github.com/pdrum/swagger-automation v0.0.0-20190629163613-c8c7c80ba858
 	github.com/segmentio/ksuid v1.0.3
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
