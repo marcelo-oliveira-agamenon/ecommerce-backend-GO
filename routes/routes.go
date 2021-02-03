@@ -10,6 +10,7 @@ import (
 //Routes create router and import routes
 func Routes(router *fiber.App) {
 	router.Post("/v1/login", a.Login)
+	router.Post("/v1/loginWithFacebook", a.LoginWithFacebook)
 	router.Post("/v1/signUp", a.SignUpUser)
 	router.Patch("/v1/resetPassword", a.ResetPassword)
 	router.Post("/v1/resetPasswordLink/:email", a.SendEmailToResetPassword)

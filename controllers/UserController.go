@@ -2,6 +2,7 @@ package controller
 
 import (
 	"io/ioutil"
+	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -17,6 +18,11 @@ import (
 type login struct {
 	Email		string	`json:"email"`
 	Password	string	`json:"password"`
+}
+
+type loginFacebook struct {
+	Email		string	`json:"email"`
+	Token		string	`json:"token"`
 }
 
 type claims struct {
@@ -155,6 +161,50 @@ func Login(w *fiber.Ctx) {
 	w.Status(200).JSON(&fiber.Map{
 		"user": user,
 		"token": token,
+	})
+}
+
+//LoginWithFacebook verify if user is logged with facebook
+func LoginWithFacebook(w *fiber.Ctx)  {
+	loginFacebook := new(loginFacebook)
+	if err := w.BodyParser(loginFacebook); err != nil {
+		w.Status(500).JSON("Missing fields")
+		return
+	}
+	
+	resp, err := http.Get("https://graph.facebook.com/me?access_token=" + loginFacebook.Token)
+	if err != nil {
+		w.Status(401).JSON("Invalid token")
+		return
+	}
+	
+	defer resp.Body.Close()
+
+	var user u.User
+	result := db.DBConn.Where("email = ?", loginFacebook.Email).Find(&user)
+	if result.Error != nil {
+		w.Status(500).JSON("No user with this email")
+		return
+	}
+
+	expTime := time.Now().Add(4000 * time.Minute)
+	claimsJwt := &claims{
+		email: user.Email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expTime.Unix(),
+		},
+	}
+	tokenMethod := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsJwt)
+	jwtKey := []byte(q.GetDotEnv("JWT_KEY"))
+	tokenJWT, err := tokenMethod.SignedString(jwtKey)
+	if err != nil {
+		w.Status(500).JSON("Error in jwt token")
+		return
+	}
+
+	w.Status(200).JSON(&fiber.Map{
+		"user": user,
+		"token": tokenJWT,
 	})
 }
 
