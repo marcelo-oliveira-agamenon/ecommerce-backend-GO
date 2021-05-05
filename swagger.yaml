@@ -1,7 +1,7 @@
 basePath: /v1
 consumes:
-- application/json
-- application/multipartform
+  - application/json
+  - application/multipartform
 host: https://ecommerce-go.herokuapp.com
 info:
   contact:
@@ -13,32 +13,87 @@ info:
 paths:
   /login:
     post:
+      tags:
+        - user
+      parameters:
+        - name: email
+          in: body
+          description: User Email
+          required: true
+        - name: password
+          in: body
+          description: User Password
+          required: true
       description: Login na aplicação
       operationId: response
       responses:
-        "200":
-          description: Login
-        "500":
-          description: Error
-      tags:
-      - user
+        200:
+          description: Login Successful in application
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                format: string
+              user:
+                type: object
+                properties:
+                  ID:
+                    type: string
+                  Name:
+                    type: string
+                  Email:
+                    type: string
+                  Address:
+                    type: string
+                  ImageKey:
+                    type: string
+                  ImageURL:
+                    type: string
+                  Phone:
+                    type: string
+                  Password:
+                    type: string
+                  FacebookID:
+                    type: string
+                  Birthday:
+                    type: string
+                  Gender:
+                    type: string
+                  CreatedAt:
+                    type: string
+                  UpdatedAt:
+                    type: string
+                  DeletedAt:
+                    type: string
+        500:
+          description: Error in application
   /signUp:
     post:
       description: Adiciona novo usuário
       operationId: response
       responses:
-        "201":
+        201:
           description: User created
-        "500":
+        500:
           description: Error
       tags:
-      - user
+        - user
+  /product:
+    get:
+      tags:
+        - product
+      description: Buscar todos os produtos
+      operationId: response
+      responses:
+        200:
+          description: Lista de produtos
 produces:
-- application/json
+  - application/json
 schemes:
-- https
+  - https
 security:
-- bearer: []
+  - bearer: []
 securityDefinitions:
   bearer:
     type: apiKey
