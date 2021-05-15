@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/ecommerce/db"
 	u "github.com/ecommerce/models"
 	"github.com/gofiber/fiber"
@@ -32,9 +34,11 @@ func CreateFavorite(w *fiber.Ctx)  {
 //GetFavoriteByUser params id user
 func GetFavoriteByUser(w * fiber.Ctx)  {
 	id := w.Params("id")
+	limit, _ := strconv.Atoi(w.Query("limit"))
+	offset, _ := strconv.Atoi(w.Query("offset"))
 
 	var fav []u.Favorites
-	result := db.DBConn.Where("user_id", id).Find(&fav)
+	result := db.DBConn.Where("user_id", id).Limit(limit).Offset(offset).Find(&fav)
 	if result.Error != nil {
 		w.Status(500).JSON("Error set favorite")
 		return

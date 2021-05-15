@@ -12,7 +12,7 @@ type Product struct {
 	ID				string
 	Name				string
 	Categoryid			string
-	CategoryID			Category				`gorm:"foreignKey:Categoryid;references:ID"`
+	Category			Category				`gorm:"foreignKey:ID;references:Categoryid"`
 	Value				float64
 	StockQtd			int
 	Description			string

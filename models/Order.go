@@ -23,4 +23,5 @@ type Order struct {
 	CreatedAt			time.Time
 	UpdatedAt			time.Time
 	DeletedAt			gorm.DeletedAt
+	Payment			Payment			`gorm:"foreignKey:OrderID"`
 }
