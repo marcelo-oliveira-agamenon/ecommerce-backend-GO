@@ -39,4 +39,8 @@ func Routes(router *fiber.App) {
 
 	router.Post("/v1/product-image/:product_id", a.InsertProductImage)
 	router.Delete("/v1/product-image/:id", a.DeleteProductImage)
+
+	router.Get("/v1/payment/user/:userid", a.GetAllPaymentsByUser)
+	router.Post("/v1/payment", a.InsertNewPayment)
+	router.Delete("/v1/payment/:id", a.DeletePayment)
 }

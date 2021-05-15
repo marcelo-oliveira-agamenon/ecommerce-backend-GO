@@ -3,20 +3,40 @@ package controller
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ecommerce/db"
 	e "github.com/ecommerce/models"
 	"github.com/gofiber/fiber"
 	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
 	"github.com/segmentio/ksuid"
+	"gorm.io/gorm"
 )
+
+type APIOrder struct {
+	gorm.Model
+	ID				string
+	User_id			uuid.UUID
+	ProductID			pq.StringArray		`gorm:"type:varchar(64)[]"`
+	TotalValue			float64
+	Status			string
+	Qtd				int
+	Paid				bool
+	Rate				int
+	CreatedAt			time.Time
+	UpdatedAt			time.Time
+	DeletedAt			gorm.DeletedAt
+}
 
 //GetByUser get orders by userid
 func GetByUser(w *fiber.Ctx)  {
 	userid := w.Params("id")
+	limit, _ := strconv.Atoi(w.Query("limit"))
+	offset, _ := strconv.Atoi(w.Query("offset"))
 
-	var orders []e.Order
-	result := db.DBConn.Where("user_id", userid).Find(&orders)
+	var orders []APIOrder
+	result := db.DBConn.Model(&e.Order{}).Where("user_id", userid).Limit(limit).Offset(offset).Find(&orders)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing orders")
 		return

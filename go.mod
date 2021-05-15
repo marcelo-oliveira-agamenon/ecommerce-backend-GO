@@ -15,15 +15,15 @@ require (
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/pdrum/swagger-automation v0.0.0-20190629163613-c8c7c80ba858
 	github.com/segmentio/ksuid v1.0.3
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/driver/postgres v1.0.5
-	gorm.io/gorm v1.20.5
+	gorm.io/driver/postgres v1.0.8
+	gorm.io/gorm v1.21.6
 	labix.org/v2/mgo v0.0.0-20140701140051-000000000287
 	launchpad.net/gocheck v0.0.0-20140225173054-000000000087 // indirect
 )

@@ -26,4 +26,5 @@ type User struct {
 	DeletedAt		gorm.DeletedAt
 	Favorite		[]Favorites			`gorm:"foreignKey:UserID"`
 	Order			[]Order			`gorm:"foreignKey:Userid"`
+	Payment		[]Payment			`gorm:"foreignKey:UserID"`
 }

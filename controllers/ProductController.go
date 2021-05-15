@@ -36,9 +36,12 @@ func InsertProduct(w *fiber.Ctx) {
 
 //GetAllProducts from database
 func GetAllProducts(w *fiber.Ctx) {
+	limit, _ := strconv.Atoi(w.Query("limit"))
+	offset, _ := strconv.Atoi(w.Query("offset"))
+
 	var products []u.Product
 
-	result := db.DBConn.Preload("ProductImage").Joins("Category").Find(&products)
+	result := db.DBConn.Preload("ProductImage").Joins("Category").Limit(limit).Offset(offset).Find(&products)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing products")
 		return
@@ -64,9 +67,11 @@ func GetProductByID(w *fiber.Ctx) {
 //GetAllProductsByCategory from database
 func GetAllProductsByCategory(w *fiber.Ctx)  {
 	categoryID := w.Params("id")
+	limit, _ := strconv.Atoi(w.Query("limit"))
+	offset, _ := strconv.Atoi(w.Query("offset"))
 
 	var products []u.Product
-	result := db.DBConn.Preload("ProductImage").Joins("Category").Where("products.categoryid", categoryID).Find(&products)
+	result := db.DBConn.Preload("ProductImage").Joins("Category").Where("products.categoryid", categoryID).Limit(limit).Offset(offset).Find(&products)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing products")
 		return
@@ -77,8 +82,11 @@ func GetAllProductsByCategory(w *fiber.Ctx)  {
 
 //GetProductPromotion from database
 func GetProductPromotion(w *fiber.Ctx)  {
+	limit, _ := strconv.Atoi(w.Query("limit"))
+	offset, _ := strconv.Atoi(w.Query("offset"))
+
 	var products []u.Product
-	result := db.DBConn.Preload("ProductImage").Joins("Category").Where("has_promotion", true).Find(&products)
+	result := db.DBConn.Preload("ProductImage").Joins("Category").Where("has_promotion", true).Limit(limit).Offset(offset).Find(&products)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing products")
 		return
@@ -90,8 +98,10 @@ func GetProductPromotion(w *fiber.Ctx)  {
 //GetRecentProducts from database
 func GetRecentProducts(w *fiber.Ctx)  {
 	var products []u.Product
+	limit, _ := strconv.Atoi(w.Query("limit"))
+	offset, _ := strconv.Atoi(w.Query("offset"))
 
-	result := db.DBConn.Preload("ProductImage").Joins("Category").Order("created_at desc").Find(&products)
+	result := db.DBConn.Preload("ProductImage").Joins("Category").Order("created_at desc").Limit(limit).Offset(offset).Find(&products)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing products")
 		return
@@ -103,9 +113,11 @@ func GetRecentProducts(w *fiber.Ctx)  {
 //GetProductByName from database
 func GetProductByName(w *fiber.Ctx)  {
 	strv := w.Params("string")
+	limit, _ := strconv.Atoi(w.Query("limit"))
+	offset, _ := strconv.Atoi(w.Query("offset"))
 
 	var products []u.Product
-	result := db.DBConn.Preload("ProductImage").Joins("Category").Where("products.name like ?", "%" + strv + "%").Find(&products)
+	result := db.DBConn.Preload("ProductImage").Joins("Category").Where("products.name like ?", "%" + strv + "%").Limit(limit).Offset(offset).Find(&products)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing products")
 		return
