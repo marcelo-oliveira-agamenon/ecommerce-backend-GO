@@ -36,4 +36,7 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/favorite", a.CreateFavorite)
 	router.Get("/v1/favorite/:id", a.GetFavoriteByUser)
 	router.Delete("/v1/favorite/:id", a.RemoveFromFavorite)
+
+	router.Post("/v1/product-image/:product_id", a.InsertProductImage)
+	router.Delete("/v1/product-image/:id", a.DeleteProductImage)
 }

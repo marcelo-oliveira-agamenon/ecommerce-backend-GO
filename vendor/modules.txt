@@ -95,6 +95,10 @@ github.com/joho/godotenv
 github.com/klauspost/compress/flate
 github.com/klauspost/compress/gzip
 github.com/klauspost/compress/zlib
+# github.com/kr/pretty v0.2.1
+## explicit
+# github.com/kr/text v0.2.0
+## explicit
 # github.com/labstack/echo v3.3.10+incompatible
 github.com/labstack/echo
 # github.com/labstack/gommon v0.2.9
@@ -105,7 +109,8 @@ github.com/labstack/gommon/log
 github.com/lib/pq
 github.com/lib/pq/oid
 github.com/lib/pq/scram
-# github.com/mattn/go-colorable v0.1.7
+# github.com/mattn/go-colorable v0.1.8
+## explicit
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
@@ -136,7 +141,8 @@ golang.org/x/crypto/blowfish
 golang.org/x/crypto/pbkdf2
 # golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 golang.org/x/net/idna
-# golang.org/x/sys v0.0.0-20200602225109-6fdc65e7d980
+# golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6
+## explicit
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -154,15 +160,20 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
+# golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+## explicit
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
 # gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc
 ## explicit
 gopkg.in/alexcesaro/quotedprintable.v3
+# gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15
+## explicit
 # gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 ## explicit
 gopkg.in/gomail.v2
+# gopkg.in/yaml.v2 v2.4.0
+## explicit
 # gorm.io/driver/postgres v1.0.5
 ## explicit
 gorm.io/driver/postgres
