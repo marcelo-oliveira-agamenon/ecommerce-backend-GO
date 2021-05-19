@@ -36,7 +36,7 @@ func GetByUser(w *fiber.Ctx)  {
 	offset, _ := strconv.Atoi(w.Query("offset"))
 
 	var orders []APIOrder
-	result := db.DBConn.Model(&e.Order{}).Where("user_id", userid).Limit(limit).Offset(offset).Find(&orders)
+	result := db.DBConn.Model(&e.Order{}).Where("user_id", userid).Limit(limit).Offset(offset).Order("created_at desc").Find(&orders)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing orders")
 		return
