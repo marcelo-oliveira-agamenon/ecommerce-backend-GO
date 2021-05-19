@@ -24,6 +24,7 @@ func InsertProduct(w *fiber.Ctx) {
 	aux.Discount, _ = strconv.ParseFloat(w.FormValue("discount"), 64)
 	aux.HasShipping, _ = strconv.ParseBool(w.FormValue("hasShipping"))
 	aux.ShippingPrice, _ = strconv.ParseFloat(w.FormValue("shippingPrice"), 64)
+	aux.Rate = 0
 
 	result := db.DBConn.Create(&aux)
 	if result.Error != nil {

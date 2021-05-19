@@ -14,6 +14,7 @@ require (
 	github.com/lib/pq v1.3.0
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/pdrum/swagger-automation v0.0.0-20190629163613-c8c7c80ba858
+	github.com/robfig/cron v1.2.0
 	github.com/segmentio/ksuid v1.0.3
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
