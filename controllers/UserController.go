@@ -2,7 +2,9 @@ package controller
 
 import (
 	"io/ioutil"
+	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -220,7 +222,12 @@ func ResetPassword(w *fiber.Ctx)  {
 
 //SendEmailToResetPassword send link to email to reset password
 func SendEmailToResetPassword(w *fiber.Ctx)  {
-	email := w.Params("email")
+	email := w.Query("email")
+
+	if email == "" {
+		w.Status(500).JSON("Error: Missing email in query")
+		return
+	}
 
 	var user u.User
 	result := db.DBConn.Where("email = ?", email).Find(&user)
@@ -239,7 +246,10 @@ func SendEmailToResetPassword(w *fiber.Ctx)  {
 		w.Status(500).JSON("Server error")
 	}
 
-	q.SendEmailUtility(user.Email, string(fileEmail), "Reset Password")
+	rand.Seed(time.Now().UnixNano())
+	hash := strconv.Itoa(rand.Intn(999999 - 100000 + 1) + 100000)
+
+	q.SendEmailUtility(user.Email, string(fileEmail), "Reset Password - Código de Verificação: " + hash)
 
 	w.Status(200).JSON("Email sended")
 }

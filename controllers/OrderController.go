@@ -46,7 +46,7 @@ func GetByUser(w *fiber.Ctx)  {
 }
 
 //CreateOrder insert a order to database
-func CreateOrder(w * fiber.Ctx)  {
+func CreateOrder(w *fiber.Ctx)  {
 	var order e.Order
 	if w.FormValue("userID") == "" || len(w.FormValue("productID")) == 0 || w.FormValue("qtd") == "" {
 		w.Status(500).JSON("Missing fields")
