@@ -36,4 +36,5 @@ func CreateConnection()  {
 	db.AutoMigrate(&u.Category{})
 	db.AutoMigrate(&u.Favorites{})
 	db.AutoMigrate(&u.Payment{})
+	db.AutoMigrate(&u.Coupon{})
 }

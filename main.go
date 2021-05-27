@@ -18,6 +18,7 @@ func main()  {
 	app.Use(cors.New())
 	r.Routes(app)
 	port := u.GetDotEnv("PORT")
+	u.CallerAllJobs()
 
 	log.Fatal(app.Listen(port))
 }

@@ -118,6 +118,9 @@ github.com/mattn/go-isatty
 ## explicit
 github.com/pdrum/swagger-automation/api
 github.com/pdrum/swagger-automation/docs
+# github.com/robfig/cron v1.2.0
+## explicit
+github.com/robfig/cron
 # github.com/segmentio/ksuid v1.0.3
 ## explicit
 github.com/segmentio/ksuid

@@ -36,7 +36,7 @@ func GetByUser(w *fiber.Ctx)  {
 	offset, _ := strconv.Atoi(w.Query("offset"))
 
 	var orders []APIOrder
-	result := db.DBConn.Model(&e.Order{}).Where("user_id", userid).Limit(limit).Offset(offset).Find(&orders)
+	result := db.DBConn.Model(&e.Order{}).Where("user_id", userid).Limit(limit).Offset(offset).Order("created_at desc").Find(&orders)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing orders")
 		return
@@ -46,7 +46,7 @@ func GetByUser(w *fiber.Ctx)  {
 }
 
 //CreateOrder insert a order to database
-func CreateOrder(w * fiber.Ctx)  {
+func CreateOrder(w *fiber.Ctx)  {
 	var order e.Order
 	if w.FormValue("userID") == "" || len(w.FormValue("productID")) == 0 || w.FormValue("qtd") == "" {
 		w.Status(500).JSON("Missing fields")

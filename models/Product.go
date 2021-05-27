@@ -22,6 +22,7 @@ type Product struct {
 	Discount			float64
 	HasShipping			bool
 	ShippingPrice		float64
+	Rate				int
 	CreatedAt			time.Time
 	UpdatedAt			time.Time
 	DeletedAt			gorm.DeletedAt

@@ -13,7 +13,7 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/loginWithFacebook", a.LoginWithFacebook)
 	router.Post("/v1/signUp", a.SignUpUser)
 	router.Patch("/v1/resetPassword", a.ResetPassword)
-	router.Post("/v1/resetPasswordLink/:email", a.SendEmailToResetPassword)
+	router.Post("/v1/resetPasswordLink", a.SendEmailToResetPassword)
 	
 	router.Use(b.VerifyToken)
 	router.Get("/v1/product", a.GetAllProducts)
@@ -43,4 +43,7 @@ func Routes(router *fiber.App) {
 	router.Get("/v1/payment/user/:userid", a.GetAllPaymentsByUser)
 	router.Post("/v1/payment", a.InsertNewPayment)
 	router.Delete("/v1/payment/:id", a.DeletePayment)
+
+	router.Post("/v1/coupon", a.CreateCoupon)
+	router.Get("/v1/coupon", a.VerifyCouponStillActive)
 }
