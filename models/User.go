@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -21,6 +22,7 @@ type User struct {
 	FacebookID		string			
 	Birthday		string			
 	Gender		string
+	Roles			pq.StringArray		`gorm:"type:varchar(64)[]"`
 	CreatedAt		time.Time
 	UpdatedAt		time.Time
 	DeletedAt		gorm.DeletedAt

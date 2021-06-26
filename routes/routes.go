@@ -10,12 +10,16 @@ import (
 //Routes create router and import routes
 func Routes(router *fiber.App) {
 	router.Post("/v1/login", a.Login)
+	router.Post("/v1/admin/login", a.LoginAdmin)
 	router.Post("/v1/loginWithFacebook", a.LoginWithFacebook)
 	router.Post("/v1/signUp", a.SignUpUser)
 	router.Patch("/v1/resetPassword", a.ResetPassword)
 	router.Post("/v1/resetPasswordLink", a.SendEmailToResetPassword)
 	
 	router.Use(b.VerifyToken)
+	router.Get("/v1/admin/card3", a.GetCountForAdmin)
+
+	router.Patch("/v1/users/toggleRoles/:id", a.ToggleRolesUser)
 	router.Get("/v1/product", a.GetAllProducts)
 	router.Post("/v1/product", a.InsertProduct)
 	router.Get("/v1/product/getbyId/:id", a.GetProductByID)
