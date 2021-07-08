@@ -17,7 +17,10 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/resetPasswordLink", a.SendEmailToResetPassword)
 	
 	router.Use(b.VerifyToken)
+	router.Get("/v1/admin/card1", a.OrdersQuantityByPeriod)
+	router.Get("/v1/admin/card2", a.GetProfitOfOrdersByMonths)
 	router.Get("/v1/admin/card3", a.GetCountForAdmin)
+	router.Get("/v1/admin/card4", a.GetQuantityProductsByCategories)
 
 	router.Patch("/v1/users/toggleRoles/:id", a.ToggleRolesUser)
 	router.Get("/v1/product", a.GetAllProducts)
