@@ -10,6 +10,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber"
 	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/ecommerce/db"
@@ -28,7 +29,7 @@ type loginFacebook struct {
 }
 
 type claims struct {
-	email	string
+	userId	string
 	jwt.StandardClaims
 }
 
@@ -51,6 +52,7 @@ func SignUpUser(w *fiber.Ctx)  {
 	aux.FacebookID = w.FormValue("facebookID")
 	aux.Birthday = w.FormValue("birthday")
 	aux.Gender = w.FormValue("gender")
+	aux.Roles = pq.StringArray{"user"}
 
 	var aux1 u.User
 	db.DBConn.Where("email = ?", aux.Email).First(&aux1)
@@ -130,7 +132,63 @@ func Login(w *fiber.Ctx) {
 
 	expTime := time.Now().Add(4000 * time.Minute)
 	claimsJwt := &claims{
-		email: login.Email,
+		userId: user.ID.String(),
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expTime.Unix(),
+		},
+	}
+	tokenMethod := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsJwt)
+	jwtKey := []byte(q.GetDotEnv("JWT_KEY"))
+	token, err := tokenMethod.SignedString(jwtKey)
+	if err != nil {
+		w.Status(500).JSON("Error in jwt token")
+		return
+	}
+
+	user.Password = ""
+
+	w.Status(200).JSON(&fiber.Map{
+		"user": user,
+		"token": token,
+	})
+}
+
+//Login user in application
+func LoginAdmin(w *fiber.Ctx) {
+	login := new(login)
+	if err := w.BodyParser(login); err != nil {
+		w.Status(500).JSON("Missing fields")
+		return
+	}
+
+	var user u.User
+	result := db.DBConn.Where("email = ?", login.Email).Find(&user)
+	if result.Error != nil {
+		w.Status(500).JSON("Error listing user")
+		return
+	}
+
+	if user.Email == "" {
+		w.Status(500).JSON("No user with this email")
+		return
+	}
+
+	if len(user.Roles) == 1 {
+		w.Status(401).JSON("User doenst have admin permission")
+		return
+	}
+
+	hashPass := []byte(user.Password)
+	bodyPass := []byte(login.Password)
+	errorHash := bcrypt.CompareHashAndPassword(hashPass, bodyPass)
+	if errorHash != nil {
+		w.Status(500).JSON("Wrong password")
+		return
+	}
+
+	expTime := time.Now().Add(4000 * time.Minute)
+	claimsJwt := &claims{
+		userId: user.ID.String(),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expTime.Unix(),
 		},
@@ -158,6 +216,13 @@ func LoginWithFacebook(w *fiber.Ctx)  {
 		w.Status(500).JSON("Missing fields")
 		return
 	}
+
+	var user u.User
+	result := db.DBConn.Where("email = ?", loginFacebook.Email).Find(&user)
+	if result.Error != nil {
+		w.Status(500).JSON("No user with this email")
+		return
+	}
 	
 	resp, err := http.Get("https://graph.facebook.com/me?access_token=" + loginFacebook.Token)
 	if err != nil {
@@ -167,16 +232,9 @@ func LoginWithFacebook(w *fiber.Ctx)  {
 	
 	defer resp.Body.Close()
 
-	var user u.User
-	result := db.DBConn.Where("email = ?", loginFacebook.Email).Find(&user)
-	if result.Error != nil {
-		w.Status(500).JSON("No user with this email")
-		return
-	}
-
 	expTime := time.Now().Add(4000 * time.Minute)
 	claimsJwt := &claims{
-		email: user.Email,
+		userId: user.ID.String(),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expTime.Unix(),
 		},
@@ -253,3 +311,31 @@ func SendEmailToResetPassword(w *fiber.Ctx)  {
 
 	w.Status(200).JSON("Email sended")
 }
+
+//Change roles in user field
+func ToggleRolesUser(w *fiber.Ctx) {
+	userId := w.Params("id")
+
+	var user u.User
+	result := db.DBConn.Where("id = ?", userId).Find(&user)
+	if result.Error != nil {
+		w.Status(500).JSON("User doenst exist in database")
+		return
+	}
+
+	if len(user.Roles) > 1 {
+		resultUpdate := db.DBConn.Model(&user).Where("id = ?", userId).Update("roles", pq.StringArray{"user"})
+		if resultUpdate.Error != nil {
+			w.Status(500).JSON("Error update in user roles")
+			return
+		}
+	} else {
+		resultUpdate := db.DBConn.Model(&user).Where("id = ?", userId).Update("roles", pq.StringArray{"user", "admin"})
+		if resultUpdate.Error != nil {
+			w.Status(500).JSON("Error update in user roles")
+			return
+		}
+	}
+
+	w.Status(200).JSON(user)
+} 
