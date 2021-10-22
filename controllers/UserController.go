@@ -267,6 +267,7 @@ func SendEmailToResetPassword(w *fiber.Ctx)  {
 	fileEmail, err := ioutil.ReadFile("template/resetPassword.html")
 	if err != nil {
 		w.Status(500).JSON("Server error")
+		return
 	}
 
 	rand.Seed(time.Now().UnixNano())

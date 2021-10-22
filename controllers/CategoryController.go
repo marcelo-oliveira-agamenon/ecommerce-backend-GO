@@ -25,7 +25,12 @@ func InsertCategory(w *fiber.Ctx)  {
 		return
 	}
 
-	image, _ := w.FormFile("image")
+	image, err := w.FormFile("image")
+	if err != nil {
+		w.Status(500).JSON("Missing field image: " + err.Error())
+		return
+	}
+
 	file, err := image.Open()
 	key, url := q.SendImageToAWS(file, image.Filename, image.Size, "category")
 	if key == "" || err != nil {

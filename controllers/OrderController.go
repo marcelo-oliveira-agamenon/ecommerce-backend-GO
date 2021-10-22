@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"io/ioutil"
 	"strconv"
 	"strings"
 	"time"
@@ -70,6 +71,23 @@ func CreateOrder(w *fiber.Ctx)  {
 		w.Status(500).JSON("Error creating order")
 		return
 	}
+
+	var user e.User
+	result1 := db.DBConn.Where("id = ?", userid.UserId).Find(&user)
+	if result1.Error != nil {
+		w.Status(500).JSON("Error finding user")
+		w.Status(201).JSON(order)
+		return
+	}
+
+	fileEmail, err := ioutil.ReadFile("template/newOrder.html")
+	if err != nil {
+		w.Status(500).JSON("Server error")
+		w.Status(201).JSON(order)
+		return
+	}
+	
+	u.SendEmailUtility(user.Email, string(fileEmail), "Seu Pedido #" + order.ID + " foi realizado na Cash And Grab")
 
 	w.Status(201).JSON(order)
 }
