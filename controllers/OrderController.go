@@ -7,6 +7,7 @@ import (
 
 	"github.com/ecommerce/db"
 	e "github.com/ecommerce/models"
+	u "github.com/ecommerce/utility"
 	"github.com/gofiber/fiber"
 	"github.com/gofrs/uuid"
 	"github.com/lib/pq"
@@ -31,12 +32,13 @@ type APIOrder struct {
 
 //GetByUser get orders by userid
 func GetByUser(w *fiber.Ctx)  {
-	userid := w.Params("id")
+	userid := u.ClaimTokenData(w)
+
 	limit, _ := strconv.Atoi(w.Query("limit"))
 	offset, _ := strconv.Atoi(w.Query("offset"))
 
 	var orders []APIOrder
-	result := db.DBConn.Model(&e.Order{}).Where("user_id", userid).Limit(limit).Offset(offset).Order("created_at desc").Find(&orders)
+	result := db.DBConn.Model(&e.Order{}).Where("user_id", userid.UserId).Limit(limit).Offset(offset).Order("created_at desc").Find(&orders)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing orders")
 		return
@@ -47,14 +49,15 @@ func GetByUser(w *fiber.Ctx)  {
 
 //CreateOrder insert a order to database
 func CreateOrder(w *fiber.Ctx)  {
+	userid := u.ClaimTokenData(w)
 	var order e.Order
-	if w.FormValue("userID") == "" || len(w.FormValue("productID")) == 0 || w.FormValue("qtd") == "" {
+	if userid.UserId == "" || len(w.FormValue("productID")) == 0 || w.FormValue("qtd") == "" {
 		w.Status(500).JSON("Missing fields")
 		return
 	}
 
 	order.ID = ksuid.New().String()
-	order.Userid = uuid.FromStringOrNil(w.FormValue("userID"))
+	order.Userid = uuid.FromStringOrNil(userid.UserId)
 	aux := strings.Split(w.FormValue("productID"), ",")
 	order.ProductID = aux
 	order.Qtd, _ = strconv.Atoi(w.FormValue("qtd"))

@@ -29,7 +29,7 @@ type loginFacebook struct {
 }
 
 type claims struct {
-	userId	string
+	UserId	string	`json:"userId"`
 	jwt.StandardClaims
 }
 
@@ -132,7 +132,7 @@ func Login(w *fiber.Ctx) {
 
 	expTime := time.Now().Add(4000 * time.Minute)
 	claimsJwt := &claims{
-		userId: user.ID.String(),
+		UserId: user.ID.String(),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expTime.Unix(),
 		},
@@ -188,7 +188,7 @@ func LoginAdmin(w *fiber.Ctx) {
 
 	expTime := time.Now().Add(4000 * time.Minute)
 	claimsJwt := &claims{
-		userId: user.ID.String(),
+		UserId: user.ID.String(),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expTime.Unix(),
 		},
@@ -234,7 +234,7 @@ func LoginWithFacebook(w *fiber.Ctx)  {
 
 	expTime := time.Now().Add(4000 * time.Minute)
 	claimsJwt := &claims{
-		userId: user.ID.String(),
+		UserId: user.ID.String(),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expTime.Unix(),
 		},
