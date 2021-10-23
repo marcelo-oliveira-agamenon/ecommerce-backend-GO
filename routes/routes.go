@@ -15,6 +15,7 @@ func Routes(router *fiber.App) {
 	router.Post("/v1/signUp", a.SignUpUser)
 	router.Patch("/v1/resetPassword", a.ResetPassword)
 	router.Post("/v1/resetPasswordLink", a.SendEmailToResetPassword)
+	router.Patch("/v1/refresh", a.RefreshToken)
 	
 	router.Use(b.VerifyToken)
 	router.Get("/v1/admin/card1", a.OrdersQuantityByPeriod)
@@ -34,20 +35,20 @@ func Routes(router *fiber.App) {
 	router.Get("/v1/category", a.SelectCategoryAll)
 	router.Post("/v1/category", a.InsertCategory)
 
-	router.Get("/v1/order/user/:id", a.GetByUser)
+	router.Get("/v1/order/user", a.GetByUser)
 	router.Post("/v1/order", a.CreateOrder)
 	router.Patch("/v1/order/payment/:id/:bool", a.PaymentChangeOrderByID)
 	router.Patch("/v1/order/:id/rate/:rate", a.RateOrder)
 	router.Patch("/v1/order/:id/status/:status", a.ChangeStatusOrder)
 
 	router.Post("/v1/favorite", a.CreateFavorite)
-	router.Get("/v1/favorite/:id", a.GetFavoriteByUser)
+	router.Get("/v1/favorite", a.GetFavoriteByUser)
 	router.Delete("/v1/favorite/:id", a.RemoveFromFavorite)
 
 	router.Post("/v1/product-image/:product_id", a.InsertProductImage)
 	router.Delete("/v1/product-image/:id", a.DeleteProductImage)
 
-	router.Get("/v1/payment/user/:userid", a.GetAllPaymentsByUser)
+	router.Get("/v1/payment/user", a.GetAllPaymentsByUser)
 	router.Post("/v1/payment", a.InsertNewPayment)
 	router.Delete("/v1/payment/:id", a.DeletePayment)
 

@@ -1,7 +1,6 @@
 package utility
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -9,29 +8,24 @@ import (
 )
 
 type claims struct {
-	userId	string
+	UserId	string	`json:"userId"`
 	jwt.StandardClaims
 }
 
 //Get data from claim of JWT token
-func ClaimTokenData(w *fiber.Ctx) (claims, string)  {
+func ClaimTokenData(w *fiber.Ctx) claims  {
 	token := strings.Replace(string(w.Fasthttp.Request.Header.Peek("Authorization")), "Bearer ", "", 1)
 	jwtSecret := []byte(GetDotEnv("JWT_KEY"))
+	decodeClaim := &claims{}
 
-	localToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Error in token verify")
-		}
+	_, err := jwt.ParseWithClaims(token, decodeClaim, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
+
 	if err != nil {
-		return claims{}, "Error parsing token"
+		w.Status(500).JSON("Error token decode")
+		return claims{}
 	}
 
-	cl := localToken.Claims.(jwt.MapClaims)
-	user := cl["userId"].(string)
-	
-	fmt.Print("aa ",user)
-
-	return claims{}, ""
+	return *decodeClaim
 }

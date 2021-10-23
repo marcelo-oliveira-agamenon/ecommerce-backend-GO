@@ -12,7 +12,6 @@ type Product struct {
 	ID				string
 	Name				string
 	Categoryid			string
-	Category			Category				`gorm:"foreignKey:ID;references:Categoryid"`
 	Value				float64
 	StockQtd			int
 	Description			string
@@ -26,6 +25,7 @@ type Product struct {
 	CreatedAt			time.Time
 	UpdatedAt			time.Time
 	DeletedAt			gorm.DeletedAt
+	Category			Category				`gorm:"foreignKey:Categoryid"`
 	Favorites			[]Favorites				`gorm:"foreignKey:ProductID"`
 	ProductImage		[]ProductImage			`gorm:"foreignKey:Productid"`
 }

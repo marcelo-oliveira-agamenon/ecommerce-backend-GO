@@ -5,6 +5,7 @@ import (
 
 	"github.com/ecommerce/db"
 	u "github.com/ecommerce/models"
+	b "github.com/ecommerce/utility"
 	"github.com/gofiber/fiber"
 	"github.com/gofrs/uuid"
 )
@@ -19,12 +20,12 @@ const (
 
 //Get all payments by user id
 func GetAllPaymentsByUser(w *fiber.Ctx) {
-	userid := w.Params("userid")
+	userid := b.ClaimTokenData(w)
 	limit, _ := strconv.Atoi(w.Query("limit"))
 	offset, _ := strconv.Atoi(w.Query("offset"))
 	var payment []u.Payment
 
-	result := db.DBConn.Model(&u.Payment{}).Limit(limit).Offset(offset).Where("user_id = ?", userid).Find(&payment)
+	result := db.DBConn.Model(&u.Payment{}).Limit(limit).Offset(offset).Where("user_id = ?", userid.UserId).Find(&payment)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing payments")
 		return
@@ -35,9 +36,10 @@ func GetAllPaymentsByUser(w *fiber.Ctx) {
 
 //Create new payment by order id
 func InsertNewPayment(w *fiber.Ctx)  {
+	userid := b.ClaimTokenData(w)
 	var payment u.Payment
 	payment.OrderID = w.FormValue("order_id")
-	payment.UserID = w.FormValue("user_id")
+	payment.UserID = userid.UserId
 	payment.TotalValue, _ = strconv.ParseFloat(w.FormValue("total_value"), 64)
 	payment.PaidValue, _ = strconv.ParseFloat(w.FormValue("paid_value"), 64)
 	paymentMethod := w.FormValue("payment_method")

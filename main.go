@@ -14,6 +14,7 @@ import (
 
 func main()  {
 	m.CreateConnection()
+	m.RedisConnection()
 	app := fiber.New()
 	app.Use(cors.New())
 	r.Routes(app)

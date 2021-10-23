@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"io/ioutil"
+	"context"
+	"encoding/json"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber"
 	"github.com/gofrs/uuid"
 	"github.com/lib/pq"
@@ -17,6 +17,8 @@ import (
 	u "github.com/ecommerce/models"
 	q "github.com/ecommerce/utility"
 )
+
+var ctx = context.Background()
 
 type login struct {
 	Email		string	`json:"email"`
@@ -28,11 +30,17 @@ type loginFacebook struct {
 	Token		string	`json:"token"`
 }
 
-type claims struct {
-	userId	string
-	jwt.StandardClaims
+type redisStore struct {
+	UserId	string
+	AccessAt	string
+	ExpiresAt	string
 }
 
+type TemplateDataResetPassword struct {
+	Hash			string
+	Name			string
+	Year			string
+}
 
 //SignUpUser create user in db
 func SignUpUser(w *fiber.Ctx)  {
@@ -92,12 +100,9 @@ func SignUpUser(w *fiber.Ctx)  {
 		return
 	}
 
-	fileEmail, err := ioutil.ReadFile("template/welcome.html")
-	if err != nil {
-		w.Status(201).JSON("User created, but failed sending email")
-	}
+	body := u.User{}
 
-	q.SendEmailUtility(aux.Email, string(fileEmail), "Welcome to Cash And Grab")
+	q.SendEmailUtility(aux.Email, "template/welcome.html", body, "Welcome to Cash And Grab")
 
 	w.Status(201).JSON("User created")
 }
@@ -130,20 +135,8 @@ func Login(w *fiber.Ctx) {
 		return
 	}
 
-	expTime := time.Now().Add(4000 * time.Minute)
-	claimsJwt := &claims{
-		userId: user.ID.String(),
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expTime.Unix(),
-		},
-	}
-	tokenMethod := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsJwt)
-	jwtKey := []byte(q.GetDotEnv("JWT_KEY"))
-	token, err := tokenMethod.SignedString(jwtKey)
-	if err != nil {
-		w.Status(500).JSON("Error in jwt token")
-		return
-	}
+	token, expTime := q.GenerateToken(w, user.ID.String())
+	q.StoreSessionRedis(w, user.ID.String(), expTime.String())
 
 	user.Password = ""
 
@@ -186,20 +179,7 @@ func LoginAdmin(w *fiber.Ctx) {
 		return
 	}
 
-	expTime := time.Now().Add(4000 * time.Minute)
-	claimsJwt := &claims{
-		userId: user.ID.String(),
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expTime.Unix(),
-		},
-	}
-	tokenMethod := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsJwt)
-	jwtKey := []byte(q.GetDotEnv("JWT_KEY"))
-	token, err := tokenMethod.SignedString(jwtKey)
-	if err != nil {
-		w.Status(500).JSON("Error in jwt token")
-		return
-	}
+	token, _ := q.GenerateToken(w, user.ID.String())
 
 	user.Password = ""
 
@@ -232,20 +212,7 @@ func LoginWithFacebook(w *fiber.Ctx)  {
 	
 	defer resp.Body.Close()
 
-	expTime := time.Now().Add(4000 * time.Minute)
-	claimsJwt := &claims{
-		userId: user.ID.String(),
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expTime.Unix(),
-		},
-	}
-	tokenMethod := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsJwt)
-	jwtKey := []byte(q.GetDotEnv("JWT_KEY"))
-	tokenJWT, err := tokenMethod.SignedString(jwtKey)
-	if err != nil {
-		w.Status(500).JSON("Error in jwt token")
-		return
-	}
+	tokenJWT, _ := q.GenerateToken(w, user.ID.String())
 
 	w.Status(200).JSON(&fiber.Map{
 		"user": user,
@@ -299,15 +266,18 @@ func SendEmailToResetPassword(w *fiber.Ctx)  {
 		return
 	}
 
-	fileEmail, err := ioutil.ReadFile("template/resetPassword.html")
-	if err != nil {
-		w.Status(500).JSON("Server error")
-	}
-
 	rand.Seed(time.Now().UnixNano())
 	hash := strconv.Itoa(rand.Intn(999999 - 100000 + 1) + 100000)
+	body := TemplateDataResetPassword{
+		Hash: hash,
+		Name: user.Name,
+		Year: strconv.Itoa(time.Now().Year()),
+	}	
 
-	q.SendEmailUtility(user.Email, string(fileEmail), "Reset Password - Código de Verificação: " + hash)
+	if q.SendEmailUtility(user.Email, "template/resetPassword.html", body, "Reset Password - Código de Verificação") == false {
+		w.Status(500).JSON("Error sending email handler")
+		return
+	}
 
 	w.Status(200).JSON("Email sended")
 }
@@ -338,4 +308,41 @@ func ToggleRolesUser(w *fiber.Ctx) {
 	}
 
 	w.Status(200).JSON(user)
+} 
+
+//Refresh the given token, and verify the session on redis
+func RefreshToken(w *fiber.Ctx) {
+	userId := q.ClaimTokenData(w)
+
+	if userId.UserId == "" {
+		w.Status(500).JSON("Missing token data")
+		return	
+	}
+	
+	data, err := db.RedisServer.Get(ctx, userId.UserId).Result()
+	if err != nil {
+		w.Status(500).JSON("Error in redis server")
+		return
+	}
+
+	var unmarshalData redisStore
+	err1 := json.Unmarshal([]byte(data), &unmarshalData)
+	if err1 != nil {
+		w.Status(401).JSON("Error unmarshal redis data")
+		return
+	}
+
+	layout := "2006-01-02T15:04:05.000Z"
+	expiresAt, err := time.Parse(layout, unmarshalData.ExpiresAt)
+	if time.Now().Before(expiresAt) {
+		w.Status(401).JSON("Token already expired at: " + unmarshalData.ExpiresAt)
+		return
+	}
+
+	token, expTime := q.GenerateToken(w, userId.UserId)
+	q.StoreSessionRedis(w, userId.UserId, expTime.String())
+
+	w.Status(200).JSON(&fiber.Map{
+		"token": token,
+	})
 } 
