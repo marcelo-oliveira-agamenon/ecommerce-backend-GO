@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -35,6 +34,12 @@ type redisStore struct {
 	UserId	string
 	AccessAt	string
 	ExpiresAt	string
+}
+
+type TemplateDataResetPassword struct {
+	Hash			string
+	Name			string
+	Year			string
 }
 
 //SignUpUser create user in db
@@ -95,12 +100,9 @@ func SignUpUser(w *fiber.Ctx)  {
 		return
 	}
 
-	fileEmail, err := ioutil.ReadFile("template/welcome.html")
-	if err != nil {
-		w.Status(201).JSON("User created, but failed sending email")
-	}
+	body := u.User{}
 
-	q.SendEmailUtility(aux.Email, string(fileEmail), "Welcome to Cash And Grab")
+	q.SendEmailUtility(aux.Email, "template/welcome.html", body, "Welcome to Cash And Grab")
 
 	w.Status(201).JSON("User created")
 }
@@ -264,16 +266,18 @@ func SendEmailToResetPassword(w *fiber.Ctx)  {
 		return
 	}
 
-	fileEmail, err := ioutil.ReadFile("template/resetPassword.html")
-	if err != nil {
-		w.Status(500).JSON("Server error")
-		return
-	}
-
 	rand.Seed(time.Now().UnixNano())
 	hash := strconv.Itoa(rand.Intn(999999 - 100000 + 1) + 100000)
+	body := TemplateDataResetPassword{
+		Hash: hash,
+		Name: user.Name,
+		Year: strconv.Itoa(time.Now().Year()),
+	}	
 
-	q.SendEmailUtility(user.Email, string(fileEmail), "Reset Password - Código de Verificação: " + hash)
+	if q.SendEmailUtility(user.Email, "template/resetPassword.html", body, "Reset Password - Código de Verificação") == false {
+		w.Status(500).JSON("Error sending email handler")
+		return
+	}
 
 	w.Status(200).JSON("Email sended")
 }

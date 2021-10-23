@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"io/ioutil"
 	"strconv"
 	"strings"
 	"time"
@@ -29,6 +28,15 @@ type APIOrder struct {
 	CreatedAt			time.Time
 	UpdatedAt			time.Time
 	DeletedAt			gorm.DeletedAt
+}
+
+type TemplateDataCreateOrder struct {
+	Name			string
+	Year		 	string
+	OrderNumber		string
+	ProductName		string
+	OrderValue		string
+	OrderQtd		int
 }
 
 //GetByUser get orders by userid
@@ -79,15 +87,17 @@ func CreateOrder(w *fiber.Ctx)  {
 		w.Status(201).JSON(order)
 		return
 	}
-
-	fileEmail, err := ioutil.ReadFile("template/newOrder.html")
-	if err != nil {
-		w.Status(500).JSON("Server error")
-		w.Status(201).JSON(order)
-		return
+	
+	body := TemplateDataCreateOrder{
+		Name: user.Name,
+		Year: strconv.Itoa(time.Now().Year()),
+		OrderNumber: order.ID,
+		ProductName: "dasd",
+		OrderValue: w.FormValue("totalValue"),
+		OrderQtd: order.Qtd,
 	}
 	
-	u.SendEmailUtility(user.Email, string(fileEmail), "Seu Pedido #" + order.ID + " foi realizado na Cash And Grab")
+	u.SendEmailUtility(user.Email, "template/newOrder.html", body, "Seu Pedido #" + order.ID + " foi realizado na Grab and Cash")
 
 	w.Status(201).JSON(order)
 }

@@ -28,7 +28,7 @@
           letter-spacing: 1px;
         "
       >
-        Redefina sua senha
+        Seu Pedido #{{.OrderNumber}} no Grab and Cash
       </h1>
     </header>
 
@@ -38,15 +38,43 @@
         font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
           'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
         margin-top: 30px;
-        margin-bottom: 61.6vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       "
     >
-      <div style="display: flex; flex-direction: column; padding: 0 50px">
-        <h1>Clique no link abaixo</h1>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <h1>Olá {{.Name}}! Seu pedido foi realizado com sucesso!</h1>
 
-        <a href="https://grabandcash.vercel.app/resetPassword/555111"
-          >Redefina sua senha na nossa plataforma</a
-        >
+        <p style="margin-top: 30px;text-align: center;"></p>
+          Obrigado por comprar na Grab And Cash. Sua compra está sendo
+          processada. Se você desejar cancelar a compra ou gerenciar outros
+          pedidos, por favor, acesse Seus pedidos na
+          https://grabandcash.vercel.app.
+        </p>
+      </div>
+
+      <div
+        style="
+          background-color: #e4f2ff;
+          width: 70%;
+          height: 200px;
+          padding: 15px 30px;
+          margin-top: 30px;
+          margin-bottom: 60px;
+        "
+      >
+        <h5 style="margin: 0;font-size: 17px;">Resumo do Pedido</h5>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 30px; row-gap: 14px;">
+          <h5 style="margin: 0;font-size: 15px;">Quantidade de Produtos:</h5>
+          
+          <span style="margin-left: auto;">{{.OrderQtd}} un.</span>
+
+          <h5 style="margin: 0;font-size: 15px;">Valor total do pedido:</h5>
+          
+          <span style="margin-left: auto;">R$ {{.OrderValue}}</span>
+        </div>
       </div>
     </section>
 
@@ -70,7 +98,7 @@
           letter-spacing: 1px;
         "
       >
-        Cash and Grab 2021
+        Cash and Grab {{.Year}}
       </h1>
     </footer>
   </body>
