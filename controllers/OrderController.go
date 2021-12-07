@@ -74,6 +74,23 @@ func CreateOrder(w *fiber.Ctx)  {
 	order.TotalValue, _ = strconv.ParseFloat(w.FormValue("totalValue"), 64)
 	order.Status = "PENDENTE"
 
+	products := make([]e.Product, len(order.ProductID))
+	for _, s := range order.ProductID {
+		var product e.Product
+		result:= db.DBConn.Where("id = ?", s).Find(&product)
+		if result.Error != nil {
+			w.Status(500).JSON("Error finding product for email")
+			return
+		}
+
+		products = append(products, product)
+	}
+
+	if len(products) == 0 {
+		w.Status(500).JSON("Error, no valid products")
+		return
+	}
+
 	result := db.DBConn.Create(&order)
 	if result.Error != nil {
 		w.Status(500).JSON("Error creating order")
@@ -84,10 +101,9 @@ func CreateOrder(w *fiber.Ctx)  {
 	result1 := db.DBConn.Where("id = ?", userid.UserId).Find(&user)
 	if result1.Error != nil {
 		w.Status(500).JSON("Error finding user")
-		w.Status(201).JSON(order)
 		return
 	}
-	
+
 	body := TemplateDataCreateOrder{
 		Name: user.Name,
 		Year: strconv.Itoa(time.Now().Year()),
