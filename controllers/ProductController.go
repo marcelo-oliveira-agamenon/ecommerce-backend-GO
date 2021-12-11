@@ -5,12 +5,14 @@ import (
 
 	"github.com/ecommerce/db"
 	u "github.com/ecommerce/models"
+	"github.com/ecommerce/utility"
 	"github.com/gofiber/fiber"
 	"github.com/segmentio/ksuid"
 )
 
 //InsertProduct to database
 func InsertProduct(w *fiber.Ctx) {
+	userid := utility.ClaimTokenData(w)
 	var aux u.Product
 	aux.ID = ksuid.New().String()
 	aux.Name = w.FormValue("name")
@@ -31,6 +33,8 @@ func InsertProduct(w *fiber.Ctx) {
 		w.Status(500).JSON("Error creating product")
 		return
 	}
+
+	utility.InsertLogRegistryIntoDabatase("product", "Insert product with ID " + aux.ID, userid.UserId)
 
 	w.Status(201).JSON(aux)
 }

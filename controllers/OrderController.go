@@ -34,7 +34,6 @@ type TemplateDataCreateOrder struct {
 	Name			string
 	Year		 	string
 	OrderNumber		string
-	ProductName		string
 	OrderValue		string
 	OrderQtd		int
 }
@@ -74,7 +73,7 @@ func CreateOrder(w *fiber.Ctx)  {
 	order.TotalValue, _ = strconv.ParseFloat(w.FormValue("totalValue"), 64)
 	order.Status = "PENDENTE"
 
-	products := make([]e.Product, len(order.ProductID))
+	products := make([]string, len(order.ProductID))
 	for _, s := range order.ProductID {
 		var product e.Product
 		result:= db.DBConn.Where("id = ?", s).Find(&product)
@@ -83,7 +82,7 @@ func CreateOrder(w *fiber.Ctx)  {
 			return
 		}
 
-		products = append(products, product)
+		products = append(products, product.Name)
 	}
 
 	if len(products) == 0 {
@@ -108,11 +107,10 @@ func CreateOrder(w *fiber.Ctx)  {
 		Name: user.Name,
 		Year: strconv.Itoa(time.Now().Year()),
 		OrderNumber: order.ID,
-		ProductName: "dasd",
 		OrderValue: w.FormValue("totalValue"),
 		OrderQtd: order.Qtd,
 	}
-	
+
 	u.SendEmailUtility(user.Email, "template/newOrder.html", body, "Seu Pedido #" + order.ID + " foi realizado na Grab and Cash")
 
 	w.Status(201).JSON(order)

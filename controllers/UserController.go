@@ -15,6 +15,7 @@ import (
 
 	"github.com/ecommerce/db"
 	u "github.com/ecommerce/models"
+	"github.com/ecommerce/utility"
 	q "github.com/ecommerce/utility"
 )
 
@@ -284,6 +285,7 @@ func SendEmailToResetPassword(w *fiber.Ctx)  {
 
 //Change roles in user field
 func ToggleRolesUser(w *fiber.Ctx) {
+	useridWithToken := utility.ClaimTokenData(w)
 	userId := w.Params("id")
 
 	var user u.User
@@ -306,6 +308,8 @@ func ToggleRolesUser(w *fiber.Ctx) {
 			return
 		}
 	}
+
+	utility.InsertLogRegistryIntoDabatase("user", "Role of user with ID " + userId + " was change by user", useridWithToken.UserId)
 
 	w.Status(200).JSON(user)
 } 
