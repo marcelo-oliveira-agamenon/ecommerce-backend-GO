@@ -116,11 +116,20 @@ func Login(w *fiber.Ctx) {
 		return
 	}
 
+	isAdmin := w.Query("admin")
+
 	var user u.User
 	result := db.DBConn.Where("email = ?", login.Email).Find(&user)
 	if result.Error != nil {
 		w.Status(500).JSON("Error listing user")
 		return
+	}
+
+	if len(isAdmin) > 0 {
+		if len(user.Roles) == 1 {
+			w.Status(401).JSON("User doenst have admin permission")
+			return
+		}
 	}
 
 	if user.Email == "" {
@@ -138,49 +147,6 @@ func Login(w *fiber.Ctx) {
 
 	token, expTime := q.GenerateToken(w, user.ID.String())
 	q.StoreSessionRedis(w, user.ID.String(), expTime.String())
-
-	user.Password = ""
-
-	w.Status(200).JSON(&fiber.Map{
-		"user": user,
-		"token": token,
-	})
-}
-
-//Login user in application
-func LoginAdmin(w *fiber.Ctx) {
-	login := new(login)
-	if err := w.BodyParser(login); err != nil {
-		w.Status(500).JSON("Missing fields")
-		return
-	}
-
-	var user u.User
-	result := db.DBConn.Where("email = ?", login.Email).Find(&user)
-	if result.Error != nil {
-		w.Status(500).JSON("Error listing user")
-		return
-	}
-
-	if user.Email == "" {
-		w.Status(500).JSON("No user with this email")
-		return
-	}
-
-	if len(user.Roles) == 1 {
-		w.Status(401).JSON("User doenst have admin permission")
-		return
-	}
-
-	hashPass := []byte(user.Password)
-	bodyPass := []byte(login.Password)
-	errorHash := bcrypt.CompareHashAndPassword(hashPass, bodyPass)
-	if errorHash != nil {
-		w.Status(500).JSON("Wrong password")
-		return
-	}
-
-	token, _ := q.GenerateToken(w, user.ID.String())
 
 	user.Password = ""
 
@@ -322,7 +288,7 @@ func RefreshToken(w *fiber.Ctx) {
 		w.Status(500).JSON("Missing token data")
 		return	
 	}
-	
+
 	data, err := db.RedisServer.Get(ctx, userId.UserId).Result()
 	if err != nil {
 		w.Status(500).JSON("Error in redis server")
