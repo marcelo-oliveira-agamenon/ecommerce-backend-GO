@@ -11,7 +11,8 @@ import (
 //VerifyToken return bool for jwt token
 func VerifyToken(c *fiber.Ctx)  {
 	rawToken := strings.Replace(string(c.Fasthttp.Request.Header.Peek("Authorization")), "Bearer ", "", 1)
-	if rawToken == "" {
+
+	if rawToken == "" || rawToken == "null" {
 		c.Status(401).JSON("Missing token")
 		return
 	}
