@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	u "github.com/ecommerce/models"
 )
@@ -22,7 +23,9 @@ func CreateConnection()  {
 	dbString := os.Getenv("DB_CONNECTION")
 
 	dsn := dbString
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger:logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		fmt.Print(err)
 		return

@@ -7,7 +7,7 @@ import (
 //ProductImage struct model
 type ProductImage struct {
 	gorm.Model
-	ID				string			
+	ID					string			
 	Productid			string
 	ProductID			Product		`gorm:"foreignKey:Productid;references:ID"`
 	ImageKey			string

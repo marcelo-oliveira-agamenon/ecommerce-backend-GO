@@ -51,4 +51,6 @@ func Routes(router *fiber.App) {
 
 	router.Post("/v1/coupon", a.CreateCoupon)
 	router.Get("/v1/coupon", a.VerifyCouponStillActive)
+
+	router.Get("/v1/report/users", a.ExportUsersReport)
 }
