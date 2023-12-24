@@ -15,11 +15,9 @@ var (
 // Create new connection for redis server
 func RedisConnection() {
 	godotenv.Load(".env")
-	redisAddr := os.Getenv("REDIS_ADDR")
-	redisPassword := os.Getenv("REDIS_PASSWORD")
 	client := redis.NewClient(&redis.Options{
-		Addr: redisAddr,
-		Password: redisPassword,
+		Addr: os.Getenv("REDIS_ADDR"),
+		Password: os.Getenv("REDIS_PASSWORD"),
 		DB: 0,
 	})
 

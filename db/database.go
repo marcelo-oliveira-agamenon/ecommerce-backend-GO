@@ -22,8 +22,7 @@ func CreateConnection()  {
 	godotenv.Load(".env")
 	dbString := os.Getenv("DB_CONNECTION")
 
-	dsn := dbString
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(dbString), &gorm.Config{
 		Logger:logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
