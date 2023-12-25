@@ -23,7 +23,7 @@ type UserResponse struct {
 type API interface {
 	SignUp(context context.Context, user user.User) (*UserResponse, error)
 	DeleteUser(context context.Context, id string) (bool, error)
-	UpdateUser(context context.Context, id string, data user.User) error
+	UpdateUser(context context.Context, id string, data user.User) (bool, error)
 }
 
 type UserService struct {

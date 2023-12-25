@@ -32,10 +32,15 @@ func (u *UserService) SignUp(context context.Context, data user.User) (*UserResp
 	if errGen != nil {
 		return nil, errGen
 	}
+	roles, errRo := user.NewRoles(data.Roles)
+	if errRo != nil {
+		return nil, errRo
+	}
 	data.Password = password
 	data.Birthday = birthday
 	data.Phone = phone
 	data.Gender = gender
+	data.Roles = roles
 	user, errUser := user.NewUser(data)
 	if errUser != nil {
 		return nil, errUser
@@ -57,10 +62,13 @@ func (u *UserService) SignUp(context context.Context, data user.User) (*UserResp
 	}, nil
 }
 
-func (u *UserService) UpdateUser(context context.Context, id string, data user.User) error {
-	u.userRepository.UpdateUser(context, id, data)
+func (u *UserService) UpdateUser(context context.Context, id string, data user.User) (bool, error) {
+	uu, err := u.userRepository.UpdateUser(context, id, data)
+	if err != nil {
+		return uu, err
+	}
 
-	return nil
+	return uu, nil
 }
 
 func (u *UserService) DeleteUser(context context.Context, id string) (bool, error) {
