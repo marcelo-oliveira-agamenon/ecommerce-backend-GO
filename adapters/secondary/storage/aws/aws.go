@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/ecommerce/ports"
@@ -37,7 +38,7 @@ func (ss *AWSStorage) SaveFileAWS(file multipart.File, fileHeader string, fileSi
 	file.Read(buffer)
 	fileName := typeModel + "/" + bson.NewObjectId().Hex() + filepath.Ext(fileHeader)
 	imageURL := "https://" + ss.bucket + "." + "s3" + ".amazonaws.com/" + fileName
-
+	//todo: is better put or insert object?
 	_, err := s3.New(ss.session).PutObject(&s3.PutObjectInput{
 		Bucket:               aws.String(ss.bucket),
 		Key:                  aws.String(fileName),
@@ -60,5 +61,22 @@ func (ss *AWSStorage) SaveFileAWS(file multipart.File, fileHeader string, fileSi
 }
 
 func (ss *AWSStorage) DeleteFileAWS(fileName string) (bool, error) {
-	return false, nil
+	input := &s3.DeleteObjectInput{
+		Bucket: &ss.bucket,
+		Key:    &fileName,
+	}
+
+	_, err := s3.New(ss.session).DeleteObject(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			default:
+				return false, aerr
+			}
+		} else {
+			return false, err
+		}
+	}
+
+	return true, nil
 }

@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	ErrorToken = errors.New("invalid generated token")
+	ErrorToken           = errors.New("invalid generated token")
+	ErrorInvalidPassword = errors.New("invalid password")
 )
 
 type claims struct {
@@ -27,7 +28,7 @@ func NewToken(jwtKey string) ports.TokenService {
 	}
 }
 
-func (jt *JWTToken) CreateToken(userID string) (string, time.Time, error) {
+func (jt *JWTToken) CreateToken(userID string) (*string, time.Time, error) {
 	expTime := time.Now().Add(60 * time.Minute)
 	claimsJwt := &claims{
 		UserId: userID,
@@ -39,12 +40,12 @@ func (jt *JWTToken) CreateToken(userID string) (string, time.Time, error) {
 	tokenMethod := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsJwt)
 	token, err := tokenMethod.SignedString([]byte(jt.jwyKey))
 	if err != nil {
-		return "", time.Time{}, ErrorToken
+		return nil, time.Time{}, ErrorToken
 	}
 
-	return token, expTime, nil
+	return &token, expTime, nil
 }
 
 func (jt *JWTToken) VerifyToken() error {
-	return errors.New("")
+	return nil
 }

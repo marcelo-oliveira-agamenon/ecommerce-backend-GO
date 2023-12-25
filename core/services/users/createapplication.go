@@ -2,9 +2,9 @@ package users
 
 import (
 	"context"
-	"errors"
 
 	"github.com/ecommerce/core/domain/user"
+	"github.com/ecommerce/core/util"
 )
 
 func (u *UserService) SignUp(context context.Context, data user.User) (*UserResponse, error) {
@@ -13,12 +13,16 @@ func (u *UserService) SignUp(context context.Context, data user.User) (*UserResp
 		return nil, errRepo
 	}
 	if alreadyHasUser != nil {
-		return nil, errors.New("already has a user with this email")
+		return nil, ErrorUserAlreadyExists
 	}
 
 	password, errPass := user.NewPassword(data.Password)
 	if errPass != nil {
 		return nil, errPass
+	}
+	hashPass, errHs := util.HashPassword(password)
+	if errHs != nil {
+		return nil, errHs
 	}
 	birthday, errBirth := user.NewBirthday(data.Birthday)
 	if errBirth != nil {
@@ -36,7 +40,8 @@ func (u *UserService) SignUp(context context.Context, data user.User) (*UserResp
 	if errRo != nil {
 		return nil, errRo
 	}
-	data.Password = password
+
+	data.Password = hashPass
 	data.Birthday = birthday
 	data.Phone = phone
 	data.Gender = gender
@@ -78,4 +83,33 @@ func (u *UserService) DeleteUser(context context.Context, id string) (bool, erro
 	}
 
 	return du, nil
+}
+
+func (u *UserService) Login(context context.Context, body LoginRequest) (*UserResponse, error) {
+	if body.Email == "" || body.Password == "" {
+		return nil, ErrorMissingFieldsLogin
+	}
+	//isAdmin :=
+	user, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
+	if errRepo != nil {
+		return nil, errRepo
+	}
+	if user == nil {
+		return nil, ErrorUserDoesntExist
+	}
+
+	if err := util.CheckPassword(user.Password, body.Password); err != nil {
+		return nil, ErrorInvalidPassword
+	}
+
+	return &UserResponse{
+		ID:       user.ID,
+		Name:     user.Name,
+		Email:    user.Email,
+		Address:  user.Address,
+		Phone:    user.Phone,
+		Birthday: user.Birthday,
+		Gender:   user.Gender,
+		Roles:    user.Roles,
+	}, nil
 }

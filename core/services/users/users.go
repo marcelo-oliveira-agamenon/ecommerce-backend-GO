@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"errors"
 
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/ports"
@@ -20,7 +21,20 @@ type UserResponse struct {
 	Roles    pq.StringArray
 }
 
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+var (
+	ErrorMissingFieldsLogin = errors.New("missing fields on login body")
+	ErrorUserAlreadyExists  = errors.New("already has a user with this email")
+	ErrorUserDoesntExist    = errors.New("user doenst exist")
+	ErrorInvalidPassword    = errors.New("invalid password")
+)
+
 type API interface {
+	Login(context context.Context, body LoginRequest) (*UserResponse, error)
 	SignUp(context context.Context, user user.User) (*UserResponse, error)
 	DeleteUser(context context.Context, id string) (bool, error)
 	UpdateUser(context context.Context, id string, data user.User) (bool, error)
