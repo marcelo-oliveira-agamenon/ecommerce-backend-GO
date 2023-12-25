@@ -10,18 +10,20 @@ import (
 )
 
 type UserResponse struct {
-	ID				uuid.UUID
-	Name			string
-	Email			string			
-	Address			string		
-	Phone			string			
- 	Birthday		string			
- 	Gender			string
-	Roles			pq.StringArray
+	ID       uuid.UUID
+	Name     string
+	Email    string
+	Address  string
+	Phone    string
+	Birthday string
+	Gender   string
+	Roles    pq.StringArray
 }
 
 type API interface {
 	SignUp(context context.Context, user user.User) (*UserResponse, error)
+	DeleteUser(context context.Context, id string) (bool, error)
+	UpdateUser(context context.Context, id string, data user.User) error
 }
 
 type UserService struct {

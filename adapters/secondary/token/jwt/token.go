@@ -13,12 +13,12 @@ var (
 )
 
 type claims struct {
-    UserId string `json:"userId"`
-    jwt.StandardClaims
+	UserId string `json:"userId"`
+	jwt.StandardClaims
 }
 
 type JWTToken struct {
-	jwyKey	string
+	jwyKey string
 }
 
 func NewToken(jwtKey string) ports.TokenService {
@@ -27,7 +27,7 @@ func NewToken(jwtKey string) ports.TokenService {
 	}
 }
 
-func (jt *JWTToken) CreateToken(userID string) (string, time.Time, error)  {
+func (jt *JWTToken) CreateToken(userID string) (string, time.Time, error) {
 	expTime := time.Now().Add(60 * time.Minute)
 	claimsJwt := &claims{
 		UserId: userID,
@@ -41,7 +41,7 @@ func (jt *JWTToken) CreateToken(userID string) (string, time.Time, error)  {
 	if err != nil {
 		return "", time.Time{}, ErrorToken
 	}
-	
+
 	return token, expTime, nil
 }
 

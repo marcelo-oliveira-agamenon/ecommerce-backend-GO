@@ -5,7 +5,7 @@ import (
 	"github.com/ecommerce/ports"
 )
 
-//Get fiber instance and import routes
-func initRoutes(a *App, token ports.TokenService) {
-	a.fiber.Post("/v1/signUp", users.SignUp(a.usersAPI, token))
+// Get fiber instance and import routes
+func initRoutes(a *App, token ports.TokenService, storage ports.StorageService) {
+	a.fiber.Post("/v1/signUp", users.SignUp(a.usersAPI, token, storage))
 }
