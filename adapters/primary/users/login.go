@@ -10,6 +10,7 @@ func Login(userAPI users.API, token ports.TokenService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		lgReq := new(users.LoginRequest)
 		ctx.BodyParser(lgReq)
+		lgReq.IsAdmin = ctx.Query("admin")
 
 		user, errU := userAPI.Login(ctx.Context(), *lgReq)
 		if errU != nil {

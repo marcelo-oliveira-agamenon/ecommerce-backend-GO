@@ -26,3 +26,15 @@ func NewRoles(roles pq.StringArray) (pq.StringArray, error) {
 
 	return roles, nil
 }
+
+func IsRoleAdmin(roles pq.StringArray) bool {
+	isAdmin := false
+	for _, v := range roles {
+		if v == "admin" {
+			isAdmin = true
+			break
+		}
+	}
+
+	return isAdmin
+}

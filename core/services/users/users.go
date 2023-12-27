@@ -24,6 +24,7 @@ type UserResponse struct {
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	IsAdmin  string
 }
 
 var (
@@ -31,6 +32,7 @@ var (
 	ErrorUserAlreadyExists  = errors.New("already has a user with this email")
 	ErrorUserDoesntExist    = errors.New("user doenst exist")
 	ErrorInvalidPassword    = errors.New("invalid password")
+	ErrorUserIsNotAdmin     = errors.New("access denied")
 )
 
 type API interface {
@@ -47,5 +49,18 @@ type UserService struct {
 func NewUserService(ur ports.UserRepository) *UserService {
 	return &UserService{
 		userRepository: ur,
+	}
+}
+
+func NewUserResponse(data user.User) *UserResponse {
+	return &UserResponse{
+		ID:       data.ID,
+		Name:     data.Name,
+		Email:    data.Email,
+		Address:  data.Address,
+		Phone:    data.Phone,
+		Birthday: data.Birthday,
+		Gender:   data.Gender,
+		Roles:    data.Roles,
 	}
 }

@@ -55,16 +55,7 @@ func (u *UserService) SignUp(context context.Context, data user.User) (*UserResp
 		return nil, err
 	}
 
-	return &UserResponse{
-		ID:       user.ID,
-		Name:     user.Name,
-		Email:    user.Email,
-		Address:  user.Address,
-		Phone:    user.Phone,
-		Birthday: user.Birthday,
-		Gender:   user.Gender,
-		Roles:    user.Roles,
-	}, nil
+	return NewUserResponse(data), nil
 }
 
 func (u *UserService) UpdateUser(context context.Context, id string, data user.User) (bool, error) {
@@ -89,27 +80,22 @@ func (u *UserService) Login(context context.Context, body LoginRequest) (*UserRe
 	if body.Email == "" || body.Password == "" {
 		return nil, ErrorMissingFieldsLogin
 	}
-	//isAdmin :=
-	user, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
+
+	us, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
 	if errRepo != nil {
 		return nil, errRepo
 	}
-	if user == nil {
+	if us == nil {
 		return nil, ErrorUserDoesntExist
 	}
 
-	if err := util.CheckPassword(user.Password, body.Password); err != nil {
+	if body.IsAdmin == "true" && !user.IsRoleAdmin(us.Roles) {
+		return nil, ErrorUserIsNotAdmin
+	}
+
+	if err := util.CheckPassword(us.Password, body.Password); err != nil {
 		return nil, ErrorInvalidPassword
 	}
 
-	return &UserResponse{
-		ID:       user.ID,
-		Name:     user.Name,
-		Email:    user.Email,
-		Address:  user.Address,
-		Phone:    user.Phone,
-		Birthday: user.Birthday,
-		Gender:   user.Gender,
-		Roles:    user.Roles,
-	}, nil
+	return NewUserResponse(*us), nil
 }
