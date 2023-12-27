@@ -10,6 +10,16 @@ import (
 	"github.com/lib/pq"
 )
 
+var (
+	FacebookTokenURL        = "https://graph.facebook.com/me?access_token="
+	ErrorUserAlreadyExists  = errors.New("already has a user with this email")
+	ErrorUserDoesntExist    = errors.New("user doesnt exist")
+	ErrorInvalidPassword    = errors.New("invalid password")
+	ErrorUserIsNotAdmin     = errors.New("access denied")
+	ErrorInvalidToken       = errors.New("invalid token")
+	ErrorPasswordsDontMatch = errors.New("passwords dont match")
+)
+
 type UserResponse struct {
 	ID       uuid.UUID
 	Name     string
@@ -27,16 +37,21 @@ type LoginRequest struct {
 	IsAdmin  string
 }
 
-var (
-	ErrorMissingFieldsLogin = errors.New("missing fields on login body")
-	ErrorUserAlreadyExists  = errors.New("already has a user with this email")
-	ErrorUserDoesntExist    = errors.New("user doenst exist")
-	ErrorInvalidPassword    = errors.New("invalid password")
-	ErrorUserIsNotAdmin     = errors.New("access denied")
-)
+type LoginFacebook struct {
+	Email string `json:"email"`
+	Token string `json:"token"`
+}
+
+type ResetPassword struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Reset    string `json:"reset"`
+}
 
 type API interface {
 	Login(context context.Context, body LoginRequest) (*UserResponse, error)
+	LoginFacebook(context context.Context, body LoginFacebook) (*UserResponse, error)
+	ResetPassword(context context.Context, body ResetPassword) (bool, error)
 	SignUp(context context.Context, user user.User) (*UserResponse, error)
 	DeleteUser(context context.Context, id string) (bool, error)
 	UpdateUser(context context.Context, id string, data user.User) (bool, error)

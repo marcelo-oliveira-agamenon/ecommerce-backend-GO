@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/core/util"
@@ -77,8 +78,13 @@ func (u *UserService) DeleteUser(context context.Context, id string) (bool, erro
 }
 
 func (u *UserService) Login(context context.Context, body LoginRequest) (*UserResponse, error) {
-	if body.Email == "" || body.Password == "" {
-		return nil, ErrorMissingFieldsLogin
+	_, errEm := user.NewEmail(body.Email)
+	if errEm != nil {
+		return nil, errEm
+	}
+	_, errPa := user.NewPassword(body.Password)
+	if errPa != nil {
+		return nil, errPa
 	}
 
 	us, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
@@ -98,4 +104,48 @@ func (u *UserService) Login(context context.Context, body LoginRequest) (*UserRe
 	}
 
 	return NewUserResponse(*us), nil
+}
+
+func (u *UserService) LoginFacebook(context context.Context, body LoginFacebook) (*UserResponse, error) {
+	_, errEm := user.NewEmail(body.Email)
+	if errEm != nil {
+		return nil, errEm
+	}
+
+	us, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
+	if errRepo != nil {
+		return nil, errRepo
+	}
+	if us == nil {
+		return nil, ErrorUserDoesntExist
+	}
+
+	resp, errFa := http.Get(FacebookTokenURL + body.Token)
+	if errFa != nil {
+		return nil, ErrorInvalidToken
+	}
+	defer resp.Body.Close()
+
+	return NewUserResponse(*us), nil
+}
+
+func (u *UserService) ResetPassword(context context.Context, body ResetPassword) (bool, error) {
+	_, errEm := user.NewEmail(body.Email)
+	if errEm != nil {
+		return false, errEm
+	}
+
+	if a := user.ComparePasswords(body.Password, body.Reset); !a {
+		return false, ErrorPasswordsDontMatch
+	}
+
+	us, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
+	if errRepo != nil {
+		return false, errRepo
+	}
+	if us == nil {
+		return false, ErrorUserDoesntExist
+	}
+
+	return false, nil
 }

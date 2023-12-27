@@ -22,3 +22,10 @@ func NewPassword(password string) (string, error) {
 
 	return password, nil
 }
+
+func ComparePasswords(first string, second string) bool {
+	first = strings.TrimSpace(first)
+	second = strings.TrimSpace(second)
+
+	return first == second
+}
