@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/ecommerce/adapters/primary"
+	"github.com/ecommerce/adapters/secondary/email/gomail"
 	"github.com/ecommerce/adapters/secondary/postgres"
 	storage "github.com/ecommerce/adapters/secondary/storage/aws"
 	"github.com/ecommerce/adapters/secondary/token/jwt"
@@ -28,9 +29,11 @@ func main() {
 
 	tokenService := jwt.NewToken(os.Getenv("JWT_KEY"))
 
+	emailService := gomail.NewEmailService()
+
 	userRepository := postgres.NewUserRepository(postgresRepository)
 	userService := users.NewUserService(userRepository)
 
-	srv := primary.NewApp(tokenService, storageService, userService, os.Getenv("PORT"))
+	srv := primary.NewApp(tokenService, storageService, userService, emailService, os.Getenv("PORT"))
 	primary.Run(srv)
 }

@@ -2,7 +2,10 @@ package users
 
 import (
 	"context"
+	"math/rand"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/core/util"
@@ -147,5 +150,40 @@ func (u *UserService) ResetPassword(context context.Context, body ResetPassword)
 		return false, ErrorUserDoesntExist
 	}
 
-	return false, nil
+	_, errPa := user.NewPassword(body.Password)
+	if errPa != nil {
+		return false, errPa
+	}
+	hashPass, errHs := util.HashPassword(body.Password)
+	if errHs != nil {
+		return false, errHs
+	}
+
+	us.Password = hashPass
+	state, errUp := u.UpdateUser(context, us.ID.String(), *us)
+	if errUp != nil {
+		return false, errUp
+	}
+
+	return state, nil
+}
+
+func (u *UserService) SendEmailResetPassword(context context.Context, email string) (*EmailTemplateResetPassword, error) {
+	us, errRepo := u.userRepository.FindOneUserByEmail(context, email)
+	if errRepo != nil {
+		return nil, errRepo
+	}
+	if us == nil {
+		return nil, ErrorUserDoesntExist
+	}
+
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+	hash := strconv.Itoa(rand.Intn(999999-100000+1) + 100000)
+	body := EmailTemplateResetPassword{
+		Hash: hash,
+		Name: us.Name,
+		Year: strconv.Itoa(time.Now().Year()),
+	}
+
+	return &body, nil
 }

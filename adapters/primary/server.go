@@ -8,20 +8,22 @@ import (
 )
 
 type App struct {
-	fiber    *fiber.App
-	usersAPI users.API
-	tokenAPI ports.TokenService
-	storage  ports.StorageService
-	port     string
+	fiber      *fiber.App
+	usersAPI   users.API
+	tokenAPI   ports.TokenService
+	storageAPI ports.StorageService
+	emailAPI   ports.EmailService
+	port       string
 }
 
-func NewApp(tokenAPI ports.TokenService, storageAPI ports.StorageService, usersAPI users.API, port string) *App {
+func NewApp(tokenAPI ports.TokenService, storageAPI ports.StorageService, usersAPI users.API, emailAPI ports.EmailService, port string) *App {
 	newFiber := &App{
-		fiber:    fiber.New(),
-		usersAPI: usersAPI,
-		tokenAPI: tokenAPI,
-		storage:  storageAPI,
-		port:     port,
+		fiber:      fiber.New(),
+		usersAPI:   usersAPI,
+		tokenAPI:   tokenAPI,
+		storageAPI: storageAPI,
+		emailAPI:   emailAPI,
+		port:       port,
 	}
 	newFiber.fiber.Use(cors.New())
 	initRoutes(newFiber)

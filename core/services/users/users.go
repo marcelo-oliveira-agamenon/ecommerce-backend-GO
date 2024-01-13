@@ -48,6 +48,12 @@ type ResetPassword struct {
 	Reset    string `json:"reset"`
 }
 
+type EmailTemplateResetPassword struct {
+	Hash string
+	Name string
+	Year string
+}
+
 type API interface {
 	Login(context context.Context, body LoginRequest) (*UserResponse, error)
 	LoginFacebook(context context.Context, body LoginFacebook) (*UserResponse, error)
@@ -55,6 +61,7 @@ type API interface {
 	SignUp(context context.Context, user user.User) (*UserResponse, error)
 	DeleteUser(context context.Context, id string) (bool, error)
 	UpdateUser(context context.Context, id string, data user.User) (bool, error)
+	SendEmailResetPassword(context context.Context, email string) (*EmailTemplateResetPassword, error)
 }
 
 type UserService struct {
