@@ -5,6 +5,7 @@ import (
 
 	"github.com/ecommerce/db"
 	u "github.com/ecommerce/models"
+	"github.com/ecommerce/utility"
 	b "github.com/ecommerce/utility"
 	"github.com/gofiber/fiber"
 	"github.com/gofrs/uuid"
@@ -83,6 +84,7 @@ func InsertNewPayment(w *fiber.Ctx)  {
 
 //Delete payment, soft delete from database
 func DeletePayment(w *fiber.Ctx)  {
+	userid := utility.ClaimTokenData(w)
 	paymentId := w.Params("id")
 	var payment u.Payment
 
@@ -97,6 +99,8 @@ func DeletePayment(w *fiber.Ctx)  {
 		w.Status(500).JSON("Error delete payment")
 		return
 	}
+
+	utility.InsertLogRegistryIntoDabatase("payment", "Payment with ID " + paymentId + " was deleted by user", userid.UserId)
 
 	w.Status(200).JSON(payment)
 }

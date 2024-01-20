@@ -10,7 +10,6 @@ import (
 //Routes create router and import routes
 func Routes(router *fiber.App) {
 	router.Post("/v1/login", a.Login)
-	router.Post("/v1/admin/login", a.LoginAdmin)
 	router.Post("/v1/loginWithFacebook", a.LoginWithFacebook)
 	router.Post("/v1/signUp", a.SignUpUser)
 	router.Patch("/v1/resetPassword", a.ResetPassword)
@@ -26,11 +25,9 @@ func Routes(router *fiber.App) {
 	router.Patch("/v1/users/toggleRoles/:id", a.ToggleRolesUser)
 	router.Get("/v1/product", a.GetAllProducts)
 	router.Post("/v1/product", a.InsertProduct)
+	router.Put("/v1/product/:id", a.EditProductById)
+	router.Delete("/v1/product/:id", a.DeleteProductById)
 	router.Get("/v1/product/getbyId/:id", a.GetProductByID)
-	router.Get("/v1/product/category/:id", a.GetAllProductsByCategory)
-	router.Get("/v1/product/promotion", a.GetProductPromotion)
-	router.Get("/v1/product/recent", a.GetRecentProducts)
-	router.Get("/v1/product/search/:string", a.GetProductByName)
 	
 	router.Get("/v1/category", a.SelectCategoryAll)
 	router.Post("/v1/category", a.InsertCategory)
@@ -54,4 +51,7 @@ func Routes(router *fiber.App) {
 
 	router.Post("/v1/coupon", a.CreateCoupon)
 	router.Get("/v1/coupon", a.VerifyCouponStillActive)
+
+	router.Get("/v1/report/export-users", a.ExportUsersReport)
+	router.Get("/v1/report/import-users", a.ImportUsersFromCsvFile)
 }

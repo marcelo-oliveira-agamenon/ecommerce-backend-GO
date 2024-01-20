@@ -3,7 +3,6 @@ package utility
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/ecommerce/db"
@@ -31,7 +30,6 @@ func StoreSessionRedis(w *fiber.Ctx, userData string, expTime string) {
 	}
 	errRedis := db.RedisServer.Set(ctx, userData, marshalStore, 0).Err()
 	if errRedis != nil {
-		fmt.Print(errRedis)
 		w.Status(500).JSON("Error in redis store session")
 		return
 	}

@@ -58,7 +58,9 @@ func VerifyCouponStillActive(w *fiber.Ctx) {
 	}
 
 	if coupon.ValityDate.Before(time.Now()) {
-		w.Status(200).JSON(false)		
+		w.Status(200).JSON(&fiber.Map{
+			"valid": false,
+		})		
 		return
 	}
 
