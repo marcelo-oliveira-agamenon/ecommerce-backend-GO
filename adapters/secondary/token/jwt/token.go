@@ -16,11 +16,6 @@ var (
 	ErrorParseToken      = errors.New("parse token")
 )
 
-type claims struct {
-	UserId string `json:"userId"`
-	jwt.StandardClaims
-}
-
 type JWTToken struct {
 	jwyKey string
 }
@@ -33,7 +28,7 @@ func NewToken(jwtKey string) ports.TokenService {
 
 func (jt *JWTToken) CreateToken(userID string) (*string, time.Time, error) {
 	expTime := time.Now().Add(60 * time.Minute)
-	claimsJwt := &claims{
+	claimsJwt := &ports.Claims{
 		UserId: userID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expTime.Unix(),
@@ -62,4 +57,18 @@ func (jt *JWTToken) VerifyToken(token string) error {
 		return nil
 	}
 	return ErrorInvalidToken
+}
+
+func (jt *JWTToken) ClaimTokenData(token string) (*ports.Claims, error) {
+	jwtSecret := []byte(os.Getenv("JWT_KEY"))
+	decodeClaim := &ports.Claims{}
+
+	_, err := jwt.ParseWithClaims(token, decodeClaim, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+	if err != nil {
+		return nil, ErrorParseToken
+	}
+
+	return decodeClaim, nil
 }

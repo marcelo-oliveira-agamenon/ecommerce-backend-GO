@@ -1,31 +1,29 @@
 package middleware
 
 import (
-	"errors"
-	"strings"
-
+	"github.com/ecommerce/core/util"
 	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber"
 )
 
 var (
-	ErrorMissingToken = errors.New("missing token")
+	AuthHeader = "Authorization"
 )
 
 func VerifyToken(j ports.TokenService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
-		rawToken := strings.Replace(string(ctx.Fasthttp.Request.Header.Peek("Authorization")), "Bearer ", "", 1)
-		if rawToken == "" || rawToken == "null" {
+		token, errTo := util.GetToken(ctx, AuthHeader)
+		if errTo != nil {
 			ctx.Status(401).JSON(&fiber.Map{
-				"error": ErrorMissingToken.Error(),
+				"error": errTo.Error(),
 			})
 			return
 		}
 
-		inv := j.VerifyToken(rawToken)
-		if inv != nil {
+		err := j.VerifyToken(*token)
+		if err != nil {
 			ctx.Status(401).JSON(&fiber.Map{
-				"error": inv.Error(),
+				"error": err.Error(),
 			})
 			return
 		}

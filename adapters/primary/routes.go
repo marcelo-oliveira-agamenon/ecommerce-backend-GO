@@ -2,6 +2,7 @@ package primary
 
 import (
 	"github.com/ecommerce/adapters/primary/middleware"
+	"github.com/ecommerce/adapters/primary/products"
 	"github.com/ecommerce/adapters/primary/users"
 )
 
@@ -20,6 +21,11 @@ func initRoutes(a *App) {
 			user := authUser.Group("/users")
 			{
 				user.Patch("/toggleRoles/:id", users.ToggleRoles(a.usersAPI))
+			}
+
+			product := authUser.Group("/product")
+			{
+				product.Post("/", products.CreateProduct(a.productAPI, a.tokenAPI))
 			}
 		}
 	}
