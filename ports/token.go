@@ -1,8 +1,10 @@
 package ports
 
-import "time"
+import (
+	"time"
+)
 
 type TokenService interface {
 	CreateToken(data string) (*string, time.Time, error)
-	VerifyToken() error
+	VerifyToken(token string) error
 }

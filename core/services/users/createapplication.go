@@ -9,6 +9,7 @@ import (
 
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/core/util"
+	"github.com/lib/pq"
 )
 
 func (u *UserService) SignUp(context context.Context, data user.User) (*UserResponse, error) {
@@ -186,4 +187,29 @@ func (u *UserService) SendEmailResetPassword(context context.Context, email stri
 	}
 
 	return &body, nil
+}
+
+func (u *UserService) ToggleRoles(context context.Context, id string) (*user.User, error) {
+	us, errRepo := u.userRepository.FindOneUserById(context, id)
+	if errRepo != nil {
+		return nil, errRepo
+	}
+	if us == nil {
+		return nil, ErrorUserDoesntExist
+	}
+
+	var roles pq.StringArray
+	if len(us.Roles) > 1 {
+		roles = pq.StringArray{"user"}
+	} else {
+		roles = pq.StringArray{"user", "admin"}
+	}
+
+	us.Roles = roles
+	_, err := u.userRepository.UpdateUser(context, id, *us)
+	if err != nil {
+		return nil, ErrorUpdateUser
+	}
+
+	return us, nil
 }

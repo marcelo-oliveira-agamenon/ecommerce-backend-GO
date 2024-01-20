@@ -56,3 +56,13 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, id string, u user.User
 
 	return result.RowsAffected > 0, nil
 }
+
+func (ur *UserRepository) FindOneUserById(ctx context.Context, id string) (*user.User, error) {
+	var user user.User
+	result := ur.db.Where("id = ?", id).Find(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &user, nil
+}

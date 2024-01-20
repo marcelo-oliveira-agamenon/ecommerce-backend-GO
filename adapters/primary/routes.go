@@ -1,6 +1,7 @@
 package primary
 
 import (
+	"github.com/ecommerce/adapters/primary/middleware"
 	"github.com/ecommerce/adapters/primary/users"
 )
 
@@ -13,5 +14,13 @@ func initRoutes(a *App) {
 		v1.Post("/loginFacebook", users.LoginFacebook(a.usersAPI, a.tokenAPI))
 		v1.Patch("/resetPassword", users.ResetPassword(a.usersAPI))
 		v1.Post("/resetPasswordLink", users.SendEmailResetPassword(a.usersAPI, a.emailAPI))
+
+		authUser := v1.Use(middleware.VerifyToken(a.tokenAPI))
+		{
+			user := authUser.Group("/users")
+			{
+				user.Patch("/toggleRoles/:id", users.ToggleRoles(a.usersAPI))
+			}
+		}
 	}
 }

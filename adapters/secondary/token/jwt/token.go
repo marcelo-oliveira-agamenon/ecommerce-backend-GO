@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -11,6 +12,8 @@ import (
 var (
 	ErrorToken           = errors.New("invalid generated token")
 	ErrorInvalidPassword = errors.New("invalid password")
+	ErrorInvalidToken    = errors.New("invalid token")
+	ErrorParseToken      = errors.New("parse token")
 )
 
 type claims struct {
@@ -46,6 +49,17 @@ func (jt *JWTToken) CreateToken(userID string) (*string, time.Time, error) {
 	return &token, expTime, nil
 }
 
-func (jt *JWTToken) VerifyToken() error {
-	return nil
+func (jt *JWTToken) VerifyToken(token string) error {
+	jwtKey := []byte(os.Getenv("JWT_KEY"))
+	hasToken, _ := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, ErrorParseToken
+		}
+		return jwtKey, nil
+	})
+
+	if hasToken.Valid {
+		return nil
+	}
+	return ErrorInvalidToken
 }

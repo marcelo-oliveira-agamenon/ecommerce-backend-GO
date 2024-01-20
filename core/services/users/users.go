@@ -18,6 +18,7 @@ var (
 	ErrorUserIsNotAdmin     = errors.New("access denied")
 	ErrorInvalidToken       = errors.New("invalid token")
 	ErrorPasswordsDontMatch = errors.New("passwords dont match")
+	ErrorUpdateUser         = errors.New("updating user")
 )
 
 type UserResponse struct {
@@ -62,6 +63,7 @@ type API interface {
 	DeleteUser(context context.Context, id string) (bool, error)
 	UpdateUser(context context.Context, id string, data user.User) (bool, error)
 	SendEmailResetPassword(context context.Context, email string) (*EmailTemplateResetPassword, error)
+	ToggleRoles(context context.Context, id string) (*user.User, error)
 }
 
 type UserService struct {
