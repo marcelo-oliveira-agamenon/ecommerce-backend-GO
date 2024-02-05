@@ -13,13 +13,15 @@ import (
 	"github.com/ecommerce/adapters/secondary/token/jwt"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/services/users"
+	"github.com/joho/godotenv"
 	_ "github.com/pdrum/swagger-automation/docs"
 )
 
 func main() {
+	godotenv.Load(".env")
 	postgresRepository, err := postgres.NewPostgresRepository()
 	if err != nil {
-		log.Fatal()
+		log.Fatal() //maybe change this?
 	}
 
 	jtwKey := os.Getenv("JWT_KEY")
