@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/ecommerce/core/domain/product"
+	categories "github.com/ecommerce/core/services/category"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/util"
 	"github.com/ecommerce/ports"
@@ -12,11 +13,12 @@ import (
 )
 
 var (
-	AuthHeader      = "Authorization"
-	ErrorConversion = errors.New("conversion function failed")
+	AuthHeader           = "Authorization"
+	ErrorConversion      = errors.New("conversion function failed")
+	ErrorCategoryUnknown = errors.New("unknown category")
 )
 
-func CreateProduct(productAPI products.API, token ports.TokenService) fiber.Handler {
+func CreateProduct(productAPI products.API, categoriesAPI categories.API, token ports.TokenService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		tok, errT := util.GetToken(ctx, AuthHeader)
 		if errT != nil {
@@ -41,6 +43,15 @@ func CreateProduct(productAPI products.API, token ports.TokenService) fiber.Hand
 			return
 		}
 
+		catId := ctx.FormValue("categoryid")
+		_, errCat := categoriesAPI.GetCategoryById(ctx.Context(), catId)
+		if errCat != nil {
+			ctx.Status(500).JSON(&fiber.Map{
+				"error": ErrorCategoryUnknown.Error(),
+			})
+			return
+		}
+
 		value, e1 := strconv.ParseFloat(ctx.FormValue("value"), 64)
 		stockQtd, e2 := strconv.Atoi(ctx.FormValue("stockqtd"))
 		hasPromo, e3 := strconv.ParseBool(ctx.FormValue("hasPromotion"))
@@ -56,10 +67,10 @@ func CreateProduct(productAPI products.API, token ports.TokenService) fiber.Hand
 
 		product, errP := productAPI.CreateProduct(ctx.Context(), product.Product{
 			Name:            ctx.FormValue("name"),
-			Categoryid:      ctx.FormValue("categoryid"),
 			Description:     ctx.FormValue("description"),
 			TypeUnit:        ctx.FormValue("type"),
 			TecnicalDetails: ctx.FormValue("tecnicalDetails"),
+			Categoryid:      catId,
 			Value:           value,
 			StockQtd:        stockQtd,
 			HasPromotion:    hasPromo,

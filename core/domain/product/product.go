@@ -3,6 +3,7 @@ package product
 import (
 	"time"
 
+	"github.com/ecommerce/core/domain/category"
 	"github.com/segmentio/ksuid"
 	"gorm.io/gorm"
 )
@@ -25,6 +26,7 @@ type Product struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	DeletedAt       gorm.DeletedAt
+	Category        category.Category `gorm:"foreignKey:Categoryid"`
 }
 
 func NewProduct(data Product) (Product, error) {

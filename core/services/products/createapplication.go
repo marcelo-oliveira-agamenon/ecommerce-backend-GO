@@ -37,11 +37,23 @@ func (p *ProductService) CreateProduct(context context.Context, data product.Pro
 		return nil, errDi
 	}
 
+	tech, errT := product.NewTechnicalDescription(prod.TecnicalDetails)
+	if errT != nil {
+		return nil, errT
+	}
+
+	stock, errS := product.NewStock(prod.StockQtd)
+	if errS != nil {
+		return nil, errS
+	}
+
 	prod.Name = *name
 	prod.Rate = *rate
 	prod.Value = *value
 	prod.Discount = *disc
 	prod.Description = *desc
+	prod.TecnicalDetails = *tech
+	prod.StockQtd = *stock
 
 	errA := p.productRepository.AddProduct(context, prod)
 	if errA != nil {

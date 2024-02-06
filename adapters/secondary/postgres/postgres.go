@@ -3,6 +3,7 @@ package postgres
 import (
 	"os"
 
+	"github.com/ecommerce/core/domain/category"
 	"github.com/ecommerce/core/domain/product"
 	"github.com/ecommerce/core/domain/user"
 	"gorm.io/driver/postgres"
@@ -28,6 +29,7 @@ func initDatabase() (*gorm.DB, error) {
 
 	db.AutoMigrate(&user.User{})
 	db.AutoMigrate(&product.Product{})
+	db.AutoMigrate(&category.Category{})
 
 	return db, nil
 }

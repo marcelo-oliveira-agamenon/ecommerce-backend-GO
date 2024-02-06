@@ -15,7 +15,7 @@ func NewDescription(description string) (*string, error) {
 	if len(description) == 0 {
 		return nil, ErrorEmptyDescription
 	}
-	if len(description) > 1000 {
+	if len(description) > 5000 {
 		return nil, ErrorDescriptionTooLong
 	}
 

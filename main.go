@@ -11,6 +11,7 @@ import (
 	"github.com/ecommerce/adapters/secondary/postgres"
 	storage "github.com/ecommerce/adapters/secondary/storage/aws"
 	"github.com/ecommerce/adapters/secondary/token/jwt"
+	categories "github.com/ecommerce/core/services/category"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/services/users"
 	"github.com/joho/godotenv"
@@ -38,7 +39,9 @@ func main() {
 	userService := users.NewUserService(userRepository)
 	productRepository := postgres.NewProductRepository(postgresRepository)
 	productService := products.NewProductService(productRepository)
+	categoryRepository := postgres.NewCategoryRepository(postgresRepository)
+	categoryService := categories.NewCategoryService(categoryRepository)
 
-	srv := primary.NewApp(tokenService, storageService, userService, productService, emailService, port)
+	srv := primary.NewApp(tokenService, storageService, userService, productService, categoryService, emailService, port)
 	primary.Run(srv)
 }

@@ -25,7 +25,7 @@ func initRoutes(a *App) {
 
 			product := authUser.Group("/product")
 			{
-				product.Post("/", products.CreateProduct(a.productAPI, a.tokenAPI))
+				product.Post("/", products.CreateProduct(a.productAPI, a.categoriesAPI, a.tokenAPI))
 			}
 		}
 	}
