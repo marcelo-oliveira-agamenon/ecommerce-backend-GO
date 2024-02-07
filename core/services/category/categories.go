@@ -2,9 +2,14 @@ package categories
 
 import (
 	"context"
+	"errors"
 
 	"github.com/ecommerce/core/domain/category"
 	"github.com/ecommerce/ports"
+)
+
+var (
+	ErrorGetCategory = errors.New("fetching category list")
 )
 
 type API interface {

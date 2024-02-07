@@ -3,62 +3,75 @@ package products
 import (
 	"context"
 
+	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/ecommerce/core/domain/product"
 )
 
-func (p *ProductService) CreateProduct(context context.Context, data product.Product) (*ProductResponse, error) {
-	prod, errN := product.NewProduct(data)
-	if errN != nil {
-		return nil, errN
+func (p *ProductService) GetAllProducts(context context.Context, limit int, offset int, getByCategory string, getByPromotion string, getRecentOnes string, getByName string) ([]*product.Product, *int64, error) {
+	var params postgres.QueryParams = postgres.QueryParams{
+		Limit:          limit,
+		Offset:         offset,
+		GetByCategory:  getByCategory,
+		GetByPromotion: getByPromotion,
+		GetRecentOnes:  getRecentOnes,
+		GetByName:      getByName,
 	}
 
-	name, errN := product.NewName(prod.Name)
-	if errN != nil {
-		return nil, errN
+	prod, errG := p.productRepository.GetAllProducts(context, params)
+	if errG != nil {
+		return nil, nil, ErrorProductDoesntExist
 	}
 
-	value, errV := product.NewValue(prod.Value)
+	count, errC := p.productRepository.CountAllProducts(context)
+	if errC != nil {
+		return nil, nil, ErrorProductCount
+	}
+
+	return prod, count, nil
+}
+
+func (p *ProductService) CreateProduct(context context.Context, data product.Product) (*product.Product, error) {
+	pv, errV := ValidateProductFields(data)
 	if errV != nil {
 		return nil, errV
 	}
 
-	rate, errR := product.NewRate(prod.Rate)
-	if errR != nil {
-		return nil, errR
-	}
-
-	disc, errD := product.NewDiscount(prod.Discount)
-	if errD != nil {
-		return nil, errD
-	}
-
-	desc, errDi := product.NewDescription(prod.Description)
-	if errDi != nil {
-		return nil, errDi
-	}
-
-	tech, errT := product.NewTechnicalDescription(prod.TecnicalDetails)
-	if errT != nil {
-		return nil, errT
-	}
-
-	stock, errS := product.NewStock(prod.StockQtd)
-	if errS != nil {
-		return nil, errS
-	}
-
-	prod.Name = *name
-	prod.Rate = *rate
-	prod.Value = *value
-	prod.Discount = *disc
-	prod.Description = *desc
-	prod.TecnicalDetails = *tech
-	prod.StockQtd = *stock
-
-	errA := p.productRepository.AddProduct(context, prod)
+	errA := p.productRepository.AddProduct(context, *pv)
 	if errA != nil {
-		return nil, errA
+		return nil, ErrorCreateProduct
 	}
 
-	return NewProductResponse(prod), nil
+	return pv, nil
+}
+
+func (p *ProductService) EditProduct(context context.Context, data product.Product) (*product.Product, error) {
+	pv, errV := ValidateProductFields(data)
+	if errV != nil {
+		return nil, errV
+	}
+
+	errE := p.productRepository.EditProduct(context, *pv)
+	if errE != nil {
+		return nil, ErrorEditProduct
+	}
+
+	return &data, nil
+}
+
+func (p *ProductService) GetProductById(context context.Context, id string) (*product.Product, error) {
+	prod, errG := p.productRepository.GetProductById(context, id)
+	if errG != nil {
+		return nil, ErrorProductDoesntExist
+	}
+
+	return prod, nil
+}
+
+func (p *ProductService) DeleteProductById(context context.Context, data product.Product) error {
+	errD := p.productRepository.DeleteProductById(context, data)
+	if errD != nil {
+		return ErrorDeleteProduct
+	}
+
+	return nil
 }

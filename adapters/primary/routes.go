@@ -25,7 +25,10 @@ func initRoutes(a *App) {
 
 			product := authUser.Group("/product")
 			{
+				product.Get("/", products.GetAllProducts(a.productAPI))
 				product.Post("/", products.CreateProduct(a.productAPI, a.categoriesAPI, a.tokenAPI))
+				product.Put("/:id", products.EditProduct(a.productAPI))
+				product.Delete("/:id", products.DeleteProductById(a.productAPI))
 			}
 		}
 	}

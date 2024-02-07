@@ -9,7 +9,7 @@ import (
 func (p *CategoryService) GetCategoryById(ctx context.Context, catId string) (*category.Category, error) {
 	category, errCa := p.categoryRepository.GetCategoryById(ctx, catId)
 	if errCa != nil {
-		return nil, errCa
+		return nil, ErrorGetCategory
 	}
 
 	return category, nil
