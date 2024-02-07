@@ -9,12 +9,15 @@ import (
 )
 
 var (
-	ErrorGetCategory = errors.New("fetching category list")
+	ErrorGetCategory    = errors.New("fetching category list")
+	ErrorGetOneCategory = errors.New("getting one category")
+	ErrorCreateCategory = errors.New("adding category")
 )
 
 type API interface {
+	GetAllCategories(ctx context.Context) (*[]category.Category, error)
 	GetCategoryById(ctx context.Context, catId string) (*category.Category, error)
-	AddCategory(ctx context.Context, c category.Category) error
+	AddCategory(ctx context.Context, c category.Category) (*category.Category, error)
 }
 
 type CategoryService struct {

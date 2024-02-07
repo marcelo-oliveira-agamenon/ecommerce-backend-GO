@@ -1,6 +1,7 @@
 package primary
 
 import (
+	categories "github.com/ecommerce/adapters/primary/category"
 	"github.com/ecommerce/adapters/primary/middleware"
 	"github.com/ecommerce/adapters/primary/products"
 	"github.com/ecommerce/adapters/primary/users"
@@ -26,9 +27,16 @@ func initRoutes(a *App) {
 			product := authUser.Group("/product")
 			{
 				product.Get("/", products.GetAllProducts(a.productAPI))
+				product.Get("/getbyId/:id", products.GetProductById(a.productAPI))
 				product.Post("/", products.CreateProduct(a.productAPI, a.categoriesAPI, a.tokenAPI))
 				product.Put("/:id", products.EditProduct(a.productAPI))
 				product.Delete("/:id", products.DeleteProductById(a.productAPI))
+			}
+
+			category := authUser.Group("/category")
+			{
+				category.Get("/", categories.GetAllCategories())
+				category.Post("/")
 			}
 		}
 	}

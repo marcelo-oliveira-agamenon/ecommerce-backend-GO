@@ -17,6 +17,16 @@ func NewCategoryRepository(dbConn *gorm.DB) *CategoryRepository {
 	}
 }
 
+func (cr *CategoryRepository) GetAllCategories(ctx context.Context) (*[]category.Category, error) {
+	var list []category.Category
+	res := cr.db.Find(list)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &list, nil
+}
+
 func (cr *CategoryRepository) GetCategoryById(ctx context.Context, catId string) (*category.Category, error) {
 	var aux category.Category
 	result := cr.db.Where("id = ?", catId).First(&aux)
