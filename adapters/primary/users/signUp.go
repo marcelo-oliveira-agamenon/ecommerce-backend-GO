@@ -34,7 +34,7 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			})
 			return
 		}
-		//todo: change to a transaction
+
 		if ava, _ := ctx.FormFile("avatar"); ava != nil {
 			file, err := ava.Open()
 			if err != nil {

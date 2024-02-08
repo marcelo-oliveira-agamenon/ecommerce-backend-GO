@@ -19,7 +19,7 @@ func NewCategoryRepository(dbConn *gorm.DB) *CategoryRepository {
 
 func (cr *CategoryRepository) GetAllCategories(ctx context.Context) (*[]category.Category, error) {
 	var list []category.Category
-	res := cr.db.Find(list)
+	res := cr.db.Find(&list)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -37,11 +37,11 @@ func (cr *CategoryRepository) GetCategoryById(ctx context.Context, catId string)
 	return &aux, nil
 }
 
-func (cr *CategoryRepository) AddCategory(ctx context.Context, c category.Category) error {
+func (cr *CategoryRepository) AddCategory(ctx context.Context, c category.Category) (*category.Category, error) {
 	result := cr.db.Create(&c)
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
 
-	return nil
+	return &c, nil
 }

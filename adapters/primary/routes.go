@@ -35,8 +35,8 @@ func initRoutes(a *App) {
 
 			category := authUser.Group("/category")
 			{
-				category.Get("/", categories.GetAllCategories())
-				category.Post("/")
+				category.Get("/", categories.GetAllCategories(a.categoriesAPI))
+				category.Post("/", categories.CreateCategory(a.categoriesAPI, a.storageAPI))
 			}
 		}
 	}

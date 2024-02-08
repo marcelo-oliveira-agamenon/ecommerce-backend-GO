@@ -13,7 +13,7 @@ func GetAllProducts(productAPI products.API) fiber.Handler {
 		offset, err2 := strconv.Atoi(ctx.Query("offset"))
 		if err1 != nil || err2 != nil {
 			ctx.Status(500).JSON(&fiber.Map{
-				"error": ErrorConversion,
+				"error": ErrorConversion.Error(),
 			})
 			return
 		}

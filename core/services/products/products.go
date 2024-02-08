@@ -17,7 +17,7 @@ var (
 )
 
 type API interface {
-	GetAllProducts(context context.Context, limit int, offset int, getByCategory string, getByPromotion string, getRecentOnes string, getByName string) ([]*product.Product, *int64, error)
+	GetAllProducts(context context.Context, limit int, offset int, getByCategory string, getByPromotion string, getRecentOnes string, getByName string) (*[]product.Product, *int64, error)
 	GetProductById(context context.Context, id string) (*product.Product, error)
 	CreateProduct(context context.Context, data product.Product) (*product.Product, error)
 	EditProduct(context context.Context, data product.Product) (*product.Product, error)

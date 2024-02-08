@@ -16,7 +16,7 @@ func GetProductById(productAPI products.API) fiber.Handler {
 		id := ctx.Params("id")
 		if id == "" {
 			ctx.Status(422).JSON(&fiber.Map{
-				"error": ErrorParameter,
+				"error": ErrorParameter.Error(),
 			})
 			return
 		}

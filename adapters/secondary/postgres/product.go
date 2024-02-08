@@ -37,7 +37,7 @@ func (pr *ProductRepository) CountAllProducts(context context.Context) (*int64, 
 	return &count, nil
 }
 
-func (pr *ProductRepository) GetAllProduct(ctx context.Context, params QueryParams) (*[]product.Product, error) {
+func (pr *ProductRepository) GetAllProducts(ctx context.Context, params QueryParams) (*[]product.Product, error) {
 	var list []product.Product
 
 	query := pr.db.Preload("ProductImage").Joins("Category").Limit(params.Limit).Offset(params.Offset)
