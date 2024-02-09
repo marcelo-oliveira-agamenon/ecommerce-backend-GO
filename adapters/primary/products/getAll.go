@@ -1,10 +1,15 @@
 package products
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/ecommerce/core/services/products"
 	"github.com/gofiber/fiber"
+)
+
+var (
+	ErrorMissingOffsetLimit = errors.New("missing limit or offset query parameter")
 )
 
 func GetAllProducts(productAPI products.API) fiber.Handler {
@@ -12,8 +17,8 @@ func GetAllProducts(productAPI products.API) fiber.Handler {
 		limit, err1 := strconv.Atoi(ctx.Query("limit"))
 		offset, err2 := strconv.Atoi(ctx.Query("offset"))
 		if err1 != nil || err2 != nil {
-			ctx.Status(500).JSON(&fiber.Map{
-				"error": ErrorConversion.Error(),
+			ctx.Status(422).JSON(&fiber.Map{
+				"error": ErrorMissingOffsetLimit.Error(),
 			})
 			return
 		}

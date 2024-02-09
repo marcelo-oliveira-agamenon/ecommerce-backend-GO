@@ -14,7 +14,7 @@ import (
 
 var (
 	AuthHeader           = "Authorization"
-	ErrorConversion      = errors.New("conversion function failed")
+	ErrorConversion      = errors.New("fields missing/incorrect")
 	ErrorCategoryUnknown = errors.New("unknown category")
 )
 

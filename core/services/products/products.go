@@ -10,7 +10,8 @@ import (
 
 var (
 	ErrorProductDoesntExist = errors.New("product doenst exist with this id")
-	ErrorProductCount       = errors.New("product count query")
+	ErrorGetAllProduct      = errors.New("fetching products")
+	ErrorProductCount       = errors.New("countin products")
 	ErrorCreateProduct      = errors.New("insert product")
 	ErrorEditProduct        = errors.New("editing product")
 	ErrorDeleteProduct      = errors.New("deleting product")

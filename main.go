@@ -22,7 +22,7 @@ func main() {
 	godotenv.Load(".env")
 	postgresRepository, err := postgres.NewPostgresRepository()
 	if err != nil {
-		log.Fatal() //maybe change this?
+		log.Fatal() //todo: maybe change this?
 	}
 
 	jtwKey := os.Getenv("JWT_KEY")

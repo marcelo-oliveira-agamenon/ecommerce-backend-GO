@@ -17,9 +17,9 @@ func NewCategoryRepository(dbConn *gorm.DB) *CategoryRepository {
 	}
 }
 
-func (cr *CategoryRepository) GetAllCategories(ctx context.Context) (*[]category.Category, error) {
+func (cr *CategoryRepository) GetAllCategories(ctx context.Context, limit int, offset int) (*[]category.Category, error) {
 	var list []category.Category
-	res := cr.db.Find(&list)
+	res := cr.db.Limit(limit).Offset(offset).Find(&list)
 	if res.Error != nil {
 		return nil, res.Error
 	}

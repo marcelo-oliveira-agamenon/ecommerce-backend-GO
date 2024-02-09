@@ -6,8 +6,8 @@ import (
 	"github.com/ecommerce/core/domain/category"
 )
 
-func (p *CategoryService) GetAllCategories(ctx context.Context) (*[]category.Category, error) {
-	list, err := p.categoryRepository.GetAllCategories(ctx)
+func (p *CategoryService) GetAllCategories(ctx context.Context, limit int, offset int) (*[]category.Category, error) {
+	list, err := p.categoryRepository.GetAllCategories(ctx, limit, offset)
 	if err != nil {
 		return nil, ErrorGetCategory
 	}

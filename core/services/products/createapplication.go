@@ -8,7 +8,7 @@ import (
 )
 
 func (p *ProductService) GetAllProducts(context context.Context, limit int, offset int, getByCategory string, getByPromotion string, getRecentOnes string, getByName string) (*[]product.Product, *int64, error) {
-	var params postgres.QueryParams = postgres.QueryParams{
+	var params postgres.QueryParamsProduct = postgres.QueryParamsProduct{
 		Limit:          limit,
 		Offset:         offset,
 		GetByCategory:  getByCategory,
@@ -19,7 +19,7 @@ func (p *ProductService) GetAllProducts(context context.Context, limit int, offs
 
 	prod, errG := p.productRepository.GetAllProducts(context, params)
 	if errG != nil {
-		return nil, nil, ErrorProductDoesntExist
+		return nil, nil, ErrorGetAllProduct
 	}
 
 	count, errC := p.productRepository.CountAllProducts(context)

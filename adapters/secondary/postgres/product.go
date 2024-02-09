@@ -11,15 +11,6 @@ type ProductRepository struct {
 	db *gorm.DB
 }
 
-type QueryParams struct {
-	Limit          int
-	Offset         int
-	GetByCategory  string
-	GetByPromotion string
-	GetRecentOnes  string
-	GetByName      string
-}
-
 func NewProductRepository(dbConn *gorm.DB) *ProductRepository {
 	return &ProductRepository{
 		db: dbConn,
@@ -37,7 +28,7 @@ func (pr *ProductRepository) CountAllProducts(context context.Context) (*int64, 
 	return &count, nil
 }
 
-func (pr *ProductRepository) GetAllProducts(ctx context.Context, params QueryParams) (*[]product.Product, error) {
+func (pr *ProductRepository) GetAllProducts(ctx context.Context, params QueryParamsProduct) (*[]product.Product, error) {
 	var list []product.Product
 
 	query := pr.db.Preload("ProductImage").Joins("Category").Limit(params.Limit).Offset(params.Offset)

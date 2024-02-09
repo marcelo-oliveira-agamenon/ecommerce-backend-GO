@@ -11,6 +11,20 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+type QueryParamsProduct struct {
+	Limit          int
+	Offset         int
+	GetByCategory  string
+	GetByPromotion string
+	GetRecentOnes  string
+	GetByName      string
+}
+
+type QueryParams struct {
+	Limit  int
+	Offset int
+}
+
 // Database connection postgres
 func initDatabase() (*gorm.DB, error) {
 	dbHost := os.Getenv("DB_CONNECTION_HOST")
