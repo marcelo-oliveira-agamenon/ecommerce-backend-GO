@@ -2,9 +2,15 @@ package postgres
 
 import (
 	"context"
+	"errors"
+	"strings"
 
 	"github.com/ecommerce/core/domain/category"
 	"gorm.io/gorm"
+)
+
+var (
+	ErrorDeleteFkConstrain = errors.New("cannot delete category with associated products")
 )
 
 type CategoryRepository struct {
@@ -44,4 +50,17 @@ func (cr *CategoryRepository) AddCategory(ctx context.Context, c category.Catego
 	}
 
 	return &c, nil
+}
+
+func (cr *CategoryRepository) DeleteCategory(ctx context.Context, c category.Category) (bool, error) {
+	res := cr.db.Unscoped().Delete(&c)
+	if res.Error != nil {
+		errConstrain := strings.Contains(res.Error.Error(), "violates foreign key constraint")
+		if errConstrain {
+			return false, ErrorDeleteFkConstrain
+		}
+		return false, res.Error
+	}
+
+	return true, nil
 }

@@ -37,6 +37,7 @@ func initRoutes(a *App) {
 			{
 				category.Get("/", categories.GetAllCategories(a.categoriesAPI))
 				category.Post("/", categories.CreateCategory(a.categoriesAPI, a.storageAPI))
+				category.Delete("/:id", categories.DeleteCategory(a.categoriesAPI, a.productAPI))
 			}
 		}
 	}

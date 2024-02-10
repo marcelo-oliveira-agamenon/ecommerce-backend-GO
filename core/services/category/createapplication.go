@@ -56,3 +56,12 @@ func (p *CategoryService) AddCategory(ctx context.Context, c category.Category) 
 
 	return cat, nil
 }
+
+func (p *CategoryService) DeleteCategory(ctx context.Context, c category.Category) (bool, error) {
+	isDel, err := p.categoryRepository.DeleteCategory(ctx, c)
+	if err != nil {
+		return isDel, err
+	}
+
+	return isDel, nil
+}
