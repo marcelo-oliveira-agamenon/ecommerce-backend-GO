@@ -5,6 +5,7 @@ import (
 
 	"github.com/ecommerce/core/domain/category"
 	"github.com/ecommerce/core/domain/product"
+	"github.com/ecommerce/core/domain/productImage"
 	"github.com/ecommerce/core/domain/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -44,6 +45,7 @@ func initDatabase() (*gorm.DB, error) {
 	db.AutoMigrate(&user.User{})
 	db.AutoMigrate(&product.Product{})
 	db.AutoMigrate(&category.Category{})
+	db.AutoMigrate(&productImage.ProductImage{})
 
 	return db, nil
 }

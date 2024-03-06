@@ -7,7 +7,13 @@ import (
 	"github.com/ecommerce/core/domain/product"
 )
 
-func (p *ProductService) GetAllProducts(context context.Context, limit int, offset int, getByCategory string, getByPromotion string, getRecentOnes string, getByName string) (*[]product.Product, *int64, error) {
+func (p *ProductService) GetAllProducts(context context.Context,
+	limit int,
+	offset int,
+	getByCategory string,
+	getByPromotion string,
+	getRecentOnes string,
+	getByName string) (*[]product.Product, *int64, error) {
 	var params postgres.QueryParamsProduct = postgres.QueryParamsProduct{
 		Limit:          limit,
 		Offset:         offset,
