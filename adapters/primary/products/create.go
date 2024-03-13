@@ -35,6 +35,7 @@ func CreateProduct(productAPI products.API, categoriesAPI categories.API, token 
 			return
 		}
 
+		//TODO: use in logs table logic
 		_, errC := token.ClaimTokenData(*tok)
 		if errC != nil {
 			ctx.Status(401).JSON(&fiber.Map{

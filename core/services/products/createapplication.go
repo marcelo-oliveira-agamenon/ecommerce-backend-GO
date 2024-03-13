@@ -23,14 +23,9 @@ func (p *ProductService) GetAllProducts(context context.Context,
 		GetByName:      getByName,
 	}
 
-	prod, errG := p.productRepository.GetAllProducts(context, params)
+	prod, count, errG := p.productRepository.GetAllProducts(context, params)
 	if errG != nil {
 		return nil, nil, ErrorGetAllProduct
-	}
-
-	count, errC := p.productRepository.CountAllProducts(context)
-	if errC != nil {
-		return nil, nil, ErrorProductCount
 	}
 
 	return prod, count, nil

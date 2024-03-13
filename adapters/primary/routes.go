@@ -2,6 +2,7 @@ package primary
 
 import (
 	categories "github.com/ecommerce/adapters/primary/category"
+	favorites "github.com/ecommerce/adapters/primary/favorite"
 	"github.com/ecommerce/adapters/primary/middleware"
 	prodImages "github.com/ecommerce/adapters/primary/productImage"
 	"github.com/ecommerce/adapters/primary/products"
@@ -48,6 +49,10 @@ func initRoutes(a *App) {
 				category.Delete("/:id", categories.DeleteCategory(a.categoriesAPI, a.productAPI))
 			}
 
+			favorite := authUser.Group("/favorite")
+			{
+				favorite.Post("/", favorites.CreateFavorite(a.favoriteAPI, a.tokenAPI))
+			}
 		}
 	}
 }

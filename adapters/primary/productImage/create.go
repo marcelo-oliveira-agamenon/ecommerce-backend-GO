@@ -69,6 +69,6 @@ func CreateProductImage(productImageAPI productImages.API, productAPI products.A
 			return
 		}
 
-		ctx.Status(200).JSON(prodI)
+		ctx.Status(201).JSON(prodI)
 	}
 }

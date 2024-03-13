@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/ecommerce/core/domain/category"
+	"github.com/ecommerce/core/domain/favorite"
 	"github.com/ecommerce/core/domain/product"
 	"github.com/ecommerce/core/domain/productImage"
 	"github.com/ecommerce/core/domain/user"
@@ -46,6 +47,7 @@ func initDatabase() (*gorm.DB, error) {
 	db.AutoMigrate(&product.Product{})
 	db.AutoMigrate(&category.Category{})
 	db.AutoMigrate(&productImage.ProductImage{})
+	db.AutoMigrate(&favorite.Favorite{})
 
 	return db, nil
 }

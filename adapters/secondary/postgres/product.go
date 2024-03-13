@@ -28,7 +28,7 @@ func (pr *ProductRepository) CountAllProducts(context context.Context) (*int64, 
 	return &count, nil
 }
 
-func (pr *ProductRepository) GetAllProducts(ctx context.Context, params QueryParamsProduct) (*[]product.Product, error) {
+func (pr *ProductRepository) GetAllProducts(ctx context.Context, params QueryParamsProduct) (*[]product.Product, *int64, error) {
 	var list []product.Product
 
 	query := pr.db.Preload("ProductImage").Joins("Category").Limit(params.Limit).Offset(params.Offset)
@@ -51,10 +51,10 @@ func (pr *ProductRepository) GetAllProducts(ctx context.Context, params QueryPar
 
 	res := query.Find(&list)
 	if res.Error != nil {
-		return nil, res.Error
+		return nil, nil, res.Error
 	}
 
-	return &list, nil
+	return &list, &res.RowsAffected, nil
 }
 
 func (pr *ProductRepository) GetProductById(ctx context.Context, id string) (*product.Product, error) {

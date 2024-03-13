@@ -2,7 +2,6 @@ package prodImages
 
 import (
 	"errors"
-	"strings"
 
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/ports"
@@ -31,8 +30,7 @@ func DeleteProductImage(productImageAPI productImages.API, storage ports.Storage
 			return
 		}
 
-		imgKey := strings.Split(prodIm.ImageKey, "/")
-		_, errAdd := storage.DeleteFileAWS(imgKey[1])
+		_, errAdd := storage.DeleteFileAWS(prodIm.ImageKey)
 		if errAdd != nil {
 			ctx.Status(500).JSON(&fiber.Map{
 				"error": errAdd.Error(),

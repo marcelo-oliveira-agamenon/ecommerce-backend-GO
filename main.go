@@ -12,6 +12,7 @@ import (
 	storage "github.com/ecommerce/adapters/secondary/storage/aws"
 	"github.com/ecommerce/adapters/secondary/token/jwt"
 	categories "github.com/ecommerce/core/services/category"
+	favorites "github.com/ecommerce/core/services/favorite"
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/services/users"
@@ -44,7 +45,9 @@ func main() {
 	categoryService := categories.NewCategoryService(categoryRepository)
 	productImageRepository := postgres.NewProductImageRepository(postgresRepository)
 	productImageService := productImages.NewProductImageService(productImageRepository)
+	favoriteRepository := postgres.NewFavoriteRepository(postgresRepository)
+	favoriteService := favorites.NewFavoriteService(favoriteRepository)
 
-	srv := primary.NewApp(tokenService, storageService, userService, productService, categoryService, productImageService, emailService, port)
+	srv := primary.NewApp(tokenService, storageService, userService, productService, categoryService, productImageService, favoriteService, emailService, port)
 	primary.Run(srv)
 }

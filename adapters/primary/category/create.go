@@ -59,7 +59,6 @@ func CreateCategory(categoryAPI categories.API, storage ports.StorageService) fi
 			return
 		}
 
-		ctx.Status(200).JSON(cat)
-
+		ctx.Status(201).JSON(cat)
 	}
 }
