@@ -11,15 +11,20 @@ import (
 	"github.com/ecommerce/adapters/secondary/postgres"
 	storage "github.com/ecommerce/adapters/secondary/storage/aws"
 	"github.com/ecommerce/adapters/secondary/token/jwt"
+	categories "github.com/ecommerce/core/services/category"
+	favorites "github.com/ecommerce/core/services/favorite"
+	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/services/users"
+	"github.com/joho/godotenv"
 	_ "github.com/pdrum/swagger-automation/docs"
 )
 
 func main() {
+	godotenv.Load(".env")
 	postgresRepository, err := postgres.NewPostgresRepository()
 	if err != nil {
-		log.Fatal()
+		log.Fatal() //todo: maybe change this?
 	}
 
 	jtwKey := os.Getenv("JWT_KEY")
@@ -36,7 +41,13 @@ func main() {
 	userService := users.NewUserService(userRepository)
 	productRepository := postgres.NewProductRepository(postgresRepository)
 	productService := products.NewProductService(productRepository)
+	categoryRepository := postgres.NewCategoryRepository(postgresRepository)
+	categoryService := categories.NewCategoryService(categoryRepository)
+	productImageRepository := postgres.NewProductImageRepository(postgresRepository)
+	productImageService := productImages.NewProductImageService(productImageRepository)
+	favoriteRepository := postgres.NewFavoriteRepository(postgresRepository)
+	favoriteService := favorites.NewFavoriteService(favoriteRepository)
 
-	srv := primary.NewApp(tokenService, storageService, userService, productService, emailService, port)
+	srv := primary.NewApp(tokenService, storageService, userService, productService, categoryService, productImageService, favoriteService, emailService, port)
 	primary.Run(srv)
 }

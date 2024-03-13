@@ -1,33 +1,15 @@
 package products
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/ecommerce/core/domain/product"
-	categories "github.com/ecommerce/core/services/category"
 	"github.com/ecommerce/core/services/products"
-	"github.com/ecommerce/core/util"
-	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber"
 )
 
-var (
-	AuthHeader           = "Authorization"
-	ErrorConversion      = errors.New("fields missing/incorrect")
-	ErrorCategoryUnknown = errors.New("unknown category")
-)
-
-func CreateProduct(productAPI products.API, categoriesAPI categories.API, token ports.TokenService) fiber.Handler {
+func EditProduct(productAPI products.API) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
-		tok, errT := util.GetToken(ctx, AuthHeader)
-		if errT != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errT.Error(),
-			})
-			return
-		}
-
 		if err := ctx.BodyParser(&product.Product{}); err != nil {
 			ctx.Status(500).JSON(&fiber.Map{
 				"error": err.Error(),
@@ -35,20 +17,11 @@ func CreateProduct(productAPI products.API, categoriesAPI categories.API, token 
 			return
 		}
 
-		//TODO: use in logs table logic
-		_, errC := token.ClaimTokenData(*tok)
-		if errC != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errC.Error(),
-			})
-			return
-		}
-
-		catId := ctx.FormValue("categoryid")
-		_, errCat := categoriesAPI.GetCategoryById(ctx.Context(), catId)
-		if errCat != nil {
-			ctx.Status(500).JSON(&fiber.Map{
-				"error": ErrorCategoryUnknown.Error(),
+		prodId := ctx.Params("id")
+		_, errI := productAPI.GetProductById(ctx.Context(), prodId)
+		if errI != nil {
+			ctx.Status(404).JSON(&fiber.Map{
+				"error": errI.Error(),
 			})
 			return
 		}
@@ -60,18 +33,18 @@ func CreateProduct(productAPI products.API, categoriesAPI categories.API, token 
 		discount, e5 := strconv.ParseFloat(ctx.FormValue("discount"), 64)
 		price, e6 := strconv.ParseFloat(ctx.FormValue("shippingPrice"), 64)
 		if e1 != nil || e2 != nil || e3 != nil || e4 != nil || e5 != nil || e6 != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			ctx.Status(404).JSON(&fiber.Map{
 				"error": ErrorConversion.Error(),
 			})
 			return
 		}
 
-		product, errP := productAPI.CreateProduct(ctx.Context(), product.Product{
+		product, errP := productAPI.EditProduct(ctx.Context(), product.Product{
 			Name:            ctx.FormValue("name"),
 			Description:     ctx.FormValue("description"),
 			TypeUnit:        ctx.FormValue("type"),
 			TecnicalDetails: ctx.FormValue("tecnicalDetails"),
-			Categoryid:      catId,
+			Categoryid:      ctx.FormValue("categoryid"),
 			Value:           value,
 			StockQtd:        stockQtd,
 			HasPromotion:    hasPromo,
@@ -87,6 +60,6 @@ func CreateProduct(productAPI products.API, categoriesAPI categories.API, token 
 			return
 		}
 
-		ctx.Status(201).JSON(product)
+		ctx.Status(200).JSON(product)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/ecommerce/core/domain/favorite"
 	"github.com/gofrs/uuid"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
@@ -26,6 +27,7 @@ type User struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt
+	Favorite   []favorite.Favorite `gorm:"foreignKey:UserID"`
 }
 
 var (

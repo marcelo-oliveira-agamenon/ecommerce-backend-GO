@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# ggo test -v ./...
+# golangci-lint run

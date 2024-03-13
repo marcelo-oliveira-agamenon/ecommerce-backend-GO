@@ -2,28 +2,27 @@ package products
 
 import (
 	"context"
+	"errors"
 
 	"github.com/ecommerce/core/domain/product"
 	"github.com/ecommerce/ports"
 )
 
-type ProductResponse struct {
-	Name            string
-	Categoryid      string
-	Value           float64
-	StockQtd        int
-	Description     string
-	TypeUnit        string
-	TecnicalDetails string
-	HasPromotion    bool
-	Discount        float64
-	HasShipping     bool
-	ShippingPrice   float64
-	Rate            int
-}
+var (
+	ErrorProductDoesntExist = errors.New("product doenst exist with this id")
+	ErrorGetAllProduct      = errors.New("fetching products")
+	ErrorProductCount       = errors.New("countin products")
+	ErrorCreateProduct      = errors.New("insert product")
+	ErrorEditProduct        = errors.New("editing product")
+	ErrorDeleteProduct      = errors.New("deleting product")
+)
 
 type API interface {
-	CreateProduct(context context.Context, data product.Product) (*ProductResponse, error)
+	GetAllProducts(context context.Context, limit int, offset int, getByCategory string, getByPromotion string, getRecentOnes string, getByName string) (*[]product.Product, *int64, error)
+	GetProductById(context context.Context, id string) (*product.Product, error)
+	CreateProduct(context context.Context, data product.Product) (*product.Product, error)
+	EditProduct(context context.Context, data product.Product) (*product.Product, error)
+	DeleteProductById(context context.Context, data product.Product) error
 }
 
 type ProductService struct {
@@ -36,19 +35,54 @@ func NewProductService(pr ports.ProductRepository) *ProductService {
 	}
 }
 
-func NewProductResponse(data product.Product) *ProductResponse {
-	return &ProductResponse{
-		Name:            data.Name,
-		Categoryid:      data.Categoryid,
-		Value:           data.Value,
-		StockQtd:        data.StockQtd,
-		Description:     data.Description,
-		TypeUnit:        data.TypeUnit,
-		TecnicalDetails: data.TecnicalDetails,
-		HasPromotion:    data.HasPromotion,
-		Discount:        data.Discount,
-		HasShipping:     data.HasShipping,
-		ShippingPrice:   data.ShippingPrice,
-		Rate:            data.Rate,
+func ValidateProductFields(p product.Product) (*product.Product, error) {
+	name, errN := product.NewName(p.Name)
+	if errN != nil {
+		return nil, errN
 	}
+
+	value, errV := product.NewValue(p.Value)
+	if errV != nil {
+		return nil, errV
+	}
+
+	rate, errR := product.NewRate(p.Rate)
+	if errR != nil {
+		return nil, errR
+	}
+
+	disc, errD := product.NewDiscount(p.Discount)
+	if errD != nil {
+		return nil, errD
+	}
+
+	desc, errDi := product.NewDescription(p.Description)
+	if errDi != nil {
+		return nil, errDi
+	}
+
+	tech, errT := product.NewTechnicalDescription(p.TecnicalDetails)
+	if errT != nil {
+		return nil, errT
+	}
+
+	stock, errS := product.NewStock(p.StockQtd)
+	if errS != nil {
+		return nil, errS
+	}
+
+	p.Name = *name
+	p.Value = *value
+	p.Discount = *disc
+	p.Rate = *rate
+	p.Description = *desc
+	p.TecnicalDetails = *tech
+	p.StockQtd = *stock
+
+	prod, errN := product.NewProduct(p)
+	if errN != nil {
+		return nil, errN
+	}
+
+	return &prod, nil
 }
