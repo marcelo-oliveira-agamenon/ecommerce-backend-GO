@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"os"
+	"time"
 
 	"github.com/ecommerce/core/domain/category"
 	"github.com/ecommerce/core/domain/favorite"
@@ -42,6 +43,14 @@ func initDatabase() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	sqlDb, err1 := db.DB()
+	if err1 != nil {
+		return nil, err
+	}
+	sqlDb.SetMaxIdleConns(10)
+	sqlDb.SetMaxOpenConns(100)
+	sqlDb.SetConnMaxLifetime(time.Second * 30)
 
 	db.AutoMigrate(&user.User{})
 	db.AutoMigrate(&product.Product{})

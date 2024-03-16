@@ -51,7 +51,9 @@ func initRoutes(a *App) {
 
 			favorite := authUser.Group("/favorite")
 			{
+				favorite.Get("/", favorites.GetFavoriteByUserId(a.favoriteAPI, a.tokenAPI))
 				favorite.Post("/", favorites.CreateFavorite(a.favoriteAPI, a.tokenAPI))
+				favorite.Delete("/:id", favorites.DeleteFavorite((a.favoriteAPI)))
 			}
 		}
 	}
