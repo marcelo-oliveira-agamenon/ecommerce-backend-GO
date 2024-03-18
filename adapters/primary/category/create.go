@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrorMissingNameField = errors.New("missing name of category")
+	ErrorMissingNameField = errors.New("missing category name")
 	ErrorMissingImage     = errors.New("missing category image")
 )
 

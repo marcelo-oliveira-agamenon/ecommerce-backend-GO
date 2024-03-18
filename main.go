@@ -12,12 +12,12 @@ import (
 	storage "github.com/ecommerce/adapters/secondary/storage/aws"
 	"github.com/ecommerce/adapters/secondary/token/jwt"
 	categories "github.com/ecommerce/core/services/category"
+	coupons "github.com/ecommerce/core/services/coupon"
 	favorites "github.com/ecommerce/core/services/favorite"
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/services/users"
 	"github.com/joho/godotenv"
-	_ "github.com/pdrum/swagger-automation/docs"
 )
 
 func main() {
@@ -47,7 +47,11 @@ func main() {
 	productImageService := productImages.NewProductImageService(productImageRepository)
 	favoriteRepository := postgres.NewFavoriteRepository(postgresRepository)
 	favoriteService := favorites.NewFavoriteService(favoriteRepository)
+	couponRepository := postgres.NewCouponRepository(postgresRepository)
+	couponService := coupons.NewCouponService(couponRepository)
 
-	srv := primary.NewApp(tokenService, storageService, userService, productService, categoryService, productImageService, favoriteService, emailService, port)
+	srv := primary.NewApp(
+		tokenService, storageService, userService, productService, categoryService,
+		productImageService, favoriteService, couponService, emailService, port)
 	primary.Run(srv)
 }

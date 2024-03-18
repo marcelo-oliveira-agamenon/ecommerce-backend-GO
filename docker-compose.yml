@@ -13,7 +13,6 @@ services:
       - POSTGRES_PASSWORD=${DB_CONNECTION_PASSWORD}
       - POSTGRES_USER=${DB_CONNECTION_USER}
       - POSTGRES_DB=${DB_CONNECTION_DBNAME}
-    network_mode: bridge
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready']
       interval: 10s
@@ -45,7 +44,6 @@ services:
       - EMAIL_PRO_PASSWORD=${EMAIL_PRO_PASSWORD}
       - REDIS_ADDR=${REDIS_ADDR}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    network_mode: bridge
     depends_on:
       database:
         condition: service_healthy

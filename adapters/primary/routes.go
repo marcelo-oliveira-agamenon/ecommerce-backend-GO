@@ -2,6 +2,7 @@ package primary
 
 import (
 	categories "github.com/ecommerce/adapters/primary/category"
+	coupons "github.com/ecommerce/adapters/primary/coupon"
 	favorites "github.com/ecommerce/adapters/primary/favorite"
 	"github.com/ecommerce/adapters/primary/middleware"
 	prodImages "github.com/ecommerce/adapters/primary/productImage"
@@ -54,6 +55,12 @@ func initRoutes(a *App) {
 				favorite.Get("/", favorites.GetFavoriteByUserId(a.favoriteAPI, a.tokenAPI))
 				favorite.Post("/", favorites.CreateFavorite(a.favoriteAPI, a.tokenAPI))
 				favorite.Delete("/:id", favorites.DeleteFavorite((a.favoriteAPI)))
+			}
+
+			coupon := authUser.Group("/coupon")
+			{
+				//coupon.Get("/")
+				coupon.Post("/", coupons.CreateCoupon(a.couponAPI))
 			}
 		}
 	}
