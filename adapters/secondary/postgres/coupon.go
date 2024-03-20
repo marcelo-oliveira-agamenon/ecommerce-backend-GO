@@ -42,3 +42,14 @@ func (co *CouponRepository) GetCouponByHash(ctx context.Context, hash string) (*
 
 	return &coupons, nil
 }
+
+func (co *CouponRepository) GetOneCouponByHash(ctx context.Context, hash string) (*coupon.Coupon, error) {
+	var coupon coupon.Coupon
+
+	res := co.db.Where("hash = ?", hash).First(&coupon)
+	if res.Error != nil {
+		return nil, ErrorListingCoupon
+	}
+
+	return &coupon, nil
+}

@@ -14,6 +14,7 @@ import (
 type API interface {
 	CreateCoupon(ctx context.Context, hash string, expireDate string, discount string) (*coupon.Coupon, error)
 	CheckIfThereIsCouponsByHash(ctx context.Context, hash string) (bool, error)
+	VerifyIfCouponIsActive(ctx context.Context, hash string) (*coupon.Coupon, bool, error)
 }
 
 type CouponService struct {

@@ -59,7 +59,7 @@ func initRoutes(a *App) {
 
 			coupon := authUser.Group("/coupon")
 			{
-				//coupon.Get("/")
+				coupon.Get("/", coupons.VerifyCouponStillActive(a.couponAPI))
 				coupon.Post("/", coupons.CreateCoupon(a.couponAPI))
 			}
 		}
