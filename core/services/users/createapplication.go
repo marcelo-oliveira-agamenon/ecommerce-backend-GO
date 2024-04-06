@@ -13,12 +13,12 @@ import (
 )
 
 func (u *UserService) SignUp(context context.Context, data user.User) (*UserResponse, error) {
-	alreadyHasUser, errRepo := u.userRepository.FindOneUserByEmail(context, data.Email)
-	if errRepo != nil {
-		return nil, errRepo
-	}
-	if alreadyHasUser != nil {
+	_, errG := u.GetUserByEmail(context, data.Email)
+	if errG == ErrorUserDoesntExist {
 		return nil, ErrorUserAlreadyExists
+	}
+	if errG != nil {
+		return nil, errG
 	}
 
 	password, errPass := user.NewPassword(data.Password)
@@ -91,12 +91,9 @@ func (u *UserService) Login(context context.Context, body LoginRequest) (*UserRe
 		return nil, errPa
 	}
 
-	us, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
-	if errRepo != nil {
-		return nil, errRepo
-	}
-	if us == nil {
-		return nil, ErrorUserDoesntExist
+	us, errG := u.GetUserByEmail(context, body.Email)
+	if errG != nil {
+		return nil, errG
 	}
 
 	if body.IsAdmin == "true" && !user.IsRoleAdmin(us.Roles) {
@@ -116,12 +113,9 @@ func (u *UserService) LoginFacebook(context context.Context, body LoginFacebook)
 		return nil, errEm
 	}
 
-	us, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
-	if errRepo != nil {
-		return nil, errRepo
-	}
-	if us == nil {
-		return nil, ErrorUserDoesntExist
+	us, errG := u.GetUserByEmail(context, body.Email)
+	if errG != nil {
+		return nil, errG
 	}
 
 	resp, errFa := http.Get(FacebookTokenURL + body.Token)
@@ -143,12 +137,9 @@ func (u *UserService) ResetPassword(context context.Context, body ResetPassword)
 		return false, ErrorPasswordsDontMatch
 	}
 
-	us, errRepo := u.userRepository.FindOneUserByEmail(context, body.Email)
-	if errRepo != nil {
-		return false, errRepo
-	}
-	if us == nil {
-		return false, ErrorUserDoesntExist
+	us, errG := u.GetUserByEmail(context, body.Email)
+	if errG != nil {
+		return false, errG
 	}
 
 	_, errPa := user.NewPassword(body.Password)
@@ -170,12 +161,9 @@ func (u *UserService) ResetPassword(context context.Context, body ResetPassword)
 }
 
 func (u *UserService) SendEmailResetPassword(context context.Context, email string) (*EmailTemplateResetPassword, error) {
-	us, errRepo := u.userRepository.FindOneUserByEmail(context, email)
-	if errRepo != nil {
-		return nil, errRepo
-	}
-	if us == nil {
-		return nil, ErrorUserDoesntExist
+	us, errG := u.GetUserByEmail(context, email)
+	if errG != nil {
+		return nil, errG
 	}
 
 	rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -190,12 +178,9 @@ func (u *UserService) SendEmailResetPassword(context context.Context, email stri
 }
 
 func (u *UserService) ToggleRoles(context context.Context, id string) (*user.User, error) {
-	us, errRepo := u.userRepository.FindOneUserById(context, id)
-	if errRepo != nil {
-		return nil, errRepo
-	}
-	if us == nil {
-		return nil, ErrorUserDoesntExist
+	us, errG := u.GetUserById(context, id)
+	if errG != nil {
+		return nil, errG
 	}
 
 	var roles pq.StringArray
@@ -209,6 +194,30 @@ func (u *UserService) ToggleRoles(context context.Context, id string) (*user.Use
 	_, err := u.userRepository.UpdateUser(context, id, *us)
 	if err != nil {
 		return nil, ErrorUpdateUser
+	}
+
+	return us, nil
+}
+
+func (u *UserService) GetUserById(context context.Context, user_id string) (*user.User, error) {
+	us, errRepo := u.userRepository.FindOneUserById(context, user_id)
+	if errRepo != nil {
+		return nil, errRepo
+	}
+	if us == nil {
+		return nil, ErrorUserDoesntExist
+	}
+
+	return us, nil
+}
+
+func (u *UserService) GetUserByEmail(context context.Context, email string) (*user.User, error) {
+	us, errRepo := u.userRepository.FindOneUserByEmail(context, email)
+	if errRepo != nil {
+		return nil, errRepo
+	}
+	if us == nil {
+		return nil, ErrorUserDoesntExist
 	}
 
 	return us, nil

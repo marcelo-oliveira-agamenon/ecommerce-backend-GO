@@ -66,6 +66,8 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			return
 		}
 
+		//TODO: send email to user
+
 		ctx.Status(201).JSON(&fiber.Map{
 			"user":  UserResponse,
 			"token": token,

@@ -64,6 +64,8 @@ type API interface {
 	UpdateUser(context context.Context, id string, data user.User) (bool, error)
 	SendEmailResetPassword(context context.Context, email string) (*EmailTemplateResetPassword, error)
 	ToggleRoles(context context.Context, id string) (*user.User, error)
+	GetUserById(context context.Context, user_id string) (*user.User, error)
+	GetUserByEmail(context context.Context, email string) (*user.User, error)
 }
 
 type UserService struct {

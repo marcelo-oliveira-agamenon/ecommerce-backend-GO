@@ -2,9 +2,15 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/ecommerce/core/domain/product"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
+)
+
+var (
+	ErrorProductNotFound = errors.New("product not found")
 )
 
 type ProductRepository struct {
@@ -92,4 +98,26 @@ func (pr *ProductRepository) DeleteProductById(ctx context.Context, p product.Pr
 	}
 
 	return nil
+}
+
+func (pr *ProductRepository) CheckProductListById(ctx context.Context, prs pq.StringArray) (*[]string, error) {
+	aux := make([]string, len(prs))
+
+	tx := pr.db.Begin()
+	for _, s := range prs {
+		var p product.Product
+		if err := tx.Where("id = ?", s).Find(&p).Error; err != nil {
+			tx.Rollback()
+			return nil, ErrorProductNotFound
+		}
+
+		aux = append(aux, p.Name)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return &aux, nil
 }

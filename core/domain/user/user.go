@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ecommerce/core/domain/favorite"
+	"github.com/ecommerce/core/domain/order"
 	"github.com/gofrs/uuid"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
@@ -28,6 +29,7 @@ type User struct {
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt
 	Favorite   []favorite.Favorite `gorm:"foreignKey:UserID"`
+	Order      []order.Order
 }
 
 var (

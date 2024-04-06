@@ -15,6 +15,7 @@ var (
 	ErrorCreateProduct      = errors.New("insert product")
 	ErrorEditProduct        = errors.New("editing product")
 	ErrorDeleteProduct      = errors.New("deleting product")
+	ErrorCheckProductList   = errors.New("checking product list")
 )
 
 type API interface {
@@ -23,6 +24,7 @@ type API interface {
 	CreateProduct(context context.Context, data product.Product) (*product.Product, error)
 	EditProduct(context context.Context, data product.Product) (*product.Product, error)
 	DeleteProductById(context context.Context, data product.Product) error
+	CheckProductListById(context context.Context, prList string) (*[]string, error)
 }
 
 type ProductService struct {

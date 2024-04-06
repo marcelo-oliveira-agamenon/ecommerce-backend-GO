@@ -5,6 +5,7 @@ import (
 	coupons "github.com/ecommerce/adapters/primary/coupon"
 	favorites "github.com/ecommerce/adapters/primary/favorite"
 	"github.com/ecommerce/adapters/primary/middleware"
+	orders "github.com/ecommerce/adapters/primary/order"
 	prodImages "github.com/ecommerce/adapters/primary/productImage"
 	"github.com/ecommerce/adapters/primary/products"
 	"github.com/ecommerce/adapters/primary/users"
@@ -61,6 +62,12 @@ func initRoutes(a *App) {
 			{
 				coupon.Get("/", coupons.VerifyCouponStillActive(a.couponAPI))
 				coupon.Post("/", coupons.CreateCoupon(a.couponAPI))
+			}
+
+			order := authUser.Group("/order")
+			{
+				order.Get("/", orders.GetByUserId(a.orderAPI, a.usersAPI, a.tokenAPI))
+				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.productAPI, a.tokenAPI))
 			}
 		}
 	}

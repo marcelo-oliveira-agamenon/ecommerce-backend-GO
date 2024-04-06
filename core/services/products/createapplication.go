@@ -2,6 +2,7 @@ package products
 
 import (
 	"context"
+	"strings"
 
 	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/ecommerce/core/domain/product"
@@ -75,4 +76,15 @@ func (p *ProductService) DeleteProductById(context context.Context, data product
 	}
 
 	return nil
+}
+
+func (p *ProductService) CheckProductListById(context context.Context, prList string) (*[]string, error) {
+	prod := strings.Split(prList, ",")
+
+	li, err := p.productRepository.CheckProductListById(context, prod)
+	if err != nil {
+		return nil, ErrorCheckProductList
+	}
+
+	return li, nil
 }

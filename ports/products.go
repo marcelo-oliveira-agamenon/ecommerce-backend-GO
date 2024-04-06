@@ -5,6 +5,7 @@ import (
 
 	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/ecommerce/core/domain/product"
+	"github.com/lib/pq"
 )
 
 type ProductRepository interface {
@@ -14,4 +15,5 @@ type ProductRepository interface {
 	AddProduct(ctx context.Context, p product.Product) error
 	EditProduct(ctx context.Context, p product.Product) error
 	DeleteProductById(ctx context.Context, p product.Product) error
+	CheckProductListById(ctx context.Context, prs pq.StringArray) (*[]string, error)
 }
