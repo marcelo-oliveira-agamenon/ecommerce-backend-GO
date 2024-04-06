@@ -13,10 +13,9 @@ import (
 )
 
 var (
-	ErrorMissingProductIds   = errors.New("missing product id")
-	ErrorMissingQuantity     = errors.New("missing quantity")
-	ErrorMissingTotalValue   = errors.New("missing total value")
-	ErrorEmptyListingProduct = errors.New("no valid product in list")
+	ErrorMissingProductIds = errors.New("missing product id")
+	ErrorMissingQuantity   = errors.New("missing quantity")
+	ErrorMissingTotalValue = errors.New("missing total value")
 )
 
 func CreateOrder(orderAPI orders.API, userAPI users.API, productAPI products.API, token ports.TokenService) fiber.Handler {
@@ -68,16 +67,10 @@ func CreateOrder(orderAPI orders.API, userAPI users.API, productAPI products.API
 			return
 		}
 
-		pList, errP := productAPI.CheckProductListById(ctx.Context(), prodId)
+		_, errP := productAPI.CheckProductListById(ctx.Context(), prodId)
 		if errP != nil {
 			ctx.Status(500).JSON(&fiber.Map{
 				"error": errP.Error(),
-			})
-			return
-		}
-		if len(*pList) == 0 {
-			ctx.Status(500).JSON(&fiber.Map{
-				"error": ErrorEmptyListingProduct.Error(),
 			})
 			return
 		}

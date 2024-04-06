@@ -2,6 +2,7 @@ package orders
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/ecommerce/core/domain/order"
 )
@@ -69,4 +70,69 @@ func (o *OrderService) AddOrder(ctx context.Context,
 	}
 
 	return newO, nil
+}
+
+func (o *OrderService) UpdatePayment(ctx context.Context,
+	id string, paid string) (*order.Order, error) {
+	or, errO := o.orderRepository.GetById(ctx, id)
+	if errO != nil {
+		return nil, errO
+	}
+
+	nPa, errP := strconv.ParseBool(paid)
+	if errP != nil {
+		return nil, errP
+	}
+
+	up, err := o.orderRepository.UpdateOrderPayment(ctx, *or, nPa)
+	if err != nil {
+		return nil, err
+	}
+
+	return up, nil
+}
+
+func (o *OrderService) UpdateRate(ctx context.Context,
+	id string, rate string) (*order.Order, error) {
+	or, errO := o.orderRepository.GetById(ctx, id)
+	if errO != nil {
+		return nil, errO
+	}
+
+	nRa, errR := strconv.Atoi(rate)
+	if errR != nil {
+		return nil, errR
+	}
+
+	rt, errR := order.NewRate(nRa)
+	if errR != nil {
+		return nil, errR
+	}
+
+	up, err := o.orderRepository.UpdateOrderRate(ctx, *or, *rt)
+	if err != nil {
+		return nil, err
+	}
+
+	return up, nil
+}
+
+func (o *OrderService) UpdateStatus(ctx context.Context,
+	id string, status string) (*order.Order, error) {
+	or, errO := o.orderRepository.GetById(ctx, id)
+	if errO != nil {
+		return nil, errO
+	}
+
+	st, errS := order.NewStatus(status)
+	if errS != nil {
+		return nil, errS
+	}
+
+	up, err := o.orderRepository.UpdateOrderStatus(ctx, *or, *st)
+	if err != nil {
+		return nil, err
+	}
+
+	return up, nil
 }

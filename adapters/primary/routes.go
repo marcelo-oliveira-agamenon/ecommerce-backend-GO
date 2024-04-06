@@ -68,6 +68,9 @@ func initRoutes(a *App) {
 			{
 				order.Get("/", orders.GetByUserId(a.orderAPI, a.usersAPI, a.tokenAPI))
 				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.productAPI, a.tokenAPI))
+				order.Patch("/payment/:id", orders.EditPayment(a.orderAPI))
+				order.Patch("/rate/:id", orders.EditRate(a.orderAPI))
+				order.Patch("/status/:id", orders.EditStatus(a.orderAPI))
 			}
 		}
 	}

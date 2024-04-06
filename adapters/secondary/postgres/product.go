@@ -106,7 +106,12 @@ func (pr *ProductRepository) CheckProductListById(ctx context.Context, prs pq.St
 	tx := pr.db.Begin()
 	for _, s := range prs {
 		var p product.Product
-		if err := tx.Where("id = ?", s).Find(&p).Error; err != nil {
+		res := tx.Where("id = ?", s).Find(&p)
+		if res.Error != nil {
+			tx.Rollback()
+			return nil, res.Error
+		}
+		if res.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, ErrorProductNotFound
 		}
