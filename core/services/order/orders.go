@@ -14,6 +14,7 @@ var (
 
 type API interface {
 	AddOrder(ctx context.Context, userId string, prodId string, qtd int, toV float64) (*order.Order, error)
+	GetById(ctx context.Context, id string) (*order.Order, error)
 	GetByUserId(ctx context.Context, userId string, limit int, offset int) (*[]order.Order, error)
 	UpdatePayment(ctx context.Context, id string, paid string) (*order.Order, error)
 	UpdateRate(ctx context.Context, id string, rate string) (*order.Order, error)

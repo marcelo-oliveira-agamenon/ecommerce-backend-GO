@@ -6,6 +6,7 @@ import (
 	favorites "github.com/ecommerce/adapters/primary/favorite"
 	"github.com/ecommerce/adapters/primary/middleware"
 	orders "github.com/ecommerce/adapters/primary/order"
+	payments "github.com/ecommerce/adapters/primary/payment"
 	prodImages "github.com/ecommerce/adapters/primary/productImage"
 	"github.com/ecommerce/adapters/primary/products"
 	"github.com/ecommerce/adapters/primary/users"
@@ -71,6 +72,13 @@ func initRoutes(a *App) {
 				order.Patch("/payment/:id", orders.EditPayment(a.orderAPI))
 				order.Patch("/rate/:id", orders.EditRate(a.orderAPI))
 				order.Patch("/status/:id", orders.EditStatus(a.orderAPI))
+			}
+
+			payment := authUser.Group("/payment")
+			{
+				payment.Get("/", payments.GetAllByUser(a.paymentAPI, a.usersAPI, a.tokenAPI))
+				payment.Post("/", payments.CreatePayment(a.paymentAPI, a.usersAPI, a.orderAPI, a.tokenAPI))
+				payment.Delete("/:id", payments.DeletePayment(a.paymentAPI))
 			}
 		}
 	}

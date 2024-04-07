@@ -6,8 +6,8 @@ The documentation for the API is [here]().
 
 ## Technologies used
 
-- [Golang](https://go.dev/){:target="\_blank"}
-- [Postgres](https://www.postgresql.org/){:target="\_blank"}
-- [Docker](https://www.docker.com/){:target="\_blank"}
-- [Husky](https://typicode.github.io/husky/){:target="\_blank"}
-- [Redis](https://redis.io/){:target="\_blank"}
+- [Golang](https://go.dev/)
+- [Postgres](https://www.postgresql.org/)
+- [Docker](https://www.docker.com/)
+- [Husky](https://typicode.github.io/husky/)
+- [Redis](https://redis.io/)

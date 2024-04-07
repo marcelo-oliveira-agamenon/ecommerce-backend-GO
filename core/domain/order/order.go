@@ -3,6 +3,7 @@ package order
 import (
 	"time"
 
+	"github.com/ecommerce/core/domain/payment"
 	"github.com/gofrs/uuid"
 	"github.com/lib/pq"
 	"github.com/segmentio/ksuid"
@@ -22,7 +23,7 @@ type Order struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt
-	// Payment    Payment `gorm:"foreignKey:OrderID"`
+	Payment    payment.Payment `gorm:"foreignKey:OrderID"`
 }
 
 func NewOrder(data Order) (Order, error) {

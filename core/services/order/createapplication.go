@@ -19,6 +19,15 @@ func (o *OrderService) GetByUserId(ctx context.Context,
 	return ods, nil
 }
 
+func (o *OrderService) GetById(ctx context.Context, id string) (*order.Order, error) {
+	od, err := o.orderRepository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return od, nil
+}
+
 func (o *OrderService) AddOrder(ctx context.Context,
 	userId string, prodId string, qtd int, toV float64) (*order.Order, error) {
 	prs, errP := order.NewProductId(prodId)

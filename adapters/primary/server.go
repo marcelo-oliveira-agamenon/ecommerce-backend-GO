@@ -5,6 +5,7 @@ import (
 	coupons "github.com/ecommerce/core/services/coupon"
 	favorites "github.com/ecommerce/core/services/favorite"
 	orders "github.com/ecommerce/core/services/order"
+	"github.com/ecommerce/core/services/payments"
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/services/users"
@@ -22,6 +23,7 @@ type App struct {
 	favoriteAPI     favorites.API
 	couponAPI       coupons.API
 	orderAPI        orders.API
+	paymentAPI      payments.API
 	tokenAPI        ports.TokenService
 	storageAPI      ports.StorageService
 	emailAPI        ports.EmailService
@@ -38,6 +40,7 @@ func NewApp(
 	favoriteAPI favorites.API,
 	couponAPI coupons.API,
 	orderAPI orders.API,
+	paymentAPI payments.API,
 	emailAPI ports.EmailService,
 	port string) *App {
 	newFiber := &App{
@@ -49,6 +52,7 @@ func NewApp(
 		favoriteAPI:     favoriteAPI,
 		couponAPI:       couponAPI,
 		orderAPI:        orderAPI,
+		paymentAPI:      paymentAPI,
 		tokenAPI:        tokenAPI,
 		storageAPI:      storageAPI,
 		emailAPI:        emailAPI,
