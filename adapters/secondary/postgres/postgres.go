@@ -26,6 +26,12 @@ type QueryParamsProduct struct {
 	GetByName      string
 }
 
+type QueryParamsUsers struct {
+	CreatedAtStart string
+	CreatedAtEnd   string
+	Gender         string
+}
+
 type QueryParams struct {
 	Limit  int
 	Offset int

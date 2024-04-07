@@ -9,6 +9,7 @@ import (
 	payments "github.com/ecommerce/adapters/primary/payment"
 	prodImages "github.com/ecommerce/adapters/primary/productImage"
 	"github.com/ecommerce/adapters/primary/products"
+	reports "github.com/ecommerce/adapters/primary/report"
 	"github.com/ecommerce/adapters/primary/users"
 )
 
@@ -79,6 +80,12 @@ func initRoutes(a *App) {
 				payment.Get("/", payments.GetAllByUser(a.paymentAPI, a.usersAPI, a.tokenAPI))
 				payment.Post("/", payments.CreatePayment(a.paymentAPI, a.usersAPI, a.orderAPI, a.tokenAPI))
 				payment.Delete("/:id", payments.DeletePayment(a.paymentAPI))
+			}
+
+			report := authUser.Group("/report")
+			{
+				report.Get("/users/export", reports.ExportUsers(a.usersAPI))
+				report.Post("/users/import", reports.ImportUsers(a.usersAPI))
 			}
 		}
 	}

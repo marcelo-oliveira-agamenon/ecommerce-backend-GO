@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"errors"
+	"mime/multipart"
 
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/ports"
@@ -19,6 +20,9 @@ var (
 	ErrorInvalidToken       = errors.New("invalid token")
 	ErrorPasswordsDontMatch = errors.New("passwords dont match")
 	ErrorUpdateUser         = errors.New("updating user")
+	ErrorInvalidGender      = errors.New("wrong attribute to gender field")
+	ErrorInvalidCsv         = errors.New("generating csv file")
+	ErrorReadingUserInfo    = errors.New("reading user information")
 )
 
 type UserResponse struct {
@@ -66,6 +70,8 @@ type API interface {
 	ToggleRoles(context context.Context, id string) (*user.User, error)
 	GetUserById(context context.Context, user_id string) (*user.User, error)
 	GetUserByEmail(context context.Context, email string) (*user.User, error)
+	ImportUsers(context context.Context, file multipart.File) (bool, error)
+	ExportUsers(context context.Context, createdAtStart string, createdAtEnd string, gender string) ([]byte, error)
 }
 
 type UserService struct {

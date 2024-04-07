@@ -2,9 +2,14 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/ecommerce/core/domain/user"
 	"gorm.io/gorm"
+)
+
+var (
+	ErrorUsersFilterNotFound = errors.New("no user found with this filter")
 )
 
 type UserRepository struct {
@@ -21,6 +26,15 @@ func (ur *UserRepository) AddUser(ctx context.Context, u user.User) error {
 	result := ur.db.Create(&u)
 	if result.Error != nil {
 		return result.Error
+	}
+
+	return nil
+}
+
+func (ur *UserRepository) AddBulkUser(ctx context.Context, u []user.User) error {
+	res := ur.db.Create(&u)
+	if res.Error != nil {
+		return res.Error
 	}
 
 	return nil
@@ -65,4 +79,27 @@ func (ur *UserRepository) FindOneUserById(ctx context.Context, id string) (*user
 	}
 
 	return &user, nil
+}
+
+func (ur *UserRepository) FindUsersByFilters(ctx context.Context, params QueryParamsUsers) (*[]user.User, error) {
+	var usr []user.User
+	baQu := ur.db
+
+	if params.CreatedAtStart != "" && params.CreatedAtEnd != "" {
+		baQu = baQu.Where("created_at BETWEEN ?::date AND ?::date", params.CreatedAtStart, params.CreatedAtEnd)
+	}
+
+	if params.Gender != "" {
+		baQu = baQu.Where("gender = ?", params.Gender)
+	}
+
+	res := baQu.Find(&usr)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return nil, ErrorUsersFilterNotFound
+	}
+
+	return &usr, nil
 }
