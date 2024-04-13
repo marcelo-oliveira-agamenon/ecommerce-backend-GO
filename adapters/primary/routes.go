@@ -23,6 +23,7 @@ func initRoutes(a *App) {
 		v1.Post("/loginFacebook", users.LoginFacebook(a.usersAPI, a.tokenAPI, a.redisAPI))
 		v1.Patch("/resetPassword", users.ResetPassword(a.usersAPI))
 		v1.Post("/resetPasswordLink", users.SendEmailResetPassword(a.usersAPI, a.emailAPI))
+		v1.Patch("/refresh", users.RefreshToken(a.usersAPI, a.tokenAPI, a.redisAPI))
 
 		authUser := v1.Use(middleware.VerifyToken(a.tokenAPI))
 		{
