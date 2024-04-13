@@ -1,6 +1,7 @@
 package primary
 
 import (
+	admins "github.com/ecommerce/adapters/primary/admin"
 	categories "github.com/ecommerce/adapters/primary/category"
 	coupons "github.com/ecommerce/adapters/primary/coupon"
 	favorites "github.com/ecommerce/adapters/primary/favorite"
@@ -86,6 +87,14 @@ func initRoutes(a *App) {
 			{
 				report.Get("/users/export", reports.ExportUsers(a.usersAPI))
 				report.Post("/users/import", reports.ImportUsers(a.usersAPI))
+			}
+
+			admin := authUser.Group("/admin")
+			{
+				admin.Get("/card1", admins.GetOrdersByPeriod(a.orderAPI))
+				admin.Get("/card2", admins.GetProfitByOrdersByMonths(a.orderAPI))
+				admin.Get("/card3", admins.GetCountForAdmin(a.usersAPI, a.orderAPI, a.productAPI))
+				admin.Get("/card4", admins.GetProductQuantityByCategories(a.productAPI))
 			}
 		}
 	}

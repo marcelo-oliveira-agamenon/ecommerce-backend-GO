@@ -40,6 +40,16 @@ func (ur *UserRepository) AddBulkUser(ctx context.Context, u []user.User) error 
 	return nil
 }
 
+func (ur *UserRepository) GetUserCount(ctx context.Context) (*int64, error) {
+	var co int64
+	res := ur.db.Table("users").Count(&co)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &co, nil
+}
+
 func (ur *UserRepository) FindOneUserByEmail(ctx context.Context, email string) (*user.User, error) {
 	var aux user.User
 	result := ur.db.Where("email = ?", email).First(&aux)

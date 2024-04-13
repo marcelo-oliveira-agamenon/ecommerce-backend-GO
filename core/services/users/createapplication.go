@@ -98,6 +98,15 @@ func (u *UserService) DeleteUser(context context.Context, id string) (bool, erro
 	return du, nil
 }
 
+func (u *UserService) GetUserCount(context context.Context) (*int64, error) {
+	co, err := u.userRepository.GetUserCount(context)
+	if err != nil {
+		return nil, err
+	}
+
+	return co, nil
+}
+
 func (u *UserService) Login(context context.Context, body LoginRequest) (*UserResponse, error) {
 	_, errEm := user.NewEmail(body.Email)
 	if errEm != nil {

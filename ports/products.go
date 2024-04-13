@@ -10,6 +10,7 @@ import (
 
 type ProductRepository interface {
 	CountAllProducts(context context.Context) (*int64, error)
+	CountProductsByCategories(context context.Context) (*[]postgres.CountProducts, error)
 	GetAllProducts(context context.Context, params postgres.QueryParamsProduct) (*[]product.Product, *int64, error)
 	GetProductById(ctx context.Context, id string) (*product.Product, error)
 	AddProduct(ctx context.Context, p product.Product) error

@@ -3,6 +3,7 @@ package orders
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/ecommerce/core/domain/order"
 )
@@ -26,6 +27,84 @@ func (o *OrderService) GetById(ctx context.Context, id string) (*order.Order, er
 	}
 
 	return od, nil
+}
+
+func (o *OrderService) GetOrderCount(ctx context.Context) (*int64, *int64, error) {
+	co, err := o.orderRepository.GetOrderCount(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	coP, errP := o.orderRepository.GetPaidOrderCount(ctx)
+	if errP != nil {
+		return nil, nil, errP
+	}
+
+	return co, coP, nil
+}
+
+func (o *OrderService) GetOrdersByPeriod(ctx context.Context) (*[]OrderMonthQuantity, error) {
+	var toOr []OrderMonthQuantity
+
+	inDate, enDate, mot := o.GetInitialAndFinalDates()
+	ord, errO := o.orderRepository.GetOrdersByPeriod(ctx, inDate, enDate)
+	if errO != nil {
+		return nil, errO
+	}
+
+	for i := 0; i < len(mot); i++ {
+		var aux OrderMonthQuantity
+		var cot int64
+
+		aux.Month = mot[i]
+
+		for j := 0; j < len(*ord); j++ {
+			auxOr := *ord
+			if auxOr[j].CreatedAt.Month().String() == mot[i] {
+				cot++
+			}
+		}
+
+		aux.Quantity = cot
+		toOr = append(toOr, aux)
+	}
+
+	return &toOr, nil
+}
+
+func (o *OrderService) GetProfitByOrdersByMonths(ctx context.Context) (*[]MonthData, error) {
+	var foTo []OrderTotalMonth
+	var auxTo []MonthData
+
+	inDate, enDate, mot := o.GetInitialAndFinalDates()
+	ord, errO := o.orderRepository.GetOrdersByPeriod(ctx, inDate, enDate)
+	if errO != nil {
+		return nil, errO
+	}
+
+	for i := 0; i < len(*ord); i++ {
+		auxOr := *ord
+		foTo = append(foTo, OrderTotalMonth{
+			OrderId:  auxOr[i].ID,
+			Subtotal: auxOr[i].TotalValue * float64(auxOr[i].Qtd),
+			Month:    auxOr[i].CreatedAt.Month().String(),
+		})
+	}
+
+	for i := 0; i < len(mot); i++ {
+		var auxM MonthData
+		auxM.Month = mot[i]
+
+		for j := 0; j < len(foTo); j++ {
+			if foTo[j].Month == mot[i] {
+				auxM.Data = append(auxM.Data, foTo[j])
+			}
+		}
+
+		auxTo = append(auxTo, auxM)
+	}
+
+	return &auxTo, nil
 }
 
 func (o *OrderService) AddOrder(ctx context.Context,
@@ -144,4 +223,17 @@ func (o *OrderService) UpdateStatus(ctx context.Context,
 	}
 
 	return up, nil
+}
+
+func (o *OrderService) GetInitialAndFinalDates() (time.Time, time.Time, []string) {
+	inDate := time.Now()
+	enDate := inDate.AddDate(0, -5, 0)
+	mot := make([]string, 5)
+
+	for i := 0; i < 5; i++ {
+		aux := inDate.AddDate(0, -i, 0)
+		mot[i] = aux.Month().String()
+	}
+
+	return inDate, enDate, mot
 }

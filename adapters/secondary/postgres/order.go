@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/ecommerce/core/domain/order"
 	"gorm.io/gorm"
@@ -40,6 +41,39 @@ func (or *OrderRepository) GetById(ctx context.Context, id string) (*order.Order
 	}
 
 	return &od, nil
+}
+
+func (or *OrderRepository) GetOrderCount(ctx context.Context) (*int64, error) {
+	var co int64
+
+	res := or.db.Table("orders").Count(&co)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &co, nil
+}
+
+func (or *OrderRepository) GetPaidOrderCount(ctx context.Context) (*int64, error) {
+	var co int64
+
+	res := or.db.Model(&order.Order{}).Where("paid = ?", "true").Count(&co)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &co, nil
+}
+
+func (or *OrderRepository) GetOrdersByPeriod(ctx context.Context, inDate time.Time, enDate time.Time) (*[]order.Order, error) {
+	var ord []order.Order
+
+	res := or.db.Model(&order.Order{}).Where("created_at BETWEEN ? AND ?", inDate, enDate).Find(&ord)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &ord, nil
 }
 
 func (or *OrderRepository) AddOrder(ctx context.Context, o order.Order) (*order.Order, error) {

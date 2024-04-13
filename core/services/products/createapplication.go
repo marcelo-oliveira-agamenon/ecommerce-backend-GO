@@ -32,6 +32,15 @@ func (p *ProductService) GetAllProducts(context context.Context,
 	return prod, count, nil
 }
 
+func (p *ProductService) GetProductCount(context context.Context) (*int64, error) {
+	co, err := p.productRepository.CountAllProducts(context)
+	if err != nil {
+		return nil, err
+	}
+
+	return co, nil
+}
+
 func (p *ProductService) CreateProduct(context context.Context, data product.Product) (*product.Product, error) {
 	pv, errV := ValidateProductFields(data)
 	if errV != nil {
@@ -87,4 +96,20 @@ func (p *ProductService) CheckProductListById(context context.Context, prList st
 	}
 
 	return li, nil
+}
+
+func (p *ProductService) GetProductQuantityByCategories(context context.Context) (*[]postgres.CountProducts, *int64, error) {
+	var tot int64
+
+	co, err := p.productRepository.CountProductsByCategories(context)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	aux := *co
+	for i := 0; i < len(aux); i++ {
+		tot = tot + aux[i].Count
+	}
+
+	return co, &tot, nil
 }

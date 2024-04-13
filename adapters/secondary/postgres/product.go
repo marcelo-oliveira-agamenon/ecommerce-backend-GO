@@ -17,6 +17,11 @@ type ProductRepository struct {
 	db *gorm.DB
 }
 
+type CountProducts struct {
+	Name  string
+	Count int64
+}
+
 func NewProductRepository(dbConn *gorm.DB) *ProductRepository {
 	return &ProductRepository{
 		db: dbConn,
@@ -27,6 +32,17 @@ func (pr *ProductRepository) CountAllProducts(context context.Context) (*int64, 
 	var count int64
 
 	res := pr.db.Table("products").Count(&count)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &count, nil
+}
+
+func (pr *ProductRepository) CountProductsByCategories(context context.Context) (*[]CountProducts, error) {
+	var count []CountProducts
+
+	res := pr.db.Raw("select c.name, count(*) from products p join categories c on c.id = p.categoryid group by c.name").Scan(&count)
 	if res.Error != nil {
 		return nil, res.Error
 	}

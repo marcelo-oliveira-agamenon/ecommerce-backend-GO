@@ -70,6 +70,7 @@ type API interface {
 	ToggleRoles(context context.Context, id string) (*user.User, error)
 	GetUserById(context context.Context, user_id string) (*user.User, error)
 	GetUserByEmail(context context.Context, email string) (*user.User, error)
+	GetUserCount(context context.Context) (*int64, error)
 	ImportUsers(context context.Context, file multipart.File) (bool, error)
 	ExportUsers(context context.Context, createdAtStart string, createdAtEnd string, gender string) ([]byte, error)
 }
