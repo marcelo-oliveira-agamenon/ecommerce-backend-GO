@@ -4,6 +4,7 @@ import (
 	categories "github.com/ecommerce/core/services/category"
 	coupons "github.com/ecommerce/core/services/coupon"
 	favorites "github.com/ecommerce/core/services/favorite"
+	logs "github.com/ecommerce/core/services/log"
 	orders "github.com/ecommerce/core/services/order"
 	"github.com/ecommerce/core/services/payments"
 	productImages "github.com/ecommerce/core/services/productImage"
@@ -24,6 +25,7 @@ type App struct {
 	couponAPI       coupons.API
 	orderAPI        orders.API
 	paymentAPI      payments.API
+	logAPI          logs.API
 	tokenAPI        ports.TokenService
 	storageAPI      ports.StorageService
 	emailAPI        ports.EmailService
@@ -42,6 +44,7 @@ func NewApp(
 	couponAPI coupons.API,
 	orderAPI orders.API,
 	paymentAPI payments.API,
+	logAPI logs.API,
 	emailAPI ports.EmailService,
 	redisAPI ports.RedisService,
 	port string) *App {
@@ -55,6 +58,7 @@ func NewApp(
 		couponAPI:       couponAPI,
 		orderAPI:        orderAPI,
 		paymentAPI:      paymentAPI,
+		logAPI:          logAPI,
 		tokenAPI:        tokenAPI,
 		storageAPI:      storageAPI,
 		emailAPI:        emailAPI,

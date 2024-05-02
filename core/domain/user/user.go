@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ecommerce/core/domain/favorite"
+	logs "github.com/ecommerce/core/domain/log"
 	"github.com/ecommerce/core/domain/order"
 	"github.com/ecommerce/core/domain/payment"
 	"github.com/gofrs/uuid"
@@ -32,6 +33,7 @@ type User struct {
 	Favorite   []favorite.Favorite `gorm:"foreignKey:UserID"`
 	Order      []order.Order
 	Payment    []payment.Payment
+	Log        []logs.Log
 }
 
 var (

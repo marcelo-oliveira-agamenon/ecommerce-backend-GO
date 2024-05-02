@@ -13,7 +13,7 @@ import (
 
 var (
 	FacebookTokenURL        = "https://graph.facebook.com/me?access_token="
-	ErrorUserAlreadyExists  = errors.New("already has a user with this email")
+	ErrorUserAlreadyExists  = errors.New("user already exist")
 	ErrorUserDoesntExist    = errors.New("user doesnt exist")
 	ErrorInvalidPassword    = errors.New("invalid password")
 	ErrorUserIsNotAdmin     = errors.New("access denied")

@@ -15,6 +15,7 @@ import (
 	categories "github.com/ecommerce/core/services/category"
 	coupons "github.com/ecommerce/core/services/coupon"
 	favorites "github.com/ecommerce/core/services/favorite"
+	logs "github.com/ecommerce/core/services/log"
 	orders "github.com/ecommerce/core/services/order"
 	"github.com/ecommerce/core/services/payments"
 	productImages "github.com/ecommerce/core/services/productImage"
@@ -25,10 +26,13 @@ import (
 
 func main() {
 	godotenv.Load(".env")
-	postgresRepository, err := postgres.NewPostgresRepository()
-	red := redis.NewRedisRepository()
-	if err != nil {
-		log.Fatal() //todo: maybe change this?
+	postgresRepository, errP := postgres.NewPostgresRepository()
+	if errP != nil {
+		log.Fatal(errP)
+	}
+	red, errR := redis.NewRedisRepository()
+	if errR != nil {
+		log.Fatal(errR)
 	}
 
 	jtwKey := os.Getenv("JWT_KEY")
@@ -58,10 +62,12 @@ func main() {
 	orderService := orders.NewOrderService(orderRepository)
 	paymentRepository := postgres.NewPaymentRepository(postgresRepository)
 	paymentService := payments.NewPaymentService(paymentRepository)
+	logRepository := postgres.NewLogRepository(postgresRepository)
+	logService := logs.NewLogService(logRepository)
 
 	srv := primary.NewApp(
 		tokenService, storageService, userService, productService, categoryService,
 		productImageService, favoriteService, couponService, orderService,
-		paymentService, emailService, redisService, port)
+		paymentService, logService, emailService, redisService, port)
 	primary.Run(srv)
 }

@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"os"
 
 	"github.com/go-redis/redis/v8"
@@ -12,7 +13,7 @@ type redisSession struct {
 	ExpiresAt string
 }
 
-func initRedisDatabase() *redis.Client {
+func initRedisDatabase() (*redis.Client, error) {
 	reAddr := os.Getenv("REDIS_ADDR")
 	rePass := os.Getenv("REDIS_PASSWORD")
 
@@ -22,10 +23,18 @@ func initRedisDatabase() *redis.Client {
 		DB:       0,
 	})
 
-	return cli
+	_, err := cli.Ping(context.Background()).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	return cli, nil
 }
 
-func NewRedisRepository() *redis.Client {
-	redis := initRedisDatabase()
-	return redis
+func NewRedisRepository() (*redis.Client, error) {
+	redis, err := initRedisDatabase()
+	if err != nil {
+		return nil, err
+	}
+	return redis, nil
 }

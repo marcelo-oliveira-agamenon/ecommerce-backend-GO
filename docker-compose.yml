@@ -1,5 +1,15 @@
 version: '3'
 services:
+  redis:
+    image: redis:alpine
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
   database:
     image: postgres:alpine
     restart: always

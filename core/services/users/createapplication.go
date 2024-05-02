@@ -20,11 +20,11 @@ import (
 )
 
 func (u *UserService) SignUp(context context.Context, data user.User) (*UserResponse, error) {
-	_, errG := u.GetUserByEmail(context, data.Email)
-	if errG == ErrorUserDoesntExist {
+	eus, errG := u.GetUserByEmail(context, data.Email)
+	if eus != nil {
 		return nil, ErrorUserAlreadyExists
 	}
-	if errG != nil {
+	if errG != nil && errG != ErrorUserDoesntExist {
 		return nil, errG
 	}
 

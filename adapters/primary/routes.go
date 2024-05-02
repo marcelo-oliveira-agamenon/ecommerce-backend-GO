@@ -29,7 +29,7 @@ func initRoutes(a *App) {
 		{
 			user := authUser.Group("/users")
 			{
-				user.Patch("/toggleRoles/:id", users.ToggleRoles(a.usersAPI))
+				user.Patch("/toggleRoles/:id", users.ToggleRoles(a.usersAPI, a.logAPI))
 			}
 
 			product := authUser.Group("/product")
