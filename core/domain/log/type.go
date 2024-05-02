@@ -8,7 +8,7 @@ import (
 var (
 	ErrorEmptyType = errors.New("empty type")
 	ErrorWrongType = errors.New("wrong type")
-	Types          = []string{"user", "category", "coupon", "favorite", "order", "payment", "admin"}
+	Types          = []string{"user", "product", "category", "coupon", "favorite", "order", "payment", "admin"}
 )
 
 func NewType(typ string) (*string, error) {
