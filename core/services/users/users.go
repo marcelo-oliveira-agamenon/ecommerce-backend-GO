@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"errors"
+	"mime/multipart"
 
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/ports"
@@ -12,13 +13,16 @@ import (
 
 var (
 	FacebookTokenURL        = "https://graph.facebook.com/me?access_token="
-	ErrorUserAlreadyExists  = errors.New("already has a user with this email")
+	ErrorUserAlreadyExists  = errors.New("user already exist")
 	ErrorUserDoesntExist    = errors.New("user doesnt exist")
 	ErrorInvalidPassword    = errors.New("invalid password")
 	ErrorUserIsNotAdmin     = errors.New("access denied")
 	ErrorInvalidToken       = errors.New("invalid token")
 	ErrorPasswordsDontMatch = errors.New("passwords dont match")
 	ErrorUpdateUser         = errors.New("updating user")
+	ErrorInvalidGender      = errors.New("wrong attribute to gender field")
+	ErrorInvalidCsv         = errors.New("generating csv file")
+	ErrorReadingUserInfo    = errors.New("reading user information")
 )
 
 type UserResponse struct {
@@ -64,6 +68,11 @@ type API interface {
 	UpdateUser(context context.Context, id string, data user.User) (bool, error)
 	SendEmailResetPassword(context context.Context, email string) (*EmailTemplateResetPassword, error)
 	ToggleRoles(context context.Context, id string) (*user.User, error)
+	GetUserById(context context.Context, user_id string) (*user.User, error)
+	GetUserByEmail(context context.Context, email string) (*user.User, error)
+	GetUserCount(context context.Context) (*int64, error)
+	ImportUsers(context context.Context, file multipart.File) (bool, error)
+	ExportUsers(context context.Context, createdAtStart string, createdAtEnd string, gender string) ([]byte, error)
 }
 
 type UserService struct {

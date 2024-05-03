@@ -9,23 +9,33 @@ import (
 	"github.com/ecommerce/adapters/primary"
 	"github.com/ecommerce/adapters/secondary/email/gomail"
 	"github.com/ecommerce/adapters/secondary/postgres"
+	"github.com/ecommerce/adapters/secondary/redis"
 	storage "github.com/ecommerce/adapters/secondary/storage/aws"
+	cronjob "github.com/ecommerce/adapters/secondary/tasks/cron"
 	"github.com/ecommerce/adapters/secondary/token/jwt"
 	categories "github.com/ecommerce/core/services/category"
+	coupons "github.com/ecommerce/core/services/coupon"
 	favorites "github.com/ecommerce/core/services/favorite"
+	logs "github.com/ecommerce/core/services/log"
+	orders "github.com/ecommerce/core/services/order"
+	"github.com/ecommerce/core/services/payments"
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/services/users"
 	"github.com/joho/godotenv"
-	_ "github.com/pdrum/swagger-automation/docs"
 )
 
 func main() {
 	godotenv.Load(".env")
-	postgresRepository, err := postgres.NewPostgresRepository()
-	if err != nil {
-		log.Fatal() //todo: maybe change this?
+	postgresRepository, errP := postgres.NewPostgresRepository()
+	if errP != nil {
+		log.Fatal(errP)
 	}
+	red, errR := redis.NewRedisRepository()
+	if errR != nil {
+		log.Fatal(errR)
+	}
+	cronjob.NewCronTasks(postgresRepository)
 
 	jtwKey := os.Getenv("JWT_KEY")
 	port := os.Getenv("PORT")
@@ -36,6 +46,7 @@ func main() {
 	storageService := storage.NewAWS(*config)
 	tokenService := jwt.NewToken(jtwKey)
 	emailService := gomail.NewEmailService()
+	redisService := redis.NewRedisSessionRepository(red)
 
 	userRepository := postgres.NewUserRepository(postgresRepository)
 	userService := users.NewUserService(userRepository)
@@ -47,7 +58,18 @@ func main() {
 	productImageService := productImages.NewProductImageService(productImageRepository)
 	favoriteRepository := postgres.NewFavoriteRepository(postgresRepository)
 	favoriteService := favorites.NewFavoriteService(favoriteRepository)
+	couponRepository := postgres.NewCouponRepository(postgresRepository)
+	couponService := coupons.NewCouponService(couponRepository)
+	orderRepository := postgres.NewOrderRepository(postgresRepository)
+	orderService := orders.NewOrderService(orderRepository)
+	paymentRepository := postgres.NewPaymentRepository(postgresRepository)
+	paymentService := payments.NewPaymentService(paymentRepository)
+	logRepository := postgres.NewLogRepository(postgresRepository)
+	logService := logs.NewLogService(logRepository)
 
-	srv := primary.NewApp(tokenService, storageService, userService, productService, categoryService, productImageService, favoriteService, emailService, port)
+	srv := primary.NewApp(
+		tokenService, storageService, userService, productService, categoryService,
+		productImageService, favoriteService, couponService, orderService,
+		paymentService, logService, emailService, redisService, port)
 	primary.Run(srv)
 }

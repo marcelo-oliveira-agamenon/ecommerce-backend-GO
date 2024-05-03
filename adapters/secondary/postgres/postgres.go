@@ -2,9 +2,14 @@ package postgres
 
 import (
 	"os"
+	"time"
 
 	"github.com/ecommerce/core/domain/category"
+	"github.com/ecommerce/core/domain/coupon"
 	"github.com/ecommerce/core/domain/favorite"
+	logs "github.com/ecommerce/core/domain/log"
+	"github.com/ecommerce/core/domain/order"
+	"github.com/ecommerce/core/domain/payment"
 	"github.com/ecommerce/core/domain/product"
 	"github.com/ecommerce/core/domain/productImage"
 	"github.com/ecommerce/core/domain/user"
@@ -20,6 +25,12 @@ type QueryParamsProduct struct {
 	GetByPromotion string
 	GetRecentOnes  string
 	GetByName      string
+}
+
+type QueryParamsUsers struct {
+	CreatedAtStart string
+	CreatedAtEnd   string
+	Gender         string
 }
 
 type QueryParams struct {
@@ -43,11 +54,23 @@ func initDatabase() (*gorm.DB, error) {
 		return nil, err
 	}
 
+	sqlDb, err1 := db.DB()
+	if err1 != nil {
+		return nil, err
+	}
+	sqlDb.SetMaxIdleConns(10)
+	sqlDb.SetMaxOpenConns(100)
+	sqlDb.SetConnMaxLifetime(time.Second * 30)
+
 	db.AutoMigrate(&user.User{})
 	db.AutoMigrate(&product.Product{})
 	db.AutoMigrate(&category.Category{})
 	db.AutoMigrate(&productImage.ProductImage{})
 	db.AutoMigrate(&favorite.Favorite{})
+	db.AutoMigrate(&coupon.Coupon{})
+	db.AutoMigrate(&order.Order{})
+	db.AutoMigrate(&payment.Payment{})
+	db.AutoMigrate(&logs.Log{})
 
 	return db, nil
 }

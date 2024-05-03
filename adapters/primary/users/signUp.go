@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageService) fiber.Handler {
+func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageService, email ports.EmailService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		if err := ctx.BodyParser(&user.User{}); err != nil {
 			ctx.Status(500).JSON(&fiber.Map{
@@ -63,6 +63,12 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			ctx.Status(500).JSON(&fiber.Map{
 				"error": errToken.Error(),
 			})
+			return
+		}
+
+		//TODO: taking too long, maybe move to another microservice? Or outside endpoint response?
+		_, errE := email.SendEmail(UserResponse.Email, "welcome.html", user.User{}, "Welcome to Cash And Grab")
+		if errE != nil {
 			return
 		}
 

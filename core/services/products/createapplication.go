@@ -2,6 +2,7 @@ package products
 
 import (
 	"context"
+	"strings"
 
 	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/ecommerce/core/domain/product"
@@ -29,6 +30,15 @@ func (p *ProductService) GetAllProducts(context context.Context,
 	}
 
 	return prod, count, nil
+}
+
+func (p *ProductService) GetProductCount(context context.Context) (*int64, error) {
+	co, err := p.productRepository.CountAllProducts(context)
+	if err != nil {
+		return nil, err
+	}
+
+	return co, nil
 }
 
 func (p *ProductService) CreateProduct(context context.Context, data product.Product) (*product.Product, error) {
@@ -75,4 +85,34 @@ func (p *ProductService) DeleteProductById(context context.Context, data product
 	}
 
 	return nil
+}
+
+func (p *ProductService) CheckProductListById(context context.Context, prList string) (*[]string, error) {
+	prod := strings.Split(prList, ",")
+
+	li, err := p.productRepository.CheckProductListById(context, prod)
+	if err != nil {
+		return nil, ErrorCheckProductList
+	}
+
+	return li, nil
+}
+
+func (p *ProductService) GetProductQuantityByCategories(context context.Context) (*[]postgres.CountProducts, *int64, error) {
+	var tot int64
+
+	co, err := p.productRepository.CountProductsByCategories(context)
+	if err != nil {
+		return nil, nil, err
+	}
+	if len(*co) == 0 {
+		return co, &tot, nil
+	}
+
+	aux := *co
+	for i := 0; i < len(aux); i++ {
+		tot = tot + aux[i].Count
+	}
+
+	return co, &tot, nil
 }

@@ -1,11 +1,13 @@
 package users
 
 import (
+	logs "github.com/ecommerce/core/services/log"
 	"github.com/ecommerce/core/services/users"
 	"github.com/gofiber/fiber"
+	"github.com/gofrs/uuid"
 )
 
-func ToggleRoles(userAPI users.API) fiber.Handler {
+func ToggleRoles(userAPI users.API, logAPI logs.API) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		userId := ctx.Params("id")
 
@@ -16,6 +18,9 @@ func ToggleRoles(userAPI users.API) fiber.Handler {
 			})
 			return
 		}
+
+		msg := "Role of user with ID: " + userId + " was changed"
+		logAPI.AddLog(ctx.Context(), "user", msg, uuid.FromStringOrNil(userId))
 
 		ctx.Status(200).JSON(user)
 	}

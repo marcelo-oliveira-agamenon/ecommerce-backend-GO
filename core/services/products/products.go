@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/ecommerce/core/domain/product"
 	"github.com/ecommerce/ports"
 )
@@ -15,14 +16,18 @@ var (
 	ErrorCreateProduct      = errors.New("insert product")
 	ErrorEditProduct        = errors.New("editing product")
 	ErrorDeleteProduct      = errors.New("deleting product")
+	ErrorCheckProductList   = errors.New("checking product list")
 )
 
 type API interface {
 	GetAllProducts(context context.Context, limit int, offset int, getByCategory string, getByPromotion string, getRecentOnes string, getByName string) (*[]product.Product, *int64, error)
 	GetProductById(context context.Context, id string) (*product.Product, error)
+	GetProductCount(context context.Context) (*int64, error)
+	GetProductQuantityByCategories(context context.Context) (*[]postgres.CountProducts, *int64, error)
 	CreateProduct(context context.Context, data product.Product) (*product.Product, error)
 	EditProduct(context context.Context, data product.Product) (*product.Product, error)
 	DeleteProductById(context context.Context, data product.Product) error
+	CheckProductListById(context context.Context, prList string) (*[]string, error)
 }
 
 type ProductService struct {

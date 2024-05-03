@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber"
 )
 
-func LoginFacebook(userAPI users.API, token ports.TokenService) fiber.Handler {
+func LoginFacebook(userAPI users.API, token ports.TokenService, redis ports.RedisService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		lgReq := new(users.LoginFacebook)
 		ctx.BodyParser(lgReq)
@@ -19,10 +19,18 @@ func LoginFacebook(userAPI users.API, token ports.TokenService) fiber.Handler {
 			return
 		}
 
-		token, _, errToken := token.CreateToken(user.ID.String())
+		token, exTi, errToken := token.CreateToken(user.ID.String())
 		if errToken != nil {
 			ctx.Status(500).JSON(&fiber.Map{
 				"error": errToken.Error(),
+			})
+			return
+		}
+
+		errR := redis.StoreUserSession(ctx.Context(), user.ID.String(), exTi)
+		if errR != nil {
+			ctx.Status(500).JSON(&fiber.Map{
+				"error": errR.Error(),
 			})
 			return
 		}

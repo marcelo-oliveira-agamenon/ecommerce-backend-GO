@@ -2,14 +2,17 @@ package products
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/ecommerce/core/domain/product"
 	categories "github.com/ecommerce/core/services/category"
+	logs "github.com/ecommerce/core/services/log"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/util"
 	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber"
+	"github.com/gofrs/uuid"
 )
 
 var (
@@ -18,7 +21,7 @@ var (
 	ErrorCategoryUnknown = errors.New("unknown category")
 )
 
-func CreateProduct(productAPI products.API, categoriesAPI categories.API, token ports.TokenService) fiber.Handler {
+func CreateProduct(productAPI products.API, categoriesAPI categories.API, logAPI logs.API, token ports.TokenService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		tok, errT := util.GetToken(ctx, AuthHeader)
 		if errT != nil {
@@ -35,8 +38,7 @@ func CreateProduct(productAPI products.API, categoriesAPI categories.API, token 
 			return
 		}
 
-		//TODO: use in logs table logic
-		_, errC := token.ClaimTokenData(*tok)
+		dec, errC := token.ClaimTokenData(*tok)
 		if errC != nil {
 			ctx.Status(401).JSON(&fiber.Map{
 				"error": errC.Error(),
@@ -85,6 +87,12 @@ func CreateProduct(productAPI products.API, categoriesAPI categories.API, token 
 				"error": errP.Error(),
 			})
 			return
+		}
+
+		msg := "Insert product with ID: " + product.ID
+		errL := logAPI.AddLog(ctx.Context(), "product", msg, uuid.FromStringOrNil(dec.UserId))
+		if errL != nil {
+			fmt.Println(errL)
 		}
 
 		ctx.Status(201).JSON(product)

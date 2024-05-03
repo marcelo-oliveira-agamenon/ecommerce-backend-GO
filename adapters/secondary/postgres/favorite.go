@@ -2,15 +2,23 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/ecommerce/core/domain/favorite"
+	"github.com/ecommerce/core/domain/product"
 	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )
 
-// var (
-// 	ErrorDeleteFkConstrain = errors.New("cannot delete category with associated products")
-// )
+type Favorite struct {
+	ID        string
+	UserID    uuid.UUID
+	ProductID string
+	Product   product.Product
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
+}
 
 type FavoriteRepository struct {
 	db *gorm.DB
@@ -34,13 +42,31 @@ func (fr *FavoriteRepository) AddFavorite(ctx context.Context, f favorite.Favori
 func (fr *FavoriteRepository) GetFavoriteByUserIdAndProductId(ctx context.Context, prodId string, userId string) (*[]favorite.Favorite, error) {
 	var favs []favorite.Favorite
 
-	result := fr.db.Model(favorite.Favorite{
-		UserID:    uuid.FromStringOrNil(userId),
-		ProductID: prodId,
-	}).Find(&favs)
+	result := fr.db.Where("product_id", prodId).Find(&favs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	return &favs, nil
+}
+
+func (fr *FavoriteRepository) GetFavoriteByUserId(ctx context.Context, userId string, limit int, offset int) (*[]Favorite, error) {
+	var favs []Favorite
+
+	result := fr.db.Preload("Product").Joins("INNER JOIN products ON products.id = favorites.product_id").Where("user_id", userId).Limit(limit).Offset(offset).Find(&favs)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &favs, nil
+}
+
+func (fr *FavoriteRepository) DeleteFavorite(ctx context.Context, favId string) (bool, error) {
+	var fav favorite.Favorite
+	result := fr.db.Where("id", favId).Delete(&fav)
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	return result.RowsAffected > 0, nil
 }
