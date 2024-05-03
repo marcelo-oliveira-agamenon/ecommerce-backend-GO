@@ -263,6 +263,9 @@ func (u *UserService) ExportUsers(context context.Context,
 	if errU != nil {
 		return nil, errU
 	}
+	if len(*usr) == 0 {
+		return []byte{}, nil
+	}
 
 	var keys []string
 	byF := new(bytes.Buffer)

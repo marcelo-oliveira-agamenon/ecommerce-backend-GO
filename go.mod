@@ -5,11 +5,13 @@ go 1.21
 require (
 	github.com/aws/aws-sdk-go v1.35.7
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofiber/cors v0.2.2
 	github.com/gofiber/fiber v1.14.6
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.3.0
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/segmentio/ksuid v1.0.3
 	golang.org/x/crypto v0.7.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
@@ -22,7 +24,6 @@ require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -46,6 +47,5 @@ require (
 	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	launchpad.net/gocheck v0.0.0-20140225173054-000000000087 // indirect
 )

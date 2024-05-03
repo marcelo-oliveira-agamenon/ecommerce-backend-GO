@@ -105,6 +105,9 @@ func (p *ProductService) GetProductQuantityByCategories(context context.Context)
 	if err != nil {
 		return nil, nil, err
 	}
+	if len(*co) == 0 {
+		return co, &tot, nil
+	}
 
 	aux := *co
 	for i := 0; i < len(aux); i++ {

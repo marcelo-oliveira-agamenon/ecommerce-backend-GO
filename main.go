@@ -11,6 +11,7 @@ import (
 	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/ecommerce/adapters/secondary/redis"
 	storage "github.com/ecommerce/adapters/secondary/storage/aws"
+	cronjob "github.com/ecommerce/adapters/secondary/tasks/cron"
 	"github.com/ecommerce/adapters/secondary/token/jwt"
 	categories "github.com/ecommerce/core/services/category"
 	coupons "github.com/ecommerce/core/services/coupon"
@@ -34,6 +35,7 @@ func main() {
 	if errR != nil {
 		log.Fatal(errR)
 	}
+	cronjob.NewCronTasks(postgresRepository)
 
 	jtwKey := os.Getenv("JWT_KEY")
 	port := os.Getenv("PORT")

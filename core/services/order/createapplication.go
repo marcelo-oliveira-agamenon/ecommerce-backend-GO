@@ -51,6 +51,9 @@ func (o *OrderService) GetOrdersByPeriod(ctx context.Context) (*[]OrderMonthQuan
 	if errO != nil {
 		return nil, errO
 	}
+	if len(*ord) == 0 {
+		return &toOr, nil
+	}
 
 	for i := 0; i < len(mot); i++ {
 		var aux OrderMonthQuantity
@@ -80,6 +83,9 @@ func (o *OrderService) GetProfitByOrdersByMonths(ctx context.Context) (*[]MonthD
 	ord, errO := o.orderRepository.GetOrdersByPeriod(ctx, inDate, enDate)
 	if errO != nil {
 		return nil, errO
+	}
+	if len(*ord) == 0 {
+		return &auxTo, nil
 	}
 
 	for i := 0; i < len(*ord); i++ {
