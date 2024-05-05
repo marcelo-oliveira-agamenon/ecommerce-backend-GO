@@ -66,11 +66,11 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			return
 		}
 
-		//TODO: taking too long, maybe move to another microservice? Or outside endpoint response?
-		_, errE := email.SendEmail(UserResponse.Email, "welcome.html", user.User{}, "Welcome to Cash And Grab")
-		if errE != nil {
-			return
-		}
+		//TODO: taking too long, maybe use kafka to another microservice
+		// _, errE := email.SendEmail(UserResponse.Email, "welcome.html", user.User{}, "Welcome to Cash And Grab")
+		// if errE != nil {
+		// 	return
+		// }
 
 		ctx.Status(201).JSON(&fiber.Map{
 			"user":  UserResponse,

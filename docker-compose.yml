@@ -1,5 +1,14 @@
 version: '3'
 services:
+  nginx:
+    build: './nginx'
+    env_file:
+      - .env
+    ports:
+      - ${NGINX_PORT}:${NGINX_PORT}
+    depends_on:
+      - 'cash-grab'
+
   redis:
     image: redis:alpine
     restart: always
@@ -8,6 +17,7 @@ services:
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
     environment:
+      - REDIS_ADDR=${REDIS_ADDR}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
   database:
