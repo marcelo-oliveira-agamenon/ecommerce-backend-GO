@@ -1,5 +1,5 @@
 package ports
 
 type KafkaService interface {
-	WriteMessages(key []byte, body []byte) error
+	WriteMessages(body []byte) error
 }
