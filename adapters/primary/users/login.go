@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber"
 )
 
-func Login(userAPI users.API, token ports.TokenService, redis ports.RedisService) fiber.Handler {
+func Login(userAPI users.API, token ports.TokenService, redis ports.RedisService, kafka ports.KafkaService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		lgReq := new(users.LoginRequest)
 		ctx.BodyParser(lgReq)
@@ -35,6 +35,8 @@ func Login(userAPI users.API, token ports.TokenService, redis ports.RedisService
 			})
 			return
 		}
+
+		kafka.WriteMessages([]byte("dasdas"), []byte("dadasdad"))
 
 		ctx.Status(200).JSON(&fiber.Map{
 			"user":  user,

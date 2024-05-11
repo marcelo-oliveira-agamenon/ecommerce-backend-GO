@@ -8,7 +8,8 @@ import (
 	"github.com/lib/pq"
 )
 
-func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageService, email ports.EmailService) fiber.Handler {
+func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageService,
+	email ports.EmailService, kafka ports.KafkaService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		if err := ctx.BodyParser(&user.User{}); err != nil {
 			ctx.Status(500).JSON(&fiber.Map{
