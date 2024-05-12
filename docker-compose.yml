@@ -1,5 +1,41 @@
 version: '3'
 services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    env_file:
+      - .env
+    ports:
+      - ${ZOOKEEPER_PORT}:${ZOOKEEPER_CLIENT_PORT}
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=${ZOOKEEPER_CLIENT_PORT}
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    env_file:
+      - .env
+    ports:
+      - ${KAFKA_PORT_FORWARD}:${KAFKA_PORT_FORWARD}
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+
+  nginx:
+    restart: always
+    build: './nginx'
+    env_file:
+      - .env
+    ports:
+      - ${NGINX_PORT}:${NGINX_PORT}
+    depends_on:
+      - cash-grab
+
   redis:
     image: redis:alpine
     restart: always
@@ -8,6 +44,7 @@ services:
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
     environment:
+      - REDIS_ADDR=${REDIS_ADDR}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
   database:

@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/ecommerce/adapters/primary"
 	"github.com/ecommerce/adapters/secondary/email/gomail"
+	kafka_ins "github.com/ecommerce/adapters/secondary/kafka"
 	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/ecommerce/adapters/secondary/redis"
 	storage "github.com/ecommerce/adapters/secondary/storage/aws"
@@ -31,9 +32,13 @@ func main() {
 	if errP != nil {
 		log.Fatal(errP)
 	}
-	red, errR := redis.NewRedisRepository()
+	redisRepository, errR := redis.NewRedisRepository()
 	if errR != nil {
 		log.Fatal(errR)
+	}
+	kafkaRepository, errK := kafka_ins.NewKafkaRepository()
+	if errK != nil {
+		log.Fatal(errK)
 	}
 	cronjob.NewCronTasks(postgresRepository)
 
@@ -46,7 +51,8 @@ func main() {
 	storageService := storage.NewAWS(*config)
 	tokenService := jwt.NewToken(jtwKey)
 	emailService := gomail.NewEmailService()
-	redisService := redis.NewRedisSessionRepository(red)
+	redisService := redis.NewRedisSessionRepository(redisRepository)
+	kafkaService := kafka_ins.NewKafkaSessionRepository(kafkaRepository)
 
 	userRepository := postgres.NewUserRepository(postgresRepository)
 	userService := users.NewUserService(userRepository)
@@ -70,6 +76,6 @@ func main() {
 	srv := primary.NewApp(
 		tokenService, storageService, userService, productService, categoryService,
 		productImageService, favoriteService, couponService, orderService,
-		paymentService, logService, emailService, redisService, port)
+		paymentService, logService, emailService, redisService, kafkaService, port)
 	primary.Run(srv)
 }

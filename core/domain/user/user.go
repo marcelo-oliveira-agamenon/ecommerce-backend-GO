@@ -37,7 +37,7 @@ type User struct {
 }
 
 var (
-	ErrorUUID = errors.New("user id")
+	ErrorUUID = errors.New("invalid user id")
 )
 
 func NewUser(data User) (User, error) {

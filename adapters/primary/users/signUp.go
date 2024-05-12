@@ -1,6 +1,9 @@
 package users
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/core/services/users"
 	"github.com/ecommerce/ports"
@@ -8,7 +11,8 @@ import (
 	"github.com/lib/pq"
 )
 
-func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageService, email ports.EmailService) fiber.Handler {
+func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageService,
+	email ports.EmailService, kafka ports.KafkaService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
 		if err := ctx.BodyParser(&user.User{}); err != nil {
 			ctx.Status(500).JSON(&fiber.Map{
@@ -17,7 +21,8 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			return
 		}
 
-		UserResponse, err := userAPI.SignUp(ctx.Context(), user.User{
+		//TODO: create universal error struct with status code and text
+		usrRes, err := userAPI.SignUp(ctx.Context(), user.User{
 			Name:       ctx.FormValue("name"),
 			Email:      ctx.FormValue("email"),
 			Address:    ctx.FormValue("address"),
@@ -38,7 +43,7 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 		if ava, _ := ctx.FormFile("avatar"); ava != nil {
 			file, err := ava.Open()
 			if err != nil {
-				userAPI.DeleteUser(ctx.Context(), UserResponse.ID.String())
+				userAPI.DeleteUser(ctx.Context(), usrRes.ID.String())
 				ctx.Status(500).JSON(&fiber.Map{
 					"error": err.Error(),
 				})
@@ -46,19 +51,19 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			}
 			resp, errSto := storage.SaveFileAWS(file, ava.Filename, ava.Size, "user")
 			if errSto != nil {
-				userAPI.DeleteUser(ctx.Context(), UserResponse.ID.String())
+				userAPI.DeleteUser(ctx.Context(), usrRes.ID.String())
 				ctx.Status(500).JSON(&fiber.Map{
 					"error": errSto.Error(),
 				})
 				return
 			}
-			userAPI.UpdateUser(ctx.Context(), UserResponse.ID.String(), user.User{
+			userAPI.UpdateUser(ctx.Context(), usrRes.ID.String(), user.User{
 				ImageKey: resp.ImageKey,
 				ImageURL: resp.ImageURL,
 			})
 		}
 
-		token, _, errToken := token.CreateToken(UserResponse.ID.String())
+		token, _, errToken := token.CreateToken(usrRes.ID.String())
 		if errToken != nil {
 			ctx.Status(500).JSON(&fiber.Map{
 				"error": errToken.Error(),
@@ -66,14 +71,19 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			return
 		}
 
-		//TODO: taking too long, maybe move to another microservice? Or outside endpoint response?
-		_, errE := email.SendEmail(UserResponse.Email, "welcome.html", user.User{}, "Welcome to Cash And Grab")
-		if errE != nil {
-			return
+		//TODO: maybe field to check email sended in user table
+		body, errM := json.Marshal(usrRes)
+		if errM == nil {
+			errK := kafka.WriteMessages(body)
+			if errK != nil {
+				fmt.Println("kafka message", errK)
+			}
+		} else {
+			fmt.Println("marshall message", errM)
 		}
 
 		ctx.Status(201).JSON(&fiber.Map{
-			"user":  UserResponse,
+			"user":  usrRes,
 			"token": token,
 		})
 	}

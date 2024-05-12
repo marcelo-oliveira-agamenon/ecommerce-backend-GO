@@ -20,6 +20,11 @@ import (
 )
 
 func (u *UserService) SignUp(context context.Context, data user.User) (*UserResponse, error) {
+	ema, errM := user.NewEmail(data.Email)
+	if errM != nil {
+		return nil, errM
+	}
+
 	eus, errG := u.GetUserByEmail(context, data.Email)
 	if eus != nil {
 		return nil, ErrorUserAlreadyExists
@@ -31,10 +36,6 @@ func (u *UserService) SignUp(context context.Context, data user.User) (*UserResp
 	nm, errN := user.NewName(data.Name)
 	if errN != nil {
 		return nil, errN
-	}
-	ema, errM := user.NewEmail(data.Email)
-	if errM != nil {
-		return nil, errM
 	}
 	password, errPass := user.NewPassword(data.Password)
 	if errPass != nil {

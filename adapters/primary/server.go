@@ -30,6 +30,7 @@ type App struct {
 	storageAPI      ports.StorageService
 	emailAPI        ports.EmailService
 	redisAPI        ports.RedisService
+	kafkaAPI        ports.KafkaService
 	port            string
 }
 
@@ -47,6 +48,7 @@ func NewApp(
 	logAPI logs.API,
 	emailAPI ports.EmailService,
 	redisAPI ports.RedisService,
+	kafkaAPI ports.KafkaService,
 	port string) *App {
 	newFiber := &App{
 		fiber:           fiber.New(),
@@ -63,6 +65,7 @@ func NewApp(
 		storageAPI:      storageAPI,
 		emailAPI:        emailAPI,
 		redisAPI:        redisAPI,
+		kafkaAPI:        kafkaAPI,
 		port:            port,
 	}
 	newFiber.fiber.Use(cors.New())
