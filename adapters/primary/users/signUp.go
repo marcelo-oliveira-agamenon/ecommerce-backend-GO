@@ -74,7 +74,7 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 		//TODO: maybe field to check email sended in user table
 		body, errM := json.Marshal(usrRes)
 		if errM == nil {
-			errK := kafka.WriteMessages(body)
+			errK := kafka.WriteMessages([]byte("signup"), body)
 			if errK != nil {
 				fmt.Println("kafka message", errK)
 			}

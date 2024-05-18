@@ -14,8 +14,9 @@ func NewKafkaSessionRepository(conn *kafka.Conn) *KafkaRepository {
 	}
 }
 
-func (kr *KafkaRepository) WriteMessages(body []byte) error {
+func (kr *KafkaRepository) WriteMessages(typ []byte, body []byte) error {
 	_, err := kr.kf.WriteMessages(kafka.Message{
+		Key:   typ,
 		Value: body,
 	})
 	if err != nil {

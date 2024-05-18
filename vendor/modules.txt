@@ -251,7 +251,7 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+# golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 ## explicit; go 1.11
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
