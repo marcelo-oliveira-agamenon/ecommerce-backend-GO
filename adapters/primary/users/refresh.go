@@ -1,8 +1,6 @@
 package users
 
 import (
-	"github.com/ecommerce/core/services/users"
-	"github.com/ecommerce/core/util"
 	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber"
 )
@@ -11,23 +9,9 @@ var (
 	AuthHeader = "Authorization"
 )
 
-func RefreshToken(userAPI users.API, token ports.TokenService, redis ports.RedisService) fiber.Handler {
+func RefreshToken(token ports.TokenService, redis ports.RedisService) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
-		tok, errT := util.GetToken(ctx, AuthHeader)
-		if errT != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errT.Error(),
-			})
-			return
-		}
-
-		dec, errC := token.ClaimTokenData(*tok)
-		if errC != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errC.Error(),
-			})
-			return
-		}
+		dec := ctx.Locals("user").(*ports.Claims)
 
 		errV := redis.ValidateSession(ctx.Context(), dec.UserId)
 		if errV != nil {

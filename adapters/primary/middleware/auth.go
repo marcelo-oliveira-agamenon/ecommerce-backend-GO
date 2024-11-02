@@ -28,6 +28,15 @@ func VerifyToken(j ports.TokenService) fiber.Handler {
 			return
 		}
 
+		dec, errC := j.ClaimTokenData(*token)
+		if errC != nil {
+			ctx.Status(401).JSON(&fiber.Map{
+				"error": errC.Error(),
+			})
+			return
+		}
+
+		ctx.Locals("user", dec)
 		ctx.Next()
 	}
 }

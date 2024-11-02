@@ -5,7 +5,6 @@ import (
 
 	"github.com/ecommerce/core/domain/favorite"
 	favorites "github.com/ecommerce/core/services/favorite"
-	"github.com/ecommerce/core/util"
 	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber"
 	"github.com/gofrs/uuid"
@@ -17,23 +16,9 @@ var (
 	ErrorAlreadyExistFavorite  = errors.New("product is already added to favorites")
 )
 
-func CreateFavorite(favoriteAPI favorites.API, token ports.TokenService) fiber.Handler {
+func CreateFavorite(favoriteAPI favorites.API) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
-		tok, errT := util.GetToken(ctx, AuthHeader)
-		if errT != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errT.Error(),
-			})
-			return
-		}
-
-		dec, errC := token.ClaimTokenData(*tok)
-		if errC != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errC.Error(),
-			})
-			return
-		}
+		dec := ctx.Locals("user").(*ports.Claims)
 
 		prodId := ctx.FormValue("productid")
 		if prodId == "" {

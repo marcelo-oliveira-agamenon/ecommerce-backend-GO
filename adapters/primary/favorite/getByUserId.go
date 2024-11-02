@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	favorites "github.com/ecommerce/core/services/favorite"
-	"github.com/ecommerce/core/util"
 	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber"
 )
@@ -14,23 +13,9 @@ var (
 	ErrorMissingOffsetLimit = errors.New("missing limit or offset query parameter")
 )
 
-func GetFavoriteByUserId(favoriteAPI favorites.API, token ports.TokenService) fiber.Handler {
+func GetFavoriteByUserId(favoriteAPI favorites.API) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
-		tok, errT := util.GetToken(ctx, AuthHeader)
-		if errT != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errT.Error(),
-			})
-			return
-		}
-
-		dec, errC := token.ClaimTokenData(*tok)
-		if errC != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errC.Error(),
-			})
-			return
-		}
+		dec := ctx.Locals("user").(*ports.Claims)
 
 		limit, err1 := strconv.Atoi(ctx.Query("limit"))
 		offset, err2 := strconv.Atoi(ctx.Query("offset"))

@@ -23,10 +23,12 @@ func initRoutes(a *App) {
 		v1.Post("/loginFacebook", users.LoginFacebook(a.usersAPI, a.tokenAPI, a.redisAPI))
 		v1.Patch("/resetPassword", users.ResetPassword(a.usersAPI))
 		v1.Post("/resetPasswordLink", users.SendEmailResetPassword(a.usersAPI, a.emailAPI))
-		v1.Patch("/refresh", users.RefreshToken(a.usersAPI, a.tokenAPI, a.redisAPI))
 
 		authUser := v1.Use(middleware.VerifyToken(a.tokenAPI))
 		{
+			v1.Post("/logout", users.Logout(a.redisAPI))
+			v1.Patch("/refresh", users.RefreshToken(a.tokenAPI, a.redisAPI))
+
 			user := authUser.Group("/users")
 			{
 				user.Patch("/toggleRoles/:id", users.ToggleRoles(a.usersAPI, a.logAPI))
@@ -36,7 +38,7 @@ func initRoutes(a *App) {
 			{
 				product.Get("/", products.GetAllProducts(a.productAPI))
 				product.Get("/:id", products.GetProductById(a.productAPI))
-				product.Post("/", products.CreateProduct(a.productAPI, a.categoriesAPI, a.logAPI, a.tokenAPI))
+				product.Post("/", products.CreateProduct(a.productAPI, a.categoriesAPI, a.logAPI))
 				product.Put("/:id", products.EditProduct(a.productAPI))
 				product.Delete("/:id", products.DeleteProductById(a.productAPI))
 			}
@@ -57,8 +59,8 @@ func initRoutes(a *App) {
 
 			favorite := authUser.Group("/favorite")
 			{
-				favorite.Get("/", favorites.GetFavoriteByUserId(a.favoriteAPI, a.tokenAPI))
-				favorite.Post("/", favorites.CreateFavorite(a.favoriteAPI, a.tokenAPI))
+				favorite.Get("/", favorites.GetFavoriteByUserId(a.favoriteAPI))
+				favorite.Post("/", favorites.CreateFavorite(a.favoriteAPI))
 				favorite.Delete("/:id", favorites.DeleteFavorite((a.favoriteAPI)))
 			}
 
@@ -70,8 +72,8 @@ func initRoutes(a *App) {
 
 			order := authUser.Group("/order")
 			{
-				order.Get("/", orders.GetByUserId(a.orderAPI, a.usersAPI, a.tokenAPI))
-				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.productAPI, a.tokenAPI))
+				order.Get("/", orders.GetByUserId(a.orderAPI, a.usersAPI))
+				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.productAPI))
 				order.Patch("/payment/:id", orders.EditPayment(a.orderAPI))
 				order.Patch("/rate/:id", orders.EditRate(a.orderAPI))
 				order.Patch("/status/:id", orders.EditStatus(a.orderAPI))
@@ -79,8 +81,8 @@ func initRoutes(a *App) {
 
 			payment := authUser.Group("/payment")
 			{
-				payment.Get("/", payments.GetAllByUser(a.paymentAPI, a.usersAPI, a.tokenAPI))
-				payment.Post("/", payments.CreatePayment(a.paymentAPI, a.usersAPI, a.orderAPI, a.tokenAPI))
+				payment.Get("/", payments.GetAllByUser(a.paymentAPI, a.usersAPI))
+				payment.Post("/", payments.CreatePayment(a.paymentAPI, a.usersAPI, a.orderAPI))
 				payment.Delete("/:id", payments.DeletePayment(a.paymentAPI))
 			}
 

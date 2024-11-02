@@ -6,7 +6,6 @@ import (
 
 	orders "github.com/ecommerce/core/services/order"
 	"github.com/ecommerce/core/services/users"
-	"github.com/ecommerce/core/util"
 	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber"
 )
@@ -16,23 +15,9 @@ var (
 	ErrorMissingOffsetLimit = errors.New("missing limit or offset query parameter")
 )
 
-func GetByUserId(orderAPI orders.API, userAPI users.API, token ports.TokenService) fiber.Handler {
+func GetByUserId(orderAPI orders.API, userAPI users.API) fiber.Handler {
 	return func(ctx *fiber.Ctx) {
-		tok, errT := util.GetToken(ctx, AuthHeader)
-		if errT != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errT.Error(),
-			})
-			return
-		}
-
-		dec, errC := token.ClaimTokenData(*tok)
-		if errC != nil {
-			ctx.Status(401).JSON(&fiber.Map{
-				"error": errC.Error(),
-			})
-			return
-		}
+		dec := ctx.Locals("user").(*ports.Claims)
 
 		_, errU := userAPI.GetUserById(ctx.Context(), dec.UserId)
 		if errU != nil {
