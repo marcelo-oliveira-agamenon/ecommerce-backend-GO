@@ -66,21 +66,25 @@ github.com/go-redis/redis/v8/internal/pool
 github.com/go-redis/redis/v8/internal/proto
 github.com/go-redis/redis/v8/internal/rand
 github.com/go-redis/redis/v8/internal/util
-# github.com/gofiber/cors v0.2.2
+# github.com/gofiber/fiber v1.13.3
 ## explicit; go 1.11
-github.com/gofiber/cors
-# github.com/gofiber/fiber v1.14.6
-## explicit; go 1.11
-github.com/gofiber/fiber
+# github.com/gofiber/fiber/v2 v2.52.5
+## explicit; go 1.20
+github.com/gofiber/fiber/v2
+github.com/gofiber/fiber/v2/internal/schema
+github.com/gofiber/fiber/v2/log
+github.com/gofiber/fiber/v2/middleware/cors
+github.com/gofiber/fiber/v2/utils
 # github.com/gofiber/utils v0.0.10
 ## explicit; go 1.11
-github.com/gofiber/utils
 # github.com/gofrs/uuid v3.2.0+incompatible
 ## explicit
 github.com/gofrs/uuid
+# github.com/google/uuid v1.5.0
+## explicit
+github.com/google/uuid
 # github.com/gorilla/schema v1.1.0
 ## explicit
-github.com/gorilla/schema
 # github.com/jackc/chunkreader/v2 v2.0.1
 ## explicit; go 1.12
 github.com/jackc/chunkreader/v2
@@ -147,6 +151,9 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
+# github.com/mattn/go-runewidth v0.0.15
+## explicit; go 1.9
+github.com/mattn/go-runewidth
 # github.com/pierrec/lz4/v4 v4.1.21
 ## explicit; go 1.14
 github.com/pierrec/lz4/v4
@@ -154,6 +161,9 @@ github.com/pierrec/lz4/v4/internal/lz4block
 github.com/pierrec/lz4/v4/internal/lz4errors
 github.com/pierrec/lz4/v4/internal/lz4stream
 github.com/pierrec/lz4/v4/internal/xxh32
+# github.com/rivo/uniseg v0.2.0
+## explicit; go 1.12
+github.com/rivo/uniseg
 # github.com/robfig/cron/v3 v3.0.0
 ## explicit; go 1.12
 github.com/robfig/cron/v3
@@ -216,7 +226,7 @@ github.com/segmentio/ksuid
 # github.com/valyala/bytebufferpool v1.0.0
 ## explicit
 github.com/valyala/bytebufferpool
-# github.com/valyala/fasthttp v1.50.0
+# github.com/valyala/fasthttp v1.51.0
 ## explicit; go 1.20
 github.com/valyala/fasthttp
 github.com/valyala/fasthttp/fasthttputil

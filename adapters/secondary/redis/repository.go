@@ -28,11 +28,15 @@ func NewRedisSessionRepository(dbConn *redis.Client) *RedisRepository {
 	}
 }
 
-func (re *RedisRepository) StoreUserSession(context context.Context, userId string, expTime time.Time) error {
+func (re *RedisRepository) StoreUserSession(context context.Context,
+	userId string,
+	expTime time.Time,
+	ip string) error {
 	ses := redisSession{
 		UserId:    userId,
 		AccessAt:  time.Now().Round(0).String(),
 		ExpiresAt: expTime.Round(0).String(),
+		UserIp:    ip,
 	}
 
 	maSes, err := json.Marshal(ses)

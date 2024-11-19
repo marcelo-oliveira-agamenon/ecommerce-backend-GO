@@ -5,25 +5,23 @@ import (
 
 	"github.com/ecommerce/core/domain/product"
 	"github.com/ecommerce/core/services/products"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 func EditProduct(productAPI products.API) fiber.Handler {
-	return func(ctx *fiber.Ctx) {
+	return func(ctx *fiber.Ctx) error {
 		if err := ctx.BodyParser(&product.Product{}); err != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": err.Error(),
 			})
-			return
 		}
 
 		prodId := ctx.Params("id")
 		_, errI := productAPI.GetProductById(ctx.Context(), prodId)
 		if errI != nil {
-			ctx.Status(404).JSON(&fiber.Map{
+			return ctx.Status(404).JSON(&fiber.Map{
 				"error": errI.Error(),
 			})
-			return
 		}
 
 		value, e1 := strconv.ParseFloat(ctx.FormValue("value"), 64)
@@ -33,10 +31,9 @@ func EditProduct(productAPI products.API) fiber.Handler {
 		discount, e5 := strconv.ParseFloat(ctx.FormValue("discount"), 64)
 		price, e6 := strconv.ParseFloat(ctx.FormValue("shippingPrice"), 64)
 		if e1 != nil || e2 != nil || e3 != nil || e4 != nil || e5 != nil || e6 != nil {
-			ctx.Status(404).JSON(&fiber.Map{
+			return ctx.Status(404).JSON(&fiber.Map{
 				"error": ErrorConversion.Error(),
 			})
-			return
 		}
 
 		product, errP := productAPI.EditProduct(ctx.Context(), product.Product{
@@ -54,12 +51,11 @@ func EditProduct(productAPI products.API) fiber.Handler {
 			Rate:            0,
 		})
 		if errP != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errP.Error(),
 			})
-			return
 		}
 
-		ctx.Status(200).JSON(product)
+		return ctx.Status(200).JSON(product)
 	}
 }

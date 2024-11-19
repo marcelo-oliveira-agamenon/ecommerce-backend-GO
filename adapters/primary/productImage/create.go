@@ -7,7 +7,7 @@ import (
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/ports"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -17,44 +17,39 @@ var (
 )
 
 func CreateProductImage(productImageAPI productImages.API, productAPI products.API, storage ports.StorageService) fiber.Handler {
-	return func(ctx *fiber.Ctx) {
+	return func(ctx *fiber.Ctx) error {
 		prodId := ctx.Params("id")
 		if prodId == "" {
-			ctx.Status(422).JSON(&fiber.Map{
+			return ctx.Status(422).JSON(&fiber.Map{
 				"error": ErrorMissingProductIdField.Error(),
 			})
-			return
 		}
 
 		_, errPr := productAPI.GetProductById(ctx.Context(), prodId)
 		if errPr != nil {
-			ctx.Status(422).JSON(&fiber.Map{
+			return ctx.Status(422).JSON(&fiber.Map{
 				"error": ErrorProductIdDoenstExist.Error(),
 			})
-			return
 		}
 
 		img, errI := ctx.FormFile("img")
 		if errI != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": ErrorMissingImage.Error(),
 			})
-			return
 		}
 
 		file, err := img.Open()
 		if err != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": err.Error(),
 			})
-			return
 		}
 		resp, errAdd := storage.SaveFileAWS(file, img.Filename, img.Size, "product")
 		if errAdd != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errAdd.Error(),
 			})
-			return
 		}
 
 		prodI, errP := productImageAPI.CreateProductImage(ctx.Context(), productImage.ProductImage{
@@ -63,12 +58,11 @@ func CreateProductImage(productImageAPI productImages.API, productAPI products.A
 			ImageURL:  resp.ImageURL,
 		})
 		if errP != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errP.Error(),
 			})
-			return
 		}
 
-		ctx.Status(201).JSON(prodI)
+		return ctx.Status(201).JSON(prodI)
 	}
 }
