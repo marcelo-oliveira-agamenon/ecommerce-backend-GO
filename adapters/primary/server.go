@@ -74,5 +74,5 @@ func NewApp(
 }
 
 func Run(a *App) error {
-	return a.fiber.Listen(a.port)
+	return a.fiber.Listen(":" + a.port)
 }
