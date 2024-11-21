@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/ecommerce/core/services/users"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -14,39 +14,35 @@ var (
 )
 
 func ImportUsers(userAPI users.API) fiber.Handler {
-	return func(ctx *fiber.Ctx) {
+	return func(ctx *fiber.Ctx) error {
 		file, errF := ctx.FormFile("csv_file")
 		if errF != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": ErrorCsvFileParam.Error(),
 			})
-			return
 		}
 
 		fiOp, errO := file.Open()
 		if errO != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": ErrorCsvOpenFile.Error(),
 			})
-			return
 		}
 
 		expU, errU := userAPI.ImportUsers(ctx.Context(), fiOp)
 		if errU != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errU.Error(),
 			})
-			return
 		}
 
 		if expU {
 			ctx.Status(200)
-			return
+			return nil
 		}
 
-		ctx.Status(500).JSON(&fiber.Map{
+		return ctx.Status(500).JSON(&fiber.Map{
 			"error": ErrorAddUsers.Error(),
 		})
-		return
 	}
 }

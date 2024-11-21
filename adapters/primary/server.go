@@ -11,8 +11,8 @@ import (
 	"github.com/ecommerce/core/services/products"
 	"github.com/ecommerce/core/services/users"
 	"github.com/ecommerce/ports"
-	"github.com/gofiber/cors"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type App struct {
@@ -74,5 +74,5 @@ func NewApp(
 }
 
 func Run(a *App) error {
-	return a.fiber.Listen(a.port)
+	return a.fiber.Listen(":" + a.port)
 }

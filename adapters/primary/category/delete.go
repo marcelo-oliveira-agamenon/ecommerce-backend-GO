@@ -5,7 +5,7 @@ import (
 
 	categories "github.com/ecommerce/core/services/category"
 	"github.com/ecommerce/core/services/products"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -14,31 +14,29 @@ var (
 )
 
 func DeleteCategory(categoryAPI categories.API, productsAPI products.API) fiber.Handler {
-	return func(ctx *fiber.Ctx) {
+	return func(ctx *fiber.Ctx) error {
 		catId := ctx.Params("id")
 		if catId == "" {
-			ctx.Status(422).JSON(&fiber.Map{
+			return ctx.Status(422).JSON(&fiber.Map{
 				"error": ErrorMissingIdParams.Error(),
 			})
-			return
 		}
 
 		cat, errG := categoryAPI.GetCategoryById(ctx.Context(), catId)
 		if errG != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": ErrorCategoryDoenstExist.Error(),
 			})
-			return
 		}
 
 		_, errA := categoryAPI.DeleteCategory(ctx.Context(), *cat)
 		if errA != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errA.Error(),
 			})
-			return
 		}
 
 		ctx.Status(200)
+		return nil
 	}
 }

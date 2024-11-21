@@ -1,9 +1,11 @@
 package postgres
 
 import (
+	"log"
 	"os"
 	"time"
 
+	"github.com/ecommerce/adapters/secondary/postgres/seeds"
 	"github.com/ecommerce/core/domain/category"
 	"github.com/ecommerce/core/domain/coupon"
 	"github.com/ecommerce/core/domain/favorite"
@@ -71,6 +73,12 @@ func initDatabase() (*gorm.DB, error) {
 	db.AutoMigrate(&order.Order{})
 	db.AutoMigrate(&payment.Payment{})
 	db.AutoMigrate(&logs.Log{})
+
+	// Populate database with products, categories
+	errSe := seeds.SeedInitialData(db)
+	if errSe != nil {
+		log.Println("Error in seeding database")
+	}
 
 	return db, nil
 }

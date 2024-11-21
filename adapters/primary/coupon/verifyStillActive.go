@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	coupons "github.com/ecommerce/core/services/coupon"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -12,24 +12,22 @@ var (
 )
 
 func VerifyCouponStillActive(couponAPI coupons.API) fiber.Handler {
-	return func(ctx *fiber.Ctx) {
+	return func(ctx *fiber.Ctx) error {
 		hash := ctx.Query("hash")
 		if hash == "" {
-			ctx.Status(422).JSON(&fiber.Map{
+			return ctx.Status(422).JSON(&fiber.Map{
 				"error": ErrorMissingExpireDate.Error(),
 			})
-			return
 		}
 
 		co, isValid, err := couponAPI.VerifyIfCouponIsActive(ctx.Context(), hash)
 		if err != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": err.Error(),
 			})
-			return
 		}
 
-		ctx.Status(200).JSON(&fiber.Map{
+		return ctx.Status(200).JSON(&fiber.Map{
 			"valid":    isValid,
 			"discount": co.Discount,
 		})

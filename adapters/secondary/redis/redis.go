@@ -11,6 +11,7 @@ type redisSession struct {
 	UserId    string
 	AccessAt  string
 	ExpiresAt string
+	UserIp    string
 }
 
 func initRedisDatabase() (*redis.Client, error) {

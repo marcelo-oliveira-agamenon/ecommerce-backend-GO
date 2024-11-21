@@ -15,6 +15,7 @@ var (
 	ErrorRegisterUserAccess = errors.New("registering user access")
 	ErrorGettingKey         = errors.New("validating user session")
 	ErrorTokenExpiredAt     = errors.New("token expired at: ")
+	ErrorDeletingKey        = errors.New("delete key with user id")
 )
 
 type RedisRepository struct {
@@ -27,11 +28,15 @@ func NewRedisSessionRepository(dbConn *redis.Client) *RedisRepository {
 	}
 }
 
-func (re *RedisRepository) StoreUserSession(context context.Context, userId string, expTime time.Time) error {
+func (re *RedisRepository) StoreUserSession(context context.Context,
+	userId string,
+	expTime time.Time,
+	ip string) error {
 	ses := redisSession{
 		UserId:    userId,
 		AccessAt:  time.Now().Round(0).String(),
 		ExpiresAt: expTime.Round(0).String(),
+		UserIp:    ip,
 	}
 
 	maSes, err := json.Marshal(ses)
@@ -66,6 +71,15 @@ func (re *RedisRepository) ValidateSession(context context.Context, userId strin
 	if time.Now().Round(0).After(expAt) {
 		dt := strings.Split(unMar.ExpiresAt, " ")
 		return errors.New(ErrorTokenExpiredAt.Error() + dt[0] + " " + dt[1])
+	}
+
+	return nil
+}
+
+func (re *RedisRepository) ClearUserSession(context context.Context, userId string) error {
+	_, errD := re.db.Del(context, userId).Result()
+	if errD != nil {
+		return ErrorDeletingKey
 	}
 
 	return nil

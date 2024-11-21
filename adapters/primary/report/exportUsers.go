@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/ecommerce/core/services/users"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -14,37 +14,33 @@ var (
 )
 
 func ExportUsers(userAPI users.API) fiber.Handler {
-	return func(ctx *fiber.Ctx) {
+	return func(ctx *fiber.Ctx) error {
 		cAtSt := ctx.Query("user_created_at_start")
 		cAtEn := ctx.Query("user_created_at_end")
 		gen := ctx.Query("gender")
 		if cAtSt == "" {
-			ctx.Status(422).JSON(&fiber.Map{
+			return ctx.Status(422).JSON(&fiber.Map{
 				"error": ErrorMissingCreatedAtStart.Error(),
 			})
-			return
 		}
 		if cAtEn == "" {
-			ctx.Status(422).JSON(&fiber.Map{
+			return ctx.Status(422).JSON(&fiber.Map{
 				"error": ErrorMissingCreatedAtEnd.Error(),
 			})
-			return
 		}
 		if gen == "" {
-			ctx.Status(422).JSON(&fiber.Map{
+			return ctx.Status(422).JSON(&fiber.Map{
 				"error": ErrorMissingGender.Error(),
 			})
-			return
 		}
 
 		expU, errU := userAPI.ExportUsers(ctx.Context(), cAtSt, cAtEn, gen)
 		if errU != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errU.Error(),
 			})
-			return
 		}
 
-		ctx.Status(200).JSON(expU)
+		return ctx.Status(200).JSON(expU)
 	}
 }

@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/ecommerce/core/services/products"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -12,23 +12,21 @@ var (
 )
 
 func GetProductById(productAPI products.API) fiber.Handler {
-	return func(ctx *fiber.Ctx) {
+	return func(ctx *fiber.Ctx) error {
 		id := ctx.Params("id")
 		if id == "" {
-			ctx.Status(422).JSON(&fiber.Map{
+			return ctx.Status(422).JSON(&fiber.Map{
 				"error": ErrorParameter.Error(),
 			})
-			return
 		}
 
 		prod, errG := productAPI.GetProductById(ctx.Context(), id)
 		if errG != nil {
-			ctx.Status(500).JSON(&fiber.Map{
+			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errG.Error(),
 			})
-			return
 		}
 
-		ctx.Status(200).JSON(prod)
+		return ctx.Status(200).JSON(prod)
 	}
 }
