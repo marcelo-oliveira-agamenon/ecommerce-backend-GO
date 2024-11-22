@@ -1,8 +1,6 @@
 package users
 
 import (
-	"log"
-
 	"github.com/ecommerce/core/services/users"
 	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber/v2"
@@ -28,9 +26,7 @@ func Login(userAPI users.API, token ports.TokenService, redis ports.RedisService
 			})
 		}
 
-		device := ctx.Get("User-Agent")
-		log.Println("device ", device)
-		errR := redis.StoreUserSession(ctx.Context(), user.ID.String(), exTi, ctx.IP())
+		errR := redis.StoreUserSession(ctx.Context(), user.ID.String(), exTi, ctx.IP(), ctx.Get("User-Agent"))
 		if errR != nil {
 			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errR.Error(),

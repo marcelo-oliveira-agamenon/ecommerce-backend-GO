@@ -92,7 +92,8 @@ func initRoutes(a *App) {
 				report.Post("/users/import", reports.ImportUsers(a.usersAPI))
 			}
 
-			admin := authUser.Group("/admin")
+			adminAuth := authUser.Use(middleware.VerifyAdminPermission(a.usersAPI))
+			admin := adminAuth.Group("/admin")
 			{
 				admin.Get("/card1", admins.GetOrdersByPeriod(a.orderAPI))
 				admin.Get("/card2", admins.GetProfitByOrdersByMonths(a.orderAPI))

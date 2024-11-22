@@ -25,7 +25,7 @@ func LoginFacebook(userAPI users.API, token ports.TokenService, redis ports.Redi
 			})
 		}
 
-		errR := redis.StoreUserSession(ctx.Context(), user.ID.String(), exTi, ctx.IP())
+		errR := redis.StoreUserSession(ctx.Context(), user.ID.String(), exTi, ctx.IP(), ctx.Get("User-Agent"))
 		if errR != nil {
 			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errR.Error(),

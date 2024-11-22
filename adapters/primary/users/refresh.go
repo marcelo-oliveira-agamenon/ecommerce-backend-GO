@@ -27,7 +27,7 @@ func RefreshToken(token ports.TokenService, redis ports.RedisService) fiber.Hand
 			})
 		}
 
-		errR := redis.StoreUserSession(ctx.Context(), dec.UserId, exTi, ctx.IP())
+		errR := redis.StoreUserSession(ctx.Context(), dec.UserId, exTi, ctx.IP(), ctx.Get("User-Agent"))
 		if errR != nil {
 			return ctx.Status(500).JSON(&fiber.Map{
 				"error": errR.Error(),
