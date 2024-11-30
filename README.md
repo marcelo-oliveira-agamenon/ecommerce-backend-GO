@@ -4,6 +4,8 @@ The purpose of this application is to serve both the web page called [Cash and G
 
 The documentation for the API is [here]().
 
+## How to Run this Application
+
 ## Technologies used
 
 - [Golang](https://go.dev/)

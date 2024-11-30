@@ -38,6 +38,7 @@ func initRoutes(a *App) {
 			{
 				product.Get("/", products.GetAllProducts(a.productAPI))
 				product.Get("/:id", products.GetProductById(a.productAPI))
+				product.Get("/category/:id", products.GetAllProductsByCategory(a.productAPI))
 				product.Post("/", products.CreateProduct(a.productAPI, a.categoriesAPI, a.logAPI))
 				product.Put("/:id", products.EditProduct(a.productAPI))
 				product.Delete("/:id", products.DeleteProductById(a.productAPI))
