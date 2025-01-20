@@ -12,7 +12,7 @@ type Payment struct {
 	gorm.Model
 
 	ID            uuid.UUID `gorm:"type:uuid"`
-	OrderID       string    `gorm:"column:payment_id"`
+	OrderID       string    `gorm:"column:order_id"`
 	UserID        string    `gorm:"column:user_id"`
 	TotalValue    float64
 	PaidValue     float64

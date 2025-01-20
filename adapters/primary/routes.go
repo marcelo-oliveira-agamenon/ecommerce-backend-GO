@@ -6,6 +6,7 @@ import (
 	coupons "github.com/ecommerce/adapters/primary/coupon"
 	favorites "github.com/ecommerce/adapters/primary/favorite"
 	"github.com/ecommerce/adapters/primary/middleware"
+	miscs "github.com/ecommerce/adapters/primary/misc"
 	orders "github.com/ecommerce/adapters/primary/order"
 	payments "github.com/ecommerce/adapters/primary/payment"
 	prodImages "github.com/ecommerce/adapters/primary/productImage"
@@ -16,6 +17,8 @@ import (
 
 // Get fiber instance and import routes
 func initRoutes(a *App) {
+	a.fiber.Get("/", miscs.WelcomeAPIReturn())
+	a.fiber.Get("/status", miscs.DatabaseStatus(a.miscAPI))
 	v1 := a.fiber.Group("/v1")
 	{
 		v1.Post("/login", users.Login(a.usersAPI, a.tokenAPI, a.redisAPI))
