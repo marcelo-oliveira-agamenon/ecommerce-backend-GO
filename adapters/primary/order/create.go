@@ -2,22 +2,20 @@ package orders
 
 import (
 	"errors"
-	"strconv"
 
+	"github.com/ecommerce/core/domain/orderDetails"
 	orders "github.com/ecommerce/core/services/order"
-	"github.com/ecommerce/core/services/products"
+	ordersdetails "github.com/ecommerce/core/services/ordersDetails"
 	"github.com/ecommerce/core/services/users"
 	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber/v2"
 )
 
 var (
-	ErrorMissingProductIds = errors.New("missing product id")
-	ErrorMissingQuantity   = errors.New("missing quantity")
-	ErrorMissingTotalValue = errors.New("missing total value")
+	ErrorInvalidOrderData = errors.New("invalid order data")
 )
 
-func CreateOrder(orderAPI orders.API, userAPI users.API, productAPI products.API) fiber.Handler {
+func CreateOrder(orderAPI orders.API, userAPI users.API, orderDetailsAPI ordersdetails.API) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		dec := ctx.Locals("user").(*ports.Claims)
 
@@ -28,34 +26,34 @@ func CreateOrder(orderAPI orders.API, userAPI users.API, productAPI products.API
 			})
 		}
 
-		prodId := ctx.FormValue("productID")
-		if len(prodId) == 0 {
+		var orDe []orderDetails.OrderProductData
+		errPr := ctx.BodyParser(&orDe)
+		if errPr != nil {
 			return ctx.Status(422).JSON(&fiber.Map{
-				"error": ErrorMissingProductIds.Error(),
+				"error": ErrorInvalidOrderData.Error(),
 			})
 		}
 
-		qtd, err1 := strconv.Atoi(ctx.FormValue("qtd"))
-		toV, err2 := strconv.ParseFloat(ctx.FormValue("totalValue"), 64)
-		if err1 != nil {
-			return ctx.Status(422).JSON(&fiber.Map{
-				"error": ErrorMissingQuantity.Error(),
-			})
-		}
-		if err2 != nil {
-			return ctx.Status(422).JSON(&fiber.Map{
-				"error": ErrorMissingTotalValue.Error(),
-			})
+		var ordSli []orderDetails.OrderDetails
+		for _, val := range orDe {
+			orFor, errF := orderDetailsAPI.CheckOrderDetails(ctx.Context(), "placeholder", val)
+			if errF != nil {
+				return ctx.Status(422).JSON(&fiber.Map{
+					"error": errF.Error(),
+				})
+			}
+
+			ordSli = append(ordSli, *orFor)
 		}
 
-		_, errP := productAPI.CheckProductListById(ctx.Context(), prodId)
-		if errP != nil {
+		toV, qtd, errDe := orderDetailsAPI.GetTotalOrderValueAndQuatity(ctx.Context(), orDe)
+		if errDe != nil {
 			return ctx.Status(500).JSON(&fiber.Map{
-				"error": errP.Error(),
+				"error": errDe.Error(),
 			})
 		}
 
-		newO, err := orderAPI.AddOrder(ctx.Context(), dec.UserId, prodId, qtd, toV)
+		newO, err := orderAPI.AddOrder(ctx.Context(), dec.UserId, *qtd, *toV, ordSli)
 		if err != nil {
 			return ctx.Status(500).JSON(&fiber.Map{
 				"error": err.Error(),

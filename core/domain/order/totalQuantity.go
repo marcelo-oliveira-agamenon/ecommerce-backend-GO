@@ -9,7 +9,7 @@ var (
 	ErrorQuantityBelowZero  = errors.New("quantity of products cannot be negative")
 )
 
-func NewQuantity(qtd int) (*int, error) {
+func NewTotalQuantity(qtd int) (*int, error) {
 	if qtd < 0 {
 		return nil, ErrorQuantityBelowZero
 	}

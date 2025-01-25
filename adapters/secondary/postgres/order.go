@@ -2,10 +2,16 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/ecommerce/core/domain/order"
+	"github.com/ecommerce/core/domain/orderDetails"
 	"gorm.io/gorm"
+)
+
+var (
+	ErrorOrderDetailBatch = errors.New("order details are incorrect to generate")
 )
 
 type OrderRepository struct {
@@ -76,10 +82,24 @@ func (or *OrderRepository) GetOrdersByPeriod(ctx context.Context, inDate time.Ti
 	return &ord, nil
 }
 
-func (or *OrderRepository) AddOrder(ctx context.Context, o order.Order) (*order.Order, error) {
+func (or *OrderRepository) AddOrder(ctx context.Context, o order.Order, det []orderDetails.OrderDetails) (*order.Order, error) {
+	tx := or.db.Begin()
+
 	result := or.db.Create(&o)
 	if result.Error != nil {
 		return nil, result.Error
+	}
+
+	// batch order details
+	resDet := or.db.Create(det)
+	if resDet.Error != nil {
+		tx.Rollback()
+		return nil, ErrorOrderDetailBatch
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, err
 	}
 
 	return &o, nil

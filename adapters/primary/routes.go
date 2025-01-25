@@ -77,7 +77,7 @@ func initRoutes(a *App) {
 			order := authUser.Group("/order")
 			{
 				order.Get("/", orders.GetByUserId(a.orderAPI, a.usersAPI))
-				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.productAPI))
+				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.orderDetailsAPI))
 				order.Patch("/payment/:id", orders.EditPayment(a.orderAPI))
 				order.Patch("/rate/:id", orders.EditRate(a.orderAPI))
 				order.Patch("/status/:id", orders.EditStatus(a.orderAPI))

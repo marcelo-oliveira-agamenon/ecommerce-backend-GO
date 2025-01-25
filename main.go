@@ -20,6 +20,7 @@ import (
 	logs "github.com/ecommerce/core/services/log"
 	"github.com/ecommerce/core/services/misc"
 	orders "github.com/ecommerce/core/services/order"
+	ordersdetails "github.com/ecommerce/core/services/ordersDetails"
 	"github.com/ecommerce/core/services/payments"
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
@@ -69,6 +70,8 @@ func main() {
 	couponService := coupons.NewCouponService(couponRepository)
 	orderRepository := postgres.NewOrderRepository(postgresRepository)
 	orderService := orders.NewOrderService(orderRepository)
+	orderDetailsRepository := postgres.NewOrderDetailsRepository(postgresRepository)
+	orderDetailsService := ordersdetails.NewOrdersDetailsService(orderDetailsRepository)
 	paymentRepository := postgres.NewPaymentRepository(postgresRepository)
 	paymentService := payments.NewPaymentService(paymentRepository)
 	logRepository := postgres.NewLogRepository(postgresRepository)
@@ -79,6 +82,7 @@ func main() {
 	srv := primary.NewApp(
 		tokenService, storageService, userService, productService, categoryService,
 		productImageService, favoriteService, couponService, orderService,
-		paymentService, logService, miscService, emailService, redisService, kafkaService, port)
+		orderDetailsService, paymentService, logService, miscService, emailService,
+		redisService, kafkaService, port)
 	primary.Run(srv)
 }

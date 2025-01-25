@@ -7,6 +7,7 @@ import (
 	logs "github.com/ecommerce/core/services/log"
 	"github.com/ecommerce/core/services/misc"
 	orders "github.com/ecommerce/core/services/order"
+	ordersdetails "github.com/ecommerce/core/services/ordersDetails"
 	"github.com/ecommerce/core/services/payments"
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
@@ -25,6 +26,7 @@ type App struct {
 	favoriteAPI     favorites.API
 	couponAPI       coupons.API
 	orderAPI        orders.API
+	orderDetailsAPI ordersdetails.API
 	paymentAPI      payments.API
 	logAPI          logs.API
 	miscAPI         misc.API
@@ -46,6 +48,7 @@ func NewApp(
 	favoriteAPI favorites.API,
 	couponAPI coupons.API,
 	orderAPI orders.API,
+	orderDetailsAPI ordersdetails.API,
 	paymentAPI payments.API,
 	logAPI logs.API,
 	miscAPI misc.API,
@@ -62,6 +65,7 @@ func NewApp(
 		favoriteAPI:     favoriteAPI,
 		couponAPI:       couponAPI,
 		orderAPI:        orderAPI,
+		orderDetailsAPI: orderDetailsAPI,
 		paymentAPI:      paymentAPI,
 		logAPI:          logAPI,
 		miscAPI:         miscAPI,
