@@ -14,7 +14,7 @@ var (
 )
 
 type API interface {
-	AddOrder(ctx context.Context, userId string, qtd int, toV float64, det []orderDetails.OrderDetails) (*order.Order, error)
+	AddOrder(ctx context.Context, userId string, qtd int, toV float64, det []orderDetails.OrderDetails, isCouponUsed bool) (*order.Order, error)
 	GetById(ctx context.Context, id string) (*order.Order, error)
 	GetByUserId(ctx context.Context, userId string, limit int, offset int) (*[]order.Order, error)
 	GetOrderCount(ctx context.Context) (*int64, *int64, error)

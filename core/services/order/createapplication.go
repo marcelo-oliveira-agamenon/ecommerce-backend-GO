@@ -115,7 +115,7 @@ func (o *OrderService) GetProfitByOrdersByMonths(ctx context.Context) (*[]MonthD
 }
 
 func (o *OrderService) AddOrder(ctx context.Context, userId string,
-	qtd int, toV float64, det []orderDetails.OrderDetails) (*order.Order, error) {
+	qtd int, toV float64, det []orderDetails.OrderDetails, isCouponUsed bool) (*order.Order, error) {
 	uId, errU := order.NewUserId(userId)
 	if errU != nil {
 		return nil, errU
@@ -142,15 +142,21 @@ func (o *OrderService) AddOrder(ctx context.Context, userId string,
 	}
 
 	or, errN := order.NewOrder(order.Order{
-		TotalQtd:   *qtd1,
-		TotalValue: *toV1,
-		Status:     *sts,
-		Userid:     uId,
-		Rate:       *rt,
-		Paid:       false,
+		TotalQtd:     *qtd1,
+		TotalValue:   *toV1,
+		Status:       *sts,
+		Userid:       uId,
+		Rate:         *rt,
+		Paid:         false,
+		IsOrderRated: false,
+		CouponUsed:   isCouponUsed,
 	})
 	if errN != nil {
 		return nil, errN
+	}
+
+	for i := range det {
+		det[i].OrderID = or.ID
 	}
 
 	newO, err := o.orderRepository.AddOrder(ctx, or, det)

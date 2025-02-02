@@ -20,6 +20,7 @@ type Order struct {
 	Paid         bool
 	Rate         int
 	CouponUsed   bool
+	IsOrderRated bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    gorm.DeletedAt
@@ -29,13 +30,14 @@ type Order struct {
 
 func NewOrder(data Order) (Order, error) {
 	return Order{
-		ID:         ksuid.New().String(),
-		Userid:     data.Userid,
-		TotalValue: data.TotalValue,
-		Status:     data.Status,
-		TotalQtd:   data.TotalQtd,
-		Paid:       data.Paid,
-		Rate:       data.Rate,
-		CouponUsed: data.CouponUsed,
+		ID:           ksuid.New().String(),
+		Userid:       data.Userid,
+		TotalValue:   data.TotalValue,
+		Status:       data.Status,
+		TotalQtd:     data.TotalQtd,
+		Paid:         data.Paid,
+		Rate:         data.Rate,
+		CouponUsed:   data.CouponUsed,
+		IsOrderRated: data.IsOrderRated,
 	}, nil
 }

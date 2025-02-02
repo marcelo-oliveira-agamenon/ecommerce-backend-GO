@@ -1,30 +1,39 @@
 package kafka_ins
 
 import (
-	"context"
 	"os"
 
 	"github.com/segmentio/kafka-go"
 )
 
-func initKafkaInstance() (*kafka.Conn, error) {
-	address := os.Getenv("KAFKA_ADDRESS")
-	network := os.Getenv("KAFKA_NETWORK")
-	topic := os.Getenv("KAFKA_TOPIC")
+var (
+	address     = os.Getenv("KAFKA_ADDRESS")
+	order_topic = os.Getenv("KAFKA_ORDER_TOPIC")
+	user_topic  = os.Getenv("KAFKA_USER_TOPIC")
+)
 
-	kfCon, errK := kafka.DialLeader(context.Background(), network, address, topic, 0)
-	if errK != nil {
-		return nil, errK
-	}
+func initKafkaInstance() (*kafka.Writer, *kafka.Reader, error) {
+	kafW := kafka.NewWriter(kafka.WriterConfig{
+		Brokers:  []string{address},
+		Topic:    order_topic,
+		Balancer: &kafka.LeastBytes{},
+	})
 
-	return kfCon, nil
+	kafR := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:     []string{address},
+		Topic:       user_topic,
+		Partition:   0,
+		StartOffset: kafka.FirstOffset,
+	})
+
+	return kafW, kafR, nil
 }
 
-func NewKafkaRepository() (*kafka.Conn, error) {
-	kf, err := initKafkaInstance()
+func NewKafkaRepository() (*kafka.Writer, *kafka.Reader, error) {
+	kafW, kafR, err := initKafkaInstance()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return kf, nil
+	return kafW, kafR, nil
 }

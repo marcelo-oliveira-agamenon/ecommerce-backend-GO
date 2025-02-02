@@ -3,20 +3,17 @@ package orderDetails
 import (
 	"errors"
 	"strings"
-
-	"github.com/gofrs/uuid"
 )
 
 var (
 	ErrorEmptyOrder = errors.New("empty order id")
 )
 
-func NewOrderId(orderId string) (uuid.UUID, error) {
+func NewOrderId(orderId string) (string, error) {
 	orderId = strings.TrimSpace(orderId)
 	if len(orderId) == 0 {
-		return uuid.UUID{}, ErrorEmptyOrder
+		return "", ErrorEmptyOrder
 	}
 
-	nOrderId := uuid.FromStringOrNil(orderId)
-	return nOrderId, nil
+	return orderId, nil
 }

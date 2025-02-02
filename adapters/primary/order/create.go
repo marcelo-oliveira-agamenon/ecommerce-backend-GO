@@ -53,7 +53,7 @@ func CreateOrder(orderAPI orders.API, userAPI users.API, orderDetailsAPI ordersd
 			})
 		}
 
-		newO, err := orderAPI.AddOrder(ctx.Context(), dec.UserId, *qtd, *toV, ordSli)
+		newO, err := orderAPI.AddOrder(ctx.Context(), dec.UserId, *qtd, *toV, ordSli, orDe[0].CouponUsed)
 		if err != nil {
 			return ctx.Status(500).JSON(&fiber.Map{
 				"error": err.Error(),

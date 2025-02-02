@@ -14,7 +14,7 @@ func (od *OrdersDetailsService) GetTotalOrderValueAndQuatity(ctx context.Context
 	var toV float64
 	var qtd int
 	for _, order := range det {
-		toV += order.Value
+		toV += order.Value * float64(order.Quantity)
 		qtd += order.Quantity
 	}
 

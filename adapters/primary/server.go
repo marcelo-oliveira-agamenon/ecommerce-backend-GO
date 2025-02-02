@@ -32,7 +32,6 @@ type App struct {
 	miscAPI         misc.API
 	tokenAPI        ports.TokenService
 	storageAPI      ports.StorageService
-	emailAPI        ports.EmailService
 	redisAPI        ports.RedisService
 	kafkaAPI        ports.KafkaService
 	port            string
@@ -52,7 +51,6 @@ func NewApp(
 	paymentAPI payments.API,
 	logAPI logs.API,
 	miscAPI misc.API,
-	emailAPI ports.EmailService,
 	redisAPI ports.RedisService,
 	kafkaAPI ports.KafkaService,
 	port string) *App {
@@ -71,7 +69,6 @@ func NewApp(
 		miscAPI:         miscAPI,
 		tokenAPI:        tokenAPI,
 		storageAPI:      storageAPI,
-		emailAPI:        emailAPI,
 		redisAPI:        redisAPI,
 		kafkaAPI:        kafkaAPI,
 		port:            port,

@@ -3,7 +3,6 @@ package orderDetails
 import (
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/segmentio/ksuid"
 	"gorm.io/gorm"
 )
@@ -11,8 +10,8 @@ import (
 type OrderDetails struct {
 	gorm.Model
 	ID        string
-	OrderID   uuid.UUID `gorm:"column:order_id"`
-	ProductID string    `gorm:"column:product_id"`
+	OrderID   string `gorm:"column:order_id"`
+	ProductID string `gorm:"column:product_id"`
 	Value     float64
 	Qtd       int
 	CreatedAt time.Time
@@ -21,9 +20,10 @@ type OrderDetails struct {
 }
 
 type OrderProductData struct {
-	ProductId string
-	Quantity  int
-	Value     float64
+	ProductId  string
+	Quantity   int
+	Value      float64
+	CouponUsed bool
 }
 
 func NewOrderDetails(data OrderDetails) (OrderDetails, error) {

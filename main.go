@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/ecommerce/adapters/primary"
-	"github.com/ecommerce/adapters/secondary/email/gomail"
 	kafka_ins "github.com/ecommerce/adapters/secondary/kafka"
 	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/ecommerce/adapters/secondary/redis"
@@ -38,10 +37,11 @@ func main() {
 	if errR != nil {
 		log.Fatal(errR)
 	}
-	kafkaRepository, errK := kafka_ins.NewKafkaRepository()
+	kafkaRepWriter, kafkaRepReader, errK := kafka_ins.NewKafkaRepository()
 	if errK != nil {
 		log.Fatal(errK)
 	}
+	// TODO: maybe pass this as a dep injection?
 	cronjob.NewCronTasks(postgresRepository)
 
 	jtwKey := os.Getenv("JWT_KEY")
@@ -52,9 +52,9 @@ func main() {
 	}
 	storageService := storage.NewAWS(*config)
 	tokenService := jwt.NewToken(jtwKey)
-	emailService := gomail.NewEmailService()
 	redisService := redis.NewRedisSessionRepository(redisRepository)
-	kafkaService := kafka_ins.NewKafkaSessionRepository(kafkaRepository)
+	kafkaService := kafka_ins.NewKafkaSessionRepository(kafkaRepWriter, kafkaRepReader)
+	go kafkaService.ExecuteMessageReceived(postgresRepository)
 
 	userRepository := postgres.NewUserRepository(postgresRepository)
 	userService := users.NewUserService(userRepository)
@@ -82,7 +82,7 @@ func main() {
 	srv := primary.NewApp(
 		tokenService, storageService, userService, productService, categoryService,
 		productImageService, favoriteService, couponService, orderService,
-		orderDetailsService, paymentService, logService, miscService, emailService,
+		orderDetailsService, paymentService, logService, miscService,
 		redisService, kafkaService, port)
 	primary.Run(srv)
 }
