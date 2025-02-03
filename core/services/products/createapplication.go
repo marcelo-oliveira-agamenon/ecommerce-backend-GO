@@ -116,3 +116,18 @@ func (p *ProductService) GetProductQuantityByCategories(context context.Context)
 
 	return co, &tot, nil
 }
+
+func (p *ProductService) GetProductsByCategory(context context.Context, categoryId string, limit int,
+	offset int) (*[]product.Product, error) {
+	var params postgres.QueryParams = postgres.QueryParams{
+		Limit:  limit,
+		Offset: offset,
+	}
+
+	pc, err := p.productRepository.GetProductsByCategory(context, categoryId, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return pc, nil
+}

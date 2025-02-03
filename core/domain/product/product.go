@@ -5,6 +5,7 @@ import (
 
 	"github.com/ecommerce/core/domain/category"
 	"github.com/ecommerce/core/domain/favorite"
+	"github.com/ecommerce/core/domain/orderDetails"
 	"github.com/ecommerce/core/domain/productImage"
 	"github.com/segmentio/ksuid"
 	"gorm.io/gorm"
@@ -31,6 +32,7 @@ type Product struct {
 	Favorite        []favorite.Favorite         `gorm:"foreignKey:ProductID"`
 	Category        category.Category           `gorm:"foreignKey:Categoryid"`
 	ProductImage    []productImage.ProductImage `gorm:"foreignKey:Productid"`
+	OrderDetails    []orderDetails.OrderDetails
 }
 
 func NewProduct(data Product) (Product, error) {

@@ -98,12 +98,10 @@ services:
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
       - AWS_REGION=${AWS_REGION}
       - AWS_BUCKET=${AWS_BUCKET}
-      - EMAIL_PRO=${EMAIL_PRO}
-      - EMAIL_PRO_SMTP=${EMAIL_PRO_SMTP}
-      - EMAIL_PRO_PASSWORD=${EMAIL_PRO_PASSWORD}
-      - EMAIL_PRO_PORT=${EMAIL_PRO_PORT}
       - REDIS_ADDR=${REDIS_ADDR}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - KAFKA_ORDER_TOPIC=${KAFKA_ORDER_TOPIC}
+      - KAFKA_USER_TOPIC=${KAFKA_USER_TOPIC}
     depends_on:
       database:
         condition: service_healthy

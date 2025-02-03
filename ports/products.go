@@ -17,4 +17,5 @@ type ProductRepository interface {
 	EditProduct(ctx context.Context, p product.Product) error
 	DeleteProductById(ctx context.Context, p product.Product) error
 	CheckProductListById(ctx context.Context, prs pq.StringArray) (*[]string, error)
+	GetProductsByCategory(context context.Context, categoryId string, params postgres.QueryParams) (*[]product.Product, error)
 }

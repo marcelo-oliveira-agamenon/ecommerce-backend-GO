@@ -1,22 +1,19 @@
-package order
+package orderDetails
 
 import (
 	"errors"
 	"strings"
-
-	"github.com/lib/pq"
 )
 
 var (
 	ErrorEmptyProductId = errors.New("empty product id")
 )
 
-func NewProductId(prodId string) (pq.StringArray, error) {
+func NewProductId(prodId string) (*string, error) {
 	prodId = strings.TrimSpace(prodId)
 	if len(prodId) == 0 {
 		return nil, ErrorEmptyProductId
 	}
 
-	prSp := strings.Split(prodId, ",")
-	return prSp, nil
+	return &prodId, nil
 }

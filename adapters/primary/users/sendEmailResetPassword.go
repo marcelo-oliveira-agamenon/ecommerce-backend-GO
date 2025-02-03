@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/ecommerce/core/services/users"
-	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,7 +14,7 @@ var (
 	ErrorMissingEmail   = errors.New("missing email parameter")
 )
 
-func SendEmailResetPassword(userAPI users.API, email ports.EmailService) fiber.Handler {
+func SendEmailResetPassword(userAPI users.API) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		userEmail := ctx.Query("email")
 		if len(userEmail) == 0 {
@@ -24,19 +23,20 @@ func SendEmailResetPassword(userAPI users.API, email ports.EmailService) fiber.H
 			})
 		}
 
-		template, err := userAPI.SendEmailResetPassword(ctx.Context(), userEmail)
-		if err != nil {
-			return ctx.Status(500).JSON(&fiber.Map{
-				"error": err.Error(),
-			})
-		}
+		// TODO: create kakfa topic to this
+		// template, err := userAPI.SendEmailResetPassword(ctx.Context(), userEmail)
+		// if err != nil {
+		// 	return ctx.Status(500).JSON(&fiber.Map{
+		// 		"error": err.Error(),
+		// 	})
+		// }
 
-		_, errMail := email.SendEmail(userEmail, EmailFileName, template, EmailSubject)
-		if errMail != nil {
-			return ctx.Status(500).JSON(&fiber.Map{
-				"error": ErrorMissingEmail,
-			})
-		}
+		// _, errMail := email.SendEmail(userEmail, EmailFileName, template, EmailSubject)
+		// if errMail != nil {
+		// 	return ctx.Status(500).JSON(&fiber.Map{
+		// 		"error": ErrorMissingEmail,
+		// 	})
+		// }
 
 		return ctx.Status(200).JSON(EmailSuccessMessage)
 	}

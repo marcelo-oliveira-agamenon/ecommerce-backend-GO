@@ -28,6 +28,7 @@ type API interface {
 	EditProduct(context context.Context, data product.Product) (*product.Product, error)
 	DeleteProductById(context context.Context, data product.Product) error
 	CheckProductListById(context context.Context, prList string) (*[]string, error)
+	GetProductsByCategory(context context.Context, categoryId string, limit int, offset int) (*[]product.Product, error)
 }
 
 type ProductService struct {

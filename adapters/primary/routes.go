@@ -6,6 +6,7 @@ import (
 	coupons "github.com/ecommerce/adapters/primary/coupon"
 	favorites "github.com/ecommerce/adapters/primary/favorite"
 	"github.com/ecommerce/adapters/primary/middleware"
+	miscs "github.com/ecommerce/adapters/primary/misc"
 	orders "github.com/ecommerce/adapters/primary/order"
 	payments "github.com/ecommerce/adapters/primary/payment"
 	prodImages "github.com/ecommerce/adapters/primary/productImage"
@@ -16,13 +17,15 @@ import (
 
 // Get fiber instance and import routes
 func initRoutes(a *App) {
+	a.fiber.Get("/", miscs.WelcomeAPIReturn())
+	a.fiber.Get("/status", miscs.DatabaseStatus(a.miscAPI))
 	v1 := a.fiber.Group("/v1")
 	{
 		v1.Post("/login", users.Login(a.usersAPI, a.tokenAPI, a.redisAPI))
-		v1.Post("/signUp", users.SignUp(a.usersAPI, a.tokenAPI, a.storageAPI, a.emailAPI, a.kafkaAPI))
+		v1.Post("/signUp", users.SignUp(a.usersAPI, a.tokenAPI, a.storageAPI, a.kafkaAPI))
 		v1.Post("/loginFacebook", users.LoginFacebook(a.usersAPI, a.tokenAPI, a.redisAPI))
 		v1.Patch("/resetPassword", users.ResetPassword(a.usersAPI))
-		v1.Post("/resetPasswordLink", users.SendEmailResetPassword(a.usersAPI, a.emailAPI))
+		v1.Post("/resetPasswordLink", users.SendEmailResetPassword(a.usersAPI))
 
 		authUser := v1.Use(middleware.VerifyToken(a.tokenAPI))
 		{
@@ -38,6 +41,7 @@ func initRoutes(a *App) {
 			{
 				product.Get("/", products.GetAllProducts(a.productAPI))
 				product.Get("/:id", products.GetProductById(a.productAPI))
+				product.Get("/category/:id", products.GetAllProductsByCategory(a.productAPI))
 				product.Post("/", products.CreateProduct(a.productAPI, a.categoriesAPI, a.logAPI))
 				product.Put("/:id", products.EditProduct(a.productAPI))
 				product.Delete("/:id", products.DeleteProductById(a.productAPI))
@@ -73,7 +77,7 @@ func initRoutes(a *App) {
 			order := authUser.Group("/order")
 			{
 				order.Get("/", orders.GetByUserId(a.orderAPI, a.usersAPI))
-				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.productAPI))
+				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.orderDetailsAPI))
 				order.Patch("/payment/:id", orders.EditPayment(a.orderAPI))
 				order.Patch("/rate/:id", orders.EditRate(a.orderAPI))
 				order.Patch("/status/:id", orders.EditStatus(a.orderAPI))
@@ -92,7 +96,8 @@ func initRoutes(a *App) {
 				report.Post("/users/import", reports.ImportUsers(a.usersAPI))
 			}
 
-			admin := authUser.Group("/admin")
+			adminAuth := authUser.Use(middleware.VerifyAdminPermission(a.usersAPI))
+			admin := adminAuth.Group("/admin")
 			{
 				admin.Get("/card1", admins.GetOrdersByPeriod(a.orderAPI))
 				admin.Get("/card2", admins.GetProfitByOrdersByMonths(a.orderAPI))

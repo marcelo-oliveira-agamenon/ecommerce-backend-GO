@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ecommerce/core/domain/order"
+	"github.com/ecommerce/core/domain/orderDetails"
 )
 
 func (o *OrderService) GetByUserId(ctx context.Context,
@@ -92,7 +93,7 @@ func (o *OrderService) GetProfitByOrdersByMonths(ctx context.Context) (*[]MonthD
 		auxOr := *ord
 		foTo = append(foTo, OrderTotalMonth{
 			OrderId:  auxOr[i].ID,
-			Subtotal: auxOr[i].TotalValue * float64(auxOr[i].Qtd),
+			Subtotal: auxOr[i].TotalValue * float64(auxOr[i].TotalQtd),
 			Month:    auxOr[i].CreatedAt.Month().String(),
 		})
 	}
@@ -113,13 +114,8 @@ func (o *OrderService) GetProfitByOrdersByMonths(ctx context.Context) (*[]MonthD
 	return &auxTo, nil
 }
 
-func (o *OrderService) AddOrder(ctx context.Context,
-	userId string, prodId string, qtd int, toV float64) (*order.Order, error) {
-	prs, errP := order.NewProductId(prodId)
-	if errP != nil {
-		return nil, errP
-	}
-
+func (o *OrderService) AddOrder(ctx context.Context, userId string,
+	qtd int, toV float64, det []orderDetails.OrderDetails, isCouponUsed bool) (*order.Order, error) {
 	uId, errU := order.NewUserId(userId)
 	if errU != nil {
 		return nil, errU
@@ -130,7 +126,7 @@ func (o *OrderService) AddOrder(ctx context.Context,
 		return nil, errT
 	}
 
-	qtd1, errQ := order.NewQuantity(qtd)
+	qtd1, errQ := order.NewTotalQuantity(qtd)
 	if errQ != nil {
 		return nil, errQ
 	}
@@ -146,19 +142,24 @@ func (o *OrderService) AddOrder(ctx context.Context,
 	}
 
 	or, errN := order.NewOrder(order.Order{
-		ProductID:  prs,
-		Qtd:        *qtd1,
-		TotalValue: *toV1,
-		Status:     *sts,
-		Userid:     uId,
-		Rate:       *rt,
-		Paid:       false,
+		TotalQtd:     *qtd1,
+		TotalValue:   *toV1,
+		Status:       *sts,
+		Userid:       uId,
+		Rate:         *rt,
+		Paid:         false,
+		IsOrderRated: false,
+		CouponUsed:   isCouponUsed,
 	})
 	if errN != nil {
 		return nil, errN
 	}
 
-	newO, err := o.orderRepository.AddOrder(ctx, or)
+	for i := range det {
+		det[i].OrderID = or.ID
+	}
+
+	newO, err := o.orderRepository.AddOrder(ctx, or, det)
 	if err != nil {
 		return nil, err
 	}

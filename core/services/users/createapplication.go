@@ -69,6 +69,7 @@ func (u *UserService) SignUp(context context.Context, data user.User) (*UserResp
 	data.Gender = gender
 	data.Roles = roles
 	data.Email = ema
+	data.WelcomeEmailSended = false
 	user, errUser := user.NewUser(data)
 	if errUser != nil {
 		return nil, errUser

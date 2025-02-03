@@ -5,7 +5,9 @@ import (
 	coupons "github.com/ecommerce/core/services/coupon"
 	favorites "github.com/ecommerce/core/services/favorite"
 	logs "github.com/ecommerce/core/services/log"
+	"github.com/ecommerce/core/services/misc"
 	orders "github.com/ecommerce/core/services/order"
+	ordersdetails "github.com/ecommerce/core/services/ordersDetails"
 	"github.com/ecommerce/core/services/payments"
 	productImages "github.com/ecommerce/core/services/productImage"
 	"github.com/ecommerce/core/services/products"
@@ -24,11 +26,12 @@ type App struct {
 	favoriteAPI     favorites.API
 	couponAPI       coupons.API
 	orderAPI        orders.API
+	orderDetailsAPI ordersdetails.API
 	paymentAPI      payments.API
 	logAPI          logs.API
+	miscAPI         misc.API
 	tokenAPI        ports.TokenService
 	storageAPI      ports.StorageService
-	emailAPI        ports.EmailService
 	redisAPI        ports.RedisService
 	kafkaAPI        ports.KafkaService
 	port            string
@@ -44,9 +47,10 @@ func NewApp(
 	favoriteAPI favorites.API,
 	couponAPI coupons.API,
 	orderAPI orders.API,
+	orderDetailsAPI ordersdetails.API,
 	paymentAPI payments.API,
 	logAPI logs.API,
-	emailAPI ports.EmailService,
+	miscAPI misc.API,
 	redisAPI ports.RedisService,
 	kafkaAPI ports.KafkaService,
 	port string) *App {
@@ -59,11 +63,12 @@ func NewApp(
 		favoriteAPI:     favoriteAPI,
 		couponAPI:       couponAPI,
 		orderAPI:        orderAPI,
+		orderDetailsAPI: orderDetailsAPI,
 		paymentAPI:      paymentAPI,
 		logAPI:          logAPI,
+		miscAPI:         miscAPI,
 		tokenAPI:        tokenAPI,
 		storageAPI:      storageAPI,
-		emailAPI:        emailAPI,
 		redisAPI:        redisAPI,
 		kafkaAPI:        kafkaAPI,
 		port:            port,

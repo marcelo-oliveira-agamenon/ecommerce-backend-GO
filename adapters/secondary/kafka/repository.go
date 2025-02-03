@@ -1,21 +1,28 @@
 package kafka_ins
 
 import (
+	"context"
+	"log"
+
+	"github.com/ecommerce/core/domain/user"
 	"github.com/segmentio/kafka-go"
+	"gorm.io/gorm"
 )
 
 type KafkaRepository struct {
-	kf *kafka.Conn
+	kw *kafka.Writer
+	kr *kafka.Reader
 }
 
-func NewKafkaSessionRepository(conn *kafka.Conn) *KafkaRepository {
+func NewKafkaSessionRepository(writer *kafka.Writer, reader *kafka.Reader) *KafkaRepository {
 	return &KafkaRepository{
-		kf: conn,
+		kw: writer,
+		kr: reader,
 	}
 }
 
 func (kr *KafkaRepository) WriteMessages(typ []byte, body []byte) error {
-	_, err := kr.kf.WriteMessages(kafka.Message{
+	err := kr.kw.WriteMessages(context.Background(), kafka.Message{
 		Key:   typ,
 		Value: body,
 	})
@@ -24,4 +31,26 @@ func (kr *KafkaRepository) WriteMessages(typ []byte, body []byte) error {
 	}
 
 	return nil
+}
+
+// TODO: use a function to handle logic
+func (kr *KafkaRepository) ExecuteMessageReceived(ps *gorm.DB) {
+	for {
+		msg, errR := kr.kr.ReadMessage(context.Background())
+		if errR != nil {
+			log.Println(errR)
+			return
+		}
+
+		switch string(msg.Key) {
+		case "welcomeEmailSended":
+			var us user.User
+			us.WelcomeEmailSended = true
+			usEmail := string(msg.Value)
+			ps.Where("email = ?", usEmail).Updates(&us)
+			log.Println("user welcome email received: ", usEmail)
+		default:
+			log.Println("default kafka message")
+		}
+	}
 }

@@ -2,7 +2,7 @@ package users
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/core/services/users"
@@ -11,8 +11,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageService,
-	email ports.EmailService, kafka ports.KafkaService) fiber.Handler {
+func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageService, kafka ports.KafkaService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		if err := ctx.BodyParser(&user.User{}); err != nil {
 			return ctx.Status(500).JSON(&fiber.Map{
@@ -68,15 +67,14 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			})
 		}
 
-		//TODO: maybe field to check email sended in user table
 		body, errM := json.Marshal(usrRes)
 		if errM == nil {
 			errK := kafka.WriteMessages([]byte("signup"), body)
 			if errK != nil {
-				fmt.Println("kafka message", errK)
+				log.Println("kafka message", errK)
 			}
 		} else {
-			fmt.Println("marshall message", errM)
+			log.Println("marshall message", errM)
 		}
 
 		return ctx.Status(201).JSON(&fiber.Map{

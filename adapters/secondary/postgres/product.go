@@ -142,3 +142,14 @@ func (pr *ProductRepository) CheckProductListById(ctx context.Context, prs pq.St
 
 	return &aux, nil
 }
+
+func (pr *ProductRepository) GetProductsByCategory(context context.Context, categoryId string, params QueryParams) (*[]product.Product, error) {
+	var list []product.Product
+
+	res := pr.db.Where("products.categoryid = ?", categoryId).Limit(params.Limit).Offset(params.Offset).Find(&list)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &list, nil
+}
