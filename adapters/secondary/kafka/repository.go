@@ -4,9 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/ecommerce/core/domain/user"
+	"github.com/ecommerce/adapters/secondary/postgres"
 	"github.com/segmentio/kafka-go"
-	"gorm.io/gorm"
 )
 
 type KafkaRepository struct {
@@ -21,9 +20,9 @@ func NewKafkaSessionRepository(writer *kafka.Writer, reader *kafka.Reader) *Kafk
 	}
 }
 
-func (kr *KafkaRepository) WriteMessages(typ []byte, body []byte) error {
+func (kr *KafkaRepository) WriteMessages(typ string, body []byte) error {
 	err := kr.kw.WriteMessages(context.Background(), kafka.Message{
-		Key:   typ,
+		Key:   []byte(typ),
 		Value: body,
 	})
 	if err != nil {
@@ -33,8 +32,8 @@ func (kr *KafkaRepository) WriteMessages(typ []byte, body []byte) error {
 	return nil
 }
 
-// TODO: use a function to handle logic
-func (kr *KafkaRepository) ExecuteMessageReceived(ps *gorm.DB) {
+// TODO: try to send email again, if possible
+func (kr *KafkaRepository) ExecuteMessageReceived(ur *postgres.UserRepository) {
 	for {
 		msg, errR := kr.kr.ReadMessage(context.Background())
 		if errR != nil {
@@ -44,11 +43,9 @@ func (kr *KafkaRepository) ExecuteMessageReceived(ps *gorm.DB) {
 
 		switch string(msg.Key) {
 		case "welcomeEmailSended":
-			var us user.User
-			us.WelcomeEmailSended = true
-			usEmail := string(msg.Value)
-			ps.Where("email = ?", usEmail).Updates(&us)
-			log.Println("user welcome email received: ", usEmail)
+			mail := string(msg.Value)
+			ur.WelcomeEmailReceived(mail)
+			log.Println("user welcome email received: ", mail)
 		default:
 			log.Println("default kafka message")
 		}

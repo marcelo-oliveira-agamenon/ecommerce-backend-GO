@@ -10,6 +10,7 @@ import (
 
 var (
 	ErrorUsersFilterNotFound = errors.New("no user found with this filter")
+	ErrorUpdatingUserEmail   = errors.New("updating user email status")
 )
 
 type UserRepository struct {
@@ -112,4 +113,17 @@ func (ur *UserRepository) FindUsersByFilters(ctx context.Context, params QueryPa
 	}
 
 	return &usr, nil
+}
+
+func (ur *UserRepository) WelcomeEmailReceived(message string) error {
+	var us user.User
+	us.WelcomeEmailSended = true
+	usEmail := message
+
+	err := ur.db.Where("email = ?", usEmail).Updates(&us)
+	if err.Error != nil {
+		return ErrorUpdatingUserEmail
+	}
+
+	return nil
 }

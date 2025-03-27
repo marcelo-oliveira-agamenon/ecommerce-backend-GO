@@ -1,20 +1,21 @@
 package users
 
 import (
+	"encoding/json"
 	"errors"
+	"log"
 
 	"github.com/ecommerce/core/services/users"
+	"github.com/ecommerce/ports"
 	"github.com/gofiber/fiber/v2"
 )
 
 var (
-	EmailSuccessMessage = "Email sended"
-	EmailFileName       = "template/resetPassword.html"
-	EmailSubject        = "Redefinição de Senha - Código de Verificação"
+	EmailSuccessMessage = "Please, check your inbox"
 	ErrorMissingEmail   = errors.New("missing email parameter")
 )
 
-func SendEmailResetPassword(userAPI users.API) fiber.Handler {
+func SendEmailResetPassword(userAPI users.API, kafka ports.KafkaService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		userEmail := ctx.Query("email")
 		if len(userEmail) == 0 {
@@ -23,20 +24,22 @@ func SendEmailResetPassword(userAPI users.API) fiber.Handler {
 			})
 		}
 
-		// TODO: create kakfa topic to this
-		// template, err := userAPI.SendEmailResetPassword(ctx.Context(), userEmail)
-		// if err != nil {
-		// 	return ctx.Status(500).JSON(&fiber.Map{
-		// 		"error": err.Error(),
-		// 	})
-		// }
+		template, err := userAPI.SendEmailResetPassword(ctx.Context(), userEmail)
+		if err != nil {
+			return ctx.Status(500).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
 
-		// _, errMail := email.SendEmail(userEmail, EmailFileName, template, EmailSubject)
-		// if errMail != nil {
-		// 	return ctx.Status(500).JSON(&fiber.Map{
-		// 		"error": ErrorMissingEmail,
-		// 	})
-		// }
+		body, errM := json.Marshal(template)
+		if errM == nil {
+			errK := kafka.WriteMessages("resetPassword", body)
+			if errK != nil {
+				log.Println("kafka message", errK)
+			}
+		} else {
+			log.Println("marshall message", errM)
+		}
 
 		return ctx.Status(200).JSON(EmailSuccessMessage)
 	}

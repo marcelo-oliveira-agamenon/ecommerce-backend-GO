@@ -1,7 +1,9 @@
 package orders
 
 import (
+	"encoding/json"
 	"errors"
+	"log"
 
 	"github.com/ecommerce/core/domain/orderDetails"
 	orders "github.com/ecommerce/core/services/order"
@@ -15,11 +17,19 @@ var (
 	ErrorInvalidOrderData = errors.New("invalid order data")
 )
 
-func CreateOrder(orderAPI orders.API, userAPI users.API, orderDetailsAPI ordersdetails.API) fiber.Handler {
+type MapOrderEmail struct {
+	Quantity    int
+	Value       float64
+	UserName    string
+	OrderNumber string
+	Email       string
+}
+
+func CreateOrder(orderAPI orders.API, userAPI users.API, orderDetailsAPI ordersdetails.API, kafka ports.KafkaService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		dec := ctx.Locals("user").(*ports.Claims)
 
-		_, errU := userAPI.GetUserById(ctx.Context(), dec.UserId)
+		user, errU := userAPI.GetUserById(ctx.Context(), dec.UserId)
 		if errU != nil {
 			return ctx.Status(422).JSON(&fiber.Map{
 				"error": errU.Error(),
@@ -60,7 +70,22 @@ func CreateOrder(orderAPI orders.API, userAPI users.API, orderDetailsAPI ordersd
 			})
 		}
 
-		//TODO: send email about order
+		resp := MapOrderEmail{
+			Quantity:    newO.TotalQtd,
+			Value:       newO.TotalValue,
+			UserName:    user.Name,
+			OrderNumber: newO.ID,
+			Email:       user.Email,
+		}
+		body, errM := json.Marshal(resp)
+		if errM == nil {
+			errK := kafka.WriteMessages("newOrder", body)
+			if errK != nil {
+				log.Println("kafka message", errK)
+			}
+		} else {
+			log.Println("marshall message", errM)
+		}
 
 		return ctx.Status(201).JSON(newO)
 	}

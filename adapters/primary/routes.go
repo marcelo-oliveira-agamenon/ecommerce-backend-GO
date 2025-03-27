@@ -25,7 +25,7 @@ func initRoutes(a *App) {
 		v1.Post("/signUp", users.SignUp(a.usersAPI, a.tokenAPI, a.storageAPI, a.kafkaAPI))
 		v1.Post("/loginFacebook", users.LoginFacebook(a.usersAPI, a.tokenAPI, a.redisAPI))
 		v1.Patch("/resetPassword", users.ResetPassword(a.usersAPI))
-		v1.Post("/resetPasswordLink", users.SendEmailResetPassword(a.usersAPI))
+		v1.Post("/resetPasswordLink", users.SendEmailResetPassword(a.usersAPI, a.kafkaAPI))
 
 		authUser := v1.Use(middleware.VerifyToken(a.tokenAPI))
 		{
@@ -77,7 +77,7 @@ func initRoutes(a *App) {
 			order := authUser.Group("/order")
 			{
 				order.Get("/", orders.GetByUserId(a.orderAPI, a.usersAPI))
-				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.orderDetailsAPI))
+				order.Post("/", orders.CreateOrder(a.orderAPI, a.usersAPI, a.orderDetailsAPI, a.kafkaAPI))
 				order.Patch("/payment/:id", orders.EditPayment(a.orderAPI))
 				order.Patch("/rate/:id", orders.EditRate(a.orderAPI))
 				order.Patch("/status/:id", orders.EditStatus(a.orderAPI))

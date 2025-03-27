@@ -75,6 +75,7 @@ func NewApp(
 	}
 	newFiber.fiber.Use(cors.New())
 	initRoutes(newFiber)
+
 	return newFiber
 }
 

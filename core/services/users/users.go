@@ -54,9 +54,9 @@ type ResetPassword struct {
 }
 
 type EmailTemplateResetPassword struct {
-	Hash string
-	Name string
-	Year string
+	Hash  string
+	Name  string
+	Email string
 }
 
 type API interface {
