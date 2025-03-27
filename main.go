@@ -54,7 +54,6 @@ func main() {
 	tokenService := jwt.NewToken(jtwKey)
 	redisService := redis.NewRedisSessionRepository(redisRepository)
 	kafkaService := kafka_ins.NewKafkaSessionRepository(kafkaRepWriter, kafkaRepReader)
-	go kafkaService.ExecuteMessageReceived(postgresRepository)
 
 	userRepository := postgres.NewUserRepository(postgresRepository)
 	userService := users.NewUserService(userRepository)
@@ -78,6 +77,7 @@ func main() {
 	logService := logs.NewLogService(logRepository)
 	miscRepository := postgres.NewMiscRepository(postgresRepository)
 	miscService := misc.NewMiscService(miscRepository)
+	go kafkaService.ExecuteMessageReceived(userRepository)
 
 	srv := primary.NewApp(
 		tokenService, storageService, userService, productService, categoryService,

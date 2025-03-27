@@ -28,7 +28,6 @@ func NewCronTasks(ps *gorm.DB) {
 	go cr.Start()
 }
 
-// TODO: improve this with a field to check order is reviewed
 func VerifyRateOrderAndModifyProduct(ps *gorm.DB) {
 	var or []order.Order
 	res := ps.Preload("OrderDetails").Where("status = 'ENTREGUE' AND is_order_rated = false").Find(&or)

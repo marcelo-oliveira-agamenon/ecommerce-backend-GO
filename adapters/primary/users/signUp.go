@@ -69,7 +69,7 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 
 		body, errM := json.Marshal(usrRes)
 		if errM == nil {
-			errK := kafka.WriteMessages([]byte("signup"), body)
+			errK := kafka.WriteMessages("signup", body)
 			if errK != nil {
 				log.Println("kafka message", errK)
 			}
