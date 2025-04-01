@@ -11,11 +11,15 @@ import (
 )
 
 var (
-	ErrorUserIdFormat       = errors.New("incorrect user id format")
 	ErrorRegisterUserAccess = errors.New("registering user access")
-	ErrorGettingKey         = errors.New("validating user session")
+	ErrorGettingKey         = errors.New("getting key info")
+	ErrorParsingInfo        = errors.New("incorrect info format")
+	ErrorValidatingUser     = errors.New("validating user session")
 	ErrorTokenExpiredAt     = errors.New("token expired at: ")
 	ErrorDeletingKey        = errors.New("delete key with user id")
+	ErrorRegisterHash       = errors.New("save hash access")
+	UserSessionKey          = "user-session-"
+	ResetPasswordKey        = "reset-hash-"
 )
 
 type RedisRepository struct {
@@ -26,6 +30,34 @@ func NewRedisSessionRepository(dbConn *redis.Client) *RedisRepository {
 	return &RedisRepository{
 		db: dbConn,
 	}
+}
+
+func (re *RedisRepository) SaveInfoIntoRedis(context context.Context, key string, data any) error {
+	maData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	errM := re.db.Set(context, key, maData, 0).Err()
+	if errM != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (re *RedisRepository) RetriveInfoFromRedis(context context.Context, key string, v any) error {
+	data, errG := re.db.Get(context, key).Result()
+	if errG != nil {
+		return ErrorGettingKey
+	}
+
+	errU := json.Unmarshal([]byte(data), v)
+	if errU != nil {
+		return ErrorParsingInfo
+	}
+
+	return nil
 }
 
 func (re *RedisRepository) StoreUserSession(context context.Context,
@@ -40,12 +72,8 @@ func (re *RedisRepository) StoreUserSession(context context.Context,
 		UserIp:    ip,
 	}
 
-	maSes, err := json.Marshal(ses)
-	if err != nil {
-		return ErrorUserIdFormat
-	}
-
-	errM := re.db.Set(context, userId, maSes, 0).Err()
+	key := UserSessionKey + userId
+	errM := re.SaveInfoIntoRedis(context, key, ses)
 	if errM != nil {
 		return ErrorRegisterUserAccess
 	}
@@ -54,20 +82,16 @@ func (re *RedisRepository) StoreUserSession(context context.Context,
 }
 
 func (re *RedisRepository) ValidateSession(context context.Context, userId string) error {
-	data, errG := re.db.Get(context, userId).Result()
-	if errG != nil {
-		return ErrorGettingKey
-	}
-
+	key := UserSessionKey + userId
 	var unMar redisSession
-	errU := json.Unmarshal([]byte(data), &unMar)
-	if errU != nil {
-		return ErrorGettingKey
+	errG := re.RetriveInfoFromRedis(context, key, unMar)
+	if errG != nil {
+		return errG
 	}
 
 	expAt, errT := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", unMar.ExpiresAt)
 	if errT != nil {
-		return ErrorGettingKey
+		return ErrorValidatingUser
 	}
 	if time.Now().Round(0).After(expAt) {
 		dt := strings.Split(unMar.ExpiresAt, " ")
@@ -78,9 +102,45 @@ func (re *RedisRepository) ValidateSession(context context.Context, userId strin
 }
 
 func (re *RedisRepository) ClearUserSession(context context.Context, userId string) error {
-	_, errD := re.db.Del(context, userId).Result()
+	key := UserSessionKey + userId
+	_, errD := re.db.Del(context, key).Result()
 	if errD != nil {
 		return ErrorDeletingKey
+	}
+
+	return nil
+}
+
+func (re *RedisRepository) SaveResetPasswordInfo(context context.Context, hash string, expiresAt time.Time) error {
+	rest := redisResetPass{
+		Hash:      hash,
+		ExpiresAt: expiresAt.Round(0).String(),
+	}
+
+	key := ResetPasswordKey + hash
+	errM := re.SaveInfoIntoRedis(context, key, rest)
+	if errM != nil {
+		return ErrorRegisterHash
+	}
+
+	return nil
+}
+
+func (re *RedisRepository) ValidateResetPasswordInfo(context context.Context, hash string) error {
+	key := ResetPasswordKey + hash
+	var unMar redisResetPass
+	errG := re.RetriveInfoFromRedis(context, key, unMar)
+	if errG != nil {
+		return errG
+	}
+
+	expAt, errT := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", unMar.ExpiresAt)
+	if errT != nil {
+		return ErrorValidatingUser
+	}
+	if time.Now().Round(0).After(expAt) {
+		dt := strings.Split(unMar.ExpiresAt, " ")
+		return errors.New(ErrorTokenExpiredAt.Error() + dt[0] + " " + dt[1])
 	}
 
 	return nil

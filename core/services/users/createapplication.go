@@ -197,9 +197,10 @@ func (u *UserService) SendEmailResetPassword(context context.Context, email stri
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	hash := strconv.Itoa(rand.Intn(999999-100000+1) + 100000)
 	body := EmailTemplateResetPassword{
-		Hash:  hash,
-		Name:  us.Name,
-		Email: email,
+		Hash:      hash,
+		Name:      us.Name,
+		Email:     email,
+		ExpiredAt: time.Now().Add(time.Hour * 24),
 	}
 
 	return &body, nil

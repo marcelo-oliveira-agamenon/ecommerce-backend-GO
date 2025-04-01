@@ -15,6 +15,11 @@ type redisSession struct {
 	Device    string
 }
 
+type redisResetPass struct {
+	Hash      string
+	ExpiresAt string
+}
+
 func initRedisDatabase() (*redis.Client, error) {
 	reAddr := os.Getenv("REDIS_ADDR")
 	rePass := os.Getenv("REDIS_PASSWORD")

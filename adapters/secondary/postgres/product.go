@@ -81,7 +81,7 @@ func (pr *ProductRepository) GetAllProducts(ctx context.Context, params QueryPar
 
 func (pr *ProductRepository) GetProductById(ctx context.Context, id string) (*product.Product, error) {
 	var prod product.Product
-	result := pr.db.Where("products.id", id).First(&prod)
+	result := pr.db.Joins("Category").Where("products.id", id).First(&prod)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -146,7 +146,7 @@ func (pr *ProductRepository) CheckProductListById(ctx context.Context, prs pq.St
 func (pr *ProductRepository) GetProductsByCategory(context context.Context, categoryId string, params QueryParams) (*[]product.Product, error) {
 	var list []product.Product
 
-	res := pr.db.Where("products.categoryid = ?", categoryId).Limit(params.Limit).Offset(params.Offset).Find(&list)
+	res := pr.db.Where("products.categoryid = ?", categoryId).Joins("Category").Limit(params.Limit).Offset(params.Offset).Find(&list)
 	if res.Error != nil {
 		return nil, res.Error
 	}
