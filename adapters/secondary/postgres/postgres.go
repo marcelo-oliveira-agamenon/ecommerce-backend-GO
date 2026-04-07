@@ -65,16 +65,36 @@ func initDatabase() (*gorm.DB, error) {
 	sqlDb.SetMaxOpenConns(100)
 	sqlDb.SetConnMaxLifetime(time.Second * 30)
 
-	db.AutoMigrate(&user.User{})
-	db.AutoMigrate(&product.Product{})
-	db.AutoMigrate(&category.Category{})
-	db.AutoMigrate(&productImage.ProductImage{})
-	db.AutoMigrate(&favorite.Favorite{})
-	db.AutoMigrate(&coupon.Coupon{})
-	db.AutoMigrate(&order.Order{})
-	db.AutoMigrate(&orderDetails.OrderDetails{})
-	db.AutoMigrate(&payment.Payment{})
-	db.AutoMigrate(&logs.Log{})
+	if err := db.AutoMigrate(&user.User{}); err != nil {
+		log.Printf("Migration failed for User migration: %v", err)
+	}
+	if err := db.AutoMigrate(&product.Product{}); err != nil {
+		log.Printf("Migration failed for Product migration: %v", err)
+	}
+	if err := db.AutoMigrate(&category.Category{}); err != nil {
+		log.Printf("Migration failed for Category migration: %v", err)
+	}
+	if err := db.AutoMigrate(&productImage.ProductImage{}); err != nil {
+		log.Printf("Migration failed for ProductImage migration: %v", err)
+	}
+	if err := db.AutoMigrate(&favorite.Favorite{}); err != nil {
+		log.Printf("Migration failed for Favorite migration: %v", err)
+	}
+	if err := db.AutoMigrate(&coupon.Coupon{}); err != nil {
+		log.Printf("Migration failed for Coupon migration: %v", err)
+	}
+	if err := db.AutoMigrate(&order.Order{}); err != nil {
+		log.Printf("Migration failed for Order migration: %v", err)
+	}
+	if err := db.AutoMigrate(&orderDetails.OrderDetails{}); err != nil {
+		log.Printf("Migration failed for OrderDetails migration: %v", err)
+	}
+	if err := db.AutoMigrate(&payment.Payment{}); err != nil {
+		log.Printf("Migration failed for Payment migration: %v", err)
+	}
+	if err := db.AutoMigrate(&logs.Log{}); err != nil {
+		log.Printf("Migration failed for Log migration: %v", err)
+	}
 
 	// Populate database with products, categories
 	errSe := seeds.SeedInitialData(db)

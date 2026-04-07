@@ -19,7 +19,12 @@ func ToggleRoles(userAPI users.API, logAPI logs.API) fiber.Handler {
 		}
 
 		msg := "Role of user with ID: " + userId + " was changed"
-		logAPI.AddLog(ctx.Context(), "user", msg, uuid.FromStringOrNil(userId))
+		errA := logAPI.AddLog(ctx.Context(), "user", msg, uuid.FromStringOrNil(userId))
+		if errA != nil {
+			return ctx.Status(500).JSON(&fiber.Map{
+				"error": errA.Error(),
+			})
+		}
 
 		return ctx.Status(200).JSON(user)
 	}

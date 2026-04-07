@@ -22,9 +22,13 @@ func NewCronTasks(ps *gorm.DB) {
 		return
 	}
 	cr := cron.New(cron.WithLocation(br))
-	cr.AddFunc("0 0 1 * * *", func() {
+	_, err = cr.AddFunc("0 0 1 * * *", func() {
 		VerifyRateOrderAndModifyProduct(ps)
 	})
+	if err != nil {
+		log.Printf("Error adding cron function: %v", err)
+		return
+	}
 	go cr.Start()
 }
 

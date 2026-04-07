@@ -40,7 +40,7 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 		if ava, _ := ctx.FormFile("avatar"); ava != nil {
 			file, err := ava.Open()
 			if err != nil {
-				userAPI.DeleteUser(ctx.Context(), usrRes.ID.String())
+				_, _ = userAPI.DeleteUser(ctx.Context(), usrRes.ID.String())
 				return ctx.Status(500).JSON(&fiber.Map{
 					"error": err.Error(),
 				})
@@ -48,16 +48,21 @@ func SignUp(userAPI users.API, token ports.TokenService, storage ports.StorageSe
 			}
 			resp, errSto := storage.SaveFileAWS(file, ava.Filename, ava.Size, "user")
 			if errSto != nil {
-				userAPI.DeleteUser(ctx.Context(), usrRes.ID.String())
+				_, _ = userAPI.DeleteUser(ctx.Context(), usrRes.ID.String())
 				return ctx.Status(500).JSON(&fiber.Map{
 					"error": errSto.Error(),
 				})
 
 			}
-			userAPI.UpdateUser(ctx.Context(), usrRes.ID.String(), user.User{
+			isUp, errUp := userAPI.UpdateUser(ctx.Context(), usrRes.ID.String(), user.User{
 				ImageKey: resp.ImageKey,
 				ImageURL: resp.ImageURL,
 			})
+			if errUp != nil || !isUp {
+				return ctx.Status(500).JSON(&fiber.Map{
+					"error": errUp.Error(),
+				})
+			}
 		}
 
 		token, _, errToken := token.CreateToken(usrRes.ID.String())

@@ -1,34 +1,25 @@
-version: '3'
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    networks:
-      - net
-    env_file:
-      - .env
-    ports:
-      - ${ZOOKEEPER_PORT}:${ZOOKEEPER_CLIENT_PORT}
-    environment:
-      - ZOOKEEPER_CLIENT_PORT=${ZOOKEEPER_CLIENT_PORT}
-
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: apache/kafka:latest
     networks:
       - net
-    depends_on:
-      - zookeeper
     env_file:
       - .env
     ports:
       - ${KAFKA_PORT_FORWARD}:${KAFKA_PORT_FORWARD}
     environment:
+      KAFKA_NODE_ID: 1
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093,PLAINTEXT_HOST://0.0.0.0:29092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      CLUSTER_ID: 'Mk3OEYBSD34fcwNTJENDM2Qk'
 
   nginx:
     restart: always
@@ -71,7 +62,7 @@ services:
       - POSTGRES_USER=${DB_CONNECTION_USER}
       - POSTGRES_DB=${DB_CONNECTION_DBNAME}
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready']
+      test: [ 'CMD-SHELL', 'pg_isready' ]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"mime/multipart"
+	"time"
 
 	"github.com/ecommerce/core/domain/user"
 	"github.com/ecommerce/ports"
@@ -51,12 +52,14 @@ type ResetPassword struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Reset    string `json:"reset"`
+	Hash     string `json:"hash"`
 }
 
 type EmailTemplateResetPassword struct {
-	Hash  string
-	Name  string
-	Email string
+	Hash      string
+	Name      string
+	Email     string
+	ExpiredAt time.Time
 }
 
 type API interface {

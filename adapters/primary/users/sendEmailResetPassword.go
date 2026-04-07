@@ -15,7 +15,7 @@ var (
 	ErrorMissingEmail   = errors.New("missing email parameter")
 )
 
-func SendEmailResetPassword(userAPI users.API, kafka ports.KafkaService) fiber.Handler {
+func SendEmailResetPassword(userAPI users.API, kafka ports.KafkaService, redis ports.RedisService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		userEmail := ctx.Query("email")
 		if len(userEmail) == 0 {
@@ -28,6 +28,13 @@ func SendEmailResetPassword(userAPI users.API, kafka ports.KafkaService) fiber.H
 		if err != nil {
 			return ctx.Status(500).JSON(&fiber.Map{
 				"error": err.Error(),
+			})
+		}
+
+		errR := redis.SaveResetPasswordInfo(ctx.Context(), template.Hash, template.ExpiredAt)
+		if errR != nil {
+			return ctx.Status(500).JSON(&fiber.Map{
+				"error": errR.Error(),
 			})
 		}
 
