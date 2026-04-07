@@ -28,7 +28,11 @@ import (
 )
 
 func main() {
-	godotenv.Load(".env")
+	errEnv := godotenv.Load(".env")
+	if errEnv != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	postgresRepository, errP := postgres.NewPostgresRepository()
 	if errP != nil {
 		log.Fatal(errP)
@@ -84,5 +88,8 @@ func main() {
 		productImageService, favoriteService, couponService, orderService,
 		orderDetailsService, paymentService, logService, miscService,
 		redisService, kafkaService, port)
-	primary.Run(srv)
+	errRun := primary.Run(srv)
+	if errRun != nil {
+		log.Fatal(errRun)
+	}
 }

@@ -3,6 +3,7 @@ package storage
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -35,7 +36,11 @@ func NewAWS(config aws.Config) ports.StorageService {
 
 func (ss *AWSStorage) SaveFileAWS(file multipart.File, fileHeader string, fileSize int64, typeModel string) (*ports.SaveFileResponse, error) {
 	buffer := make([]byte, fileSize)
-	file.Read(buffer)
+	_, errRead := file.Read(buffer)
+	if errRead != nil {
+		fmt.Println(errRead)
+		return nil, errors.New("error reading file")
+	}
 	fileName := typeModel + "/" + bson.NewObjectId().Hex() + filepath.Ext(fileHeader)
 	imageURL := "https://" + ss.bucket + "." + "s3" + ".amazonaws.com/" + fileName
 	//todo: is better put or insert object?

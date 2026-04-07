@@ -13,7 +13,11 @@ var (
 func ResetPassword(userAPI users.API, redis ports.RedisService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		rePas := new(users.ResetPassword)
-		ctx.BodyParser(rePas)
+		if errC := ctx.BodyParser(rePas); errC != nil {
+			return ctx.Status(400).JSON(&fiber.Map{
+				"error": errC.Error(),
+			})
+		}
 
 		errR := redis.ValidateResetPasswordInfo(ctx.Context(), rePas.Hash)
 		if errR != nil {

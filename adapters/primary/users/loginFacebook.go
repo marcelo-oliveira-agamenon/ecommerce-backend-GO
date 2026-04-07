@@ -9,7 +9,11 @@ import (
 func LoginFacebook(userAPI users.API, token ports.TokenService, redis ports.RedisService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		lgReq := new(users.LoginFacebook)
-		ctx.BodyParser(lgReq)
+		if errC := ctx.BodyParser(lgReq); errC != nil {
+			return ctx.Status(400).JSON(&fiber.Map{
+				"error": errC.Error(),
+			})
+		}
 
 		user, errU := userAPI.LoginFacebook(ctx.Context(), *lgReq)
 		if errU != nil {

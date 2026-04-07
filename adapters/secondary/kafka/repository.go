@@ -44,8 +44,12 @@ func (kr *KafkaRepository) ExecuteMessageReceived(ur *postgres.UserRepository) {
 		switch string(msg.Key) {
 		case "welcomeEmailSended":
 			mail := string(msg.Value)
-			ur.WelcomeEmailReceived(mail)
-			log.Println("user welcome email received: ", mail)
+			err := ur.WelcomeEmailReceived(mail)
+			if err != nil {
+				log.Println("Error occurred while processing welcome email: ", err)
+			} else {
+				log.Println("user welcome email received: ", mail)
+			}
 		default:
 			log.Println("default kafka message")
 		}
